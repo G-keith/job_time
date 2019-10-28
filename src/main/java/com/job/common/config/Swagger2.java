@@ -17,8 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author
- * @version
+ * @author keith
+ * @version 1.0
+ * @date 2019-10-28
  */
 @Configuration
 @EnableSwagger2
@@ -29,19 +30,11 @@ public class Swagger2 {
      */
     @Bean
     public Docket createRestApi() {
-        ParameterBuilder ticketPar = new ParameterBuilder();
-        List<Parameter> pars = new ArrayList<Parameter>();
-        ticketPar.name("token").description("添加token参数")
-                .modelRef(new ModelRef("string")).parameterType("header")
-                .required(false).build(); //header中的ticket参数非必填，传空也可以
-        pars.add(ticketPar.build());    //根据每个方法名也知道当前方法在设置什么参数
 
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.job.controller"))
-                .build()
-                .globalOperationParameters(pars)
-                .apiInfo(apiInfo());
+                .build();
     }
     /**
      * 构建 api文档的详细信息函数,注意这里的注解引用的是哪个
@@ -50,7 +43,7 @@ public class Swagger2 {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 //页面标题
-                .title("CIS - 注塑行业 API")
+                .title("兼职APP")
                 //创建人
                 .contact(new Contact("CIS", "http://www.cisinfo.cn", "mail@cisinfo.cn"))
                 //版本号
