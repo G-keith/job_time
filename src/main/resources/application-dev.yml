@@ -20,10 +20,19 @@ mybatis:
 #日志打印SQL
 logging:
   level:
-     com.emes: debug  #日志级别
+     com.job: debug  #日志级别
   config: classpath:logback.xml  #加载指定日志文件
 system:
   domainName: http://127.0.0.1 #域名
   picPath: /opt/tomcat/webapps/mes  #上传图片路径
 swagger:
   enable: true #是否开启swagger
+fileSavePath: C:/photo/
+
+resourcePath: /resource
+
+
+appId: 1400111151
+appKey: e1984a557f3ed83fb554ed1f76fe92cb
+templateId: 153000
+smsSign: "小蜜蜂一站式平台"

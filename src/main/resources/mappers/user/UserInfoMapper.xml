@@ -125,4 +125,41 @@
       head = #{head,jdbcType=VARCHAR}
     where userId = #{userId,jdbcType=INTEGER}
   </update>
+
+  <select id="findByPassword" resultType="java.lang.Integer">
+    select count(1) from user_info
+    where loginName=#{loginName} and password=#{password} and isAdmin=#{isAdmin}
+  </select>
+
+  <select id="findByPhone" resultType="java.lang.Integer">
+    select count(1) from user_info
+    where phone=#{phone}
+  </select>
+
+  <select id="findByNickName" resultType="java.lang.Integer">
+    select count(1) from user_info
+    where nickName=#{nickName}
+  </select>
+
+  <update id="updateByPhone">
+    update user_info
+    password = #{password,jdbcType=VARCHAR}
+    where phone=#{phone}
+  </update>
+
+  <insert id="insertCode">
+    insert into code (phone,code,sendTime)
+    values (#{phone},#{code},now())
+  </insert>
+
+  <select id="findCodeByPhone" resultType="java.lang.String">
+    select  code,sendTime
+    from code where phone=#{phone} and isUse=0 ORDER BY sendTime desc LIMIT 1
+  </select>
+
+  <update id="updateCode">
+    update date code
+    set isUse=1
+    where phone=#{phone}
+  </update>
 </mapper>

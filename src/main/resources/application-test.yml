@@ -27,3 +27,7 @@ system:
   picPath: /opt/tomcat/webapps/mes  #上传图片路径
 swagger:
   enable: true #是否开启swagger
+
+fileSavePath: C:\photo
+
+resourcePath: /resource
