@@ -27,6 +27,7 @@ public class UserInfoController {
             @ApiImplicitParam(name = "password",value = "明文密码",dataType = "string",required = true)
     })
     public String password(String password){
+        System.out.println("1111111111");
         return MD5Util.md5EncodeUtf8(password);
     }
 }
