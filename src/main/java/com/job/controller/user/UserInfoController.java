@@ -24,7 +24,7 @@ public class UserInfoController {
     @GetMapping(value = "password")
     @ApiOperation(value = "生成密码（测试用）")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "password",value = "明文密码",dataType = "string",required = true)
+            @ApiImplicitParam(name = "password",value = "明文密码111",dataType = "string",required = true)
     })
     public String password(String password){
         return MD5Util.md5EncodeUtf8(password);
