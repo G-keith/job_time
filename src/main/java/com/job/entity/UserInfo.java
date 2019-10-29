@@ -1,7 +1,9 @@
-package com.job.entity.user;
+package com.job.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 /**
  * 用户信息实体
@@ -35,4 +37,7 @@ public class UserInfo {
 
     @ApiModelProperty(value = "头像")
     private String head;
+
+    @ApiModelProperty(value = "余额")
+    private BigDecimal balance;
 }

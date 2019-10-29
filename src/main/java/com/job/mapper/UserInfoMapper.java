@@ -1,6 +1,6 @@
-package com.job.mapper.user;
+package com.job.mapper;
 
-import com.job.entity.user.UserInfo;
+import com.job.entity.UserInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
