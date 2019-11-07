@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.HomePageMapper">
+
+    <select id="findAll" resultType="com.job.entity.HomePage">
+    select * from cover_map;
+  </select>
+
+    <select id="findRecommend" resultType="com.job.entity.vo.JobVo">
+        select j.jobId,j.jobTitle,j.releasePrice,j.jobNum,j.jobSource,(j.jobNum-j.signUpNum) as surplusNum,t.typeName,i.userId,i.headimgurl
+        from job j
+        inner join job_job_type jt on j.jobId=jt.jobId
+        inner join job_type t on jt.typeId=t.typeId
+        inner join user_info i on j.userId=i.userId
+        where j.auditStatus=3 and j.jobStatus=1
+        order by j.isRecommend desc
+    </select>
+
+    <select id="isSignIn" resultType="java.lang.Integer">
+        select count(1) from sign_in where userId=#{userId} and  activityTime=curdate()
+    </select>
+
+    <insert id="insertSignIn">
+        insert into sign_in (userId,activityTime) values (#{userId},curdate())
+    </insert>
+
+    <select id="selectByUserId" resultType="com.job.entity.UserMoney">
+        select * from user_money where userId=#{userId}
+    </select>
+
+    <select id="selectSignInMoney" resultType="map">
+        select money,inviteMoney from sign_in_money
+    </select>
+
+    <insert id="insertUserMoney" parameterType="com.job.entity.UserMoney">
+        insert into sys_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                userId,
+            </if>
+            <if test="bond != null">
+                bond,
+            </if>
+            <if test="balance != null">
+                balance,
+            </if>
+            <if test="repaidBalance != null">
+                repaidBalance,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="bond != null">
+                #{bond,jdbcType=DECIMAL},
+            </if>
+            <if test="balance != null">
+                #{balance,jdbcType=DECIMAL},
+            </if>
+            <if test="repaidBalance != null">
+                #{repaidBalance,jdbcType=DECIMAL},
+            </if>
+        </trim>
+    </insert>
+</mapper>

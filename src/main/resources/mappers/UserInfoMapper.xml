@@ -1,151 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.job.mapper.UserInfoMapper" >
-  <resultMap id="BaseResultMap" type="com.job.entity.UserInfo" >
-    <id column="userId" property="userId" jdbcType="INTEGER" />
-    <result column="loginName" property="loginName" jdbcType="VARCHAR" />
-    <result column="password" property="password" jdbcType="VARCHAR" />
-    <result column="userName" property="userName" jdbcType="VARCHAR" />
-    <result column="nickName" property="nickName" jdbcType="VARCHAR" />
-    <result column="phone" property="phone" jdbcType="VARCHAR" />
-    <result column="isAdmin" property="isAdmin" jdbcType="INTEGER" />
-    <result column="head" property="head" jdbcType="VARCHAR" />
-  </resultMap>
-  <sql id="Base_Column_List" >
-    userId, loginName, password, userName, nickName, phone, isAdmin, head
-  </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
-    <include refid="Base_Column_List" />
-    from user_info
-    where userId = #{userId,jdbcType=INTEGER}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from user_info
-    where userId = #{userId,jdbcType=INTEGER}
-  </delete>
-  <insert id="insert" parameterType="com.job.entity.UserInfo" >
-    insert into user_info (userId, loginName, password, 
-      userName, nickName, phone, 
-      isAdmin, head)
-    values (#{userId,jdbcType=INTEGER}, #{loginName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
-      #{userName,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
-      #{isAdmin,jdbcType=INTEGER}, #{head,jdbcType=VARCHAR})
-  </insert>
-  <insert id="insertSelective" parameterType="com.job.entity.UserInfo" >
-    insert into user_info
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="userId != null" >
-        userId,
-      </if>
-      <if test="loginName != null" >
-        loginName,
-      </if>
-      <if test="password != null" >
-        password,
-      </if>
-      <if test="userName != null" >
-        userName,
-      </if>
-      <if test="nickName != null" >
-        nickName,
-      </if>
-      <if test="phone != null" >
-        phone,
-      </if>
-      <if test="isAdmin != null" >
-        isAdmin,
-      </if>
-      <if test="head != null" >
-        head,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="userId != null" >
-        #{userId,jdbcType=INTEGER},
-      </if>
-      <if test="loginName != null" >
-        #{loginName,jdbcType=VARCHAR},
-      </if>
-      <if test="password != null" >
-        #{password,jdbcType=VARCHAR},
-      </if>
-      <if test="userName != null" >
-        #{userName,jdbcType=VARCHAR},
-      </if>
-      <if test="nickName != null" >
-        #{nickName,jdbcType=VARCHAR},
-      </if>
-      <if test="phone != null" >
-        #{phone,jdbcType=VARCHAR},
-      </if>
-      <if test="isAdmin != null" >
-        #{isAdmin,jdbcType=INTEGER},
-      </if>
-      <if test="head != null" >
-        #{head,jdbcType=VARCHAR},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.job.entity.UserInfo" >
-    update user_info
-    <set >
-      <if test="loginName != null" >
-        loginName = #{loginName,jdbcType=VARCHAR},
-      </if>
-      <if test="password != null" >
-        password = #{password,jdbcType=VARCHAR},
-      </if>
-      <if test="userName != null" >
-        userName = #{userName,jdbcType=VARCHAR},
-      </if>
-      <if test="nickName != null" >
-        nickName = #{nickName,jdbcType=VARCHAR},
-      </if>
-      <if test="phone != null" >
-        phone = #{phone,jdbcType=VARCHAR},
-      </if>
-      <if test="isAdmin != null" >
-        isAdmin = #{isAdmin,jdbcType=INTEGER},
-      </if>
-      <if test="head != null" >
-        head = #{head,jdbcType=VARCHAR},
-      </if>
-    </set>
-    where userId = #{userId,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.job.entity.UserInfo" >
-    update user_info
-    set loginName = #{loginName,jdbcType=VARCHAR},
-      password = #{password,jdbcType=VARCHAR},
-      userName = #{userName,jdbcType=VARCHAR},
-      nickName = #{nickName,jdbcType=VARCHAR},
-      phone = #{phone,jdbcType=VARCHAR},
-      isAdmin = #{isAdmin,jdbcType=INTEGER},
-      head = #{head,jdbcType=VARCHAR}
-    where userId = #{userId,jdbcType=INTEGER}
-  </update>
-
-  <select id="findByPassword" resultType="java.lang.Integer">
-    select count(1) from user_info
-    where loginName=#{loginName} and password=#{password} and isAdmin=#{isAdmin}
-  </select>
-
-  <select id="findByPhone" resultType="java.lang.Integer">
-    select count(1) from user_info
+  <select id="findByPhone" resultType="com.job.entity.UserInfo">
+    select * from user_info
     where phone=#{phone}
   </select>
 
-  <select id="findByNickName" resultType="java.lang.Integer">
-    select count(1) from user_info
-    where nickName=#{nickName}
+  <select id="findByUserId" resultType="com.job.entity.UserInfo">
+    select * from user_info
+    where userId=#{userId}
   </select>
 
-  <update id="updateByPhone">
-    update user_info
-    password = #{password,jdbcType=VARCHAR}
-    where phone=#{phone}
-  </update>
+  <insert id="insertPhone" useGeneratedKeys="true" keyProperty="userId">
+    insert into user_info (phone,UID)
+    values (#{phone},#{UID})
+  </insert>
 
   <insert id="insertCode">
     insert into code (phone,code,sendTime)
@@ -158,8 +27,12 @@
   </select>
 
   <update id="updateCode">
-    update date code
+    update code
     set isUse=1
     where phone=#{phone}
   </update>
+
+  <select id="UidIsExist" resultType="java.lang.Integer">
+    select count(1 ) from user_info where UID=#{UID}
+  </select>
 </mapper>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.JobStepMapper">
+    <resultMap id="BaseResultMap" type="com.job.entity.JobStep">
+        <id column="stepId" property="stepId" jdbcType="INTEGER"/>
+        <result column="stepType" property="stepType" jdbcType="INTEGER"/>
+        <result column="jobId" property="jobId" jdbcType="INTEGER"/>
+        <result column="describe" property="describe" jdbcType="VARCHAR"/>
+        <result column="sort" property="sort" jdbcType="INTEGER"/>
+        <result column="checkPicture" property="checkPicture" jdbcType="INTEGER"/>
+        <result column="picture" property="picture" jdbcType="VARCHAR"/>
+        <result column="Website" property="website" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    stepId, stepType, jobId, describe, sort, checkPicture, picture, website
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from job_step
+        where stepId = #{stepId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from job_step
+    where stepId = #{stepId,jdbcType=INTEGER}
+  </delete>
+    <insert id="insertSelective" parameterType="com.job.entity.JobStep">
+        insert into job_step
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stepId != null">
+                stepId,
+            </if>
+            <if test="stepType != null">
+                stepType,
+            </if>
+            <if test="jobId != null">
+                jobId,
+            </if>
+            <if test="describe != null">
+                describe,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="checkPicture != null">
+                checkPicture,
+            </if>
+            <if test="picture != null">
+                picture,
+            </if>
+            <if test="website != null">
+                website,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="stepId != null">
+                #{stepId,jdbcType=INTEGER},
+            </if>
+            <if test="stepType != null">
+                #{stepType,jdbcType=INTEGER},
+            </if>
+            <if test="jobId != null">
+                #{jobId,jdbcType=INTEGER},
+            </if>
+            <if test="describe != null">
+                #{describe,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="checkPicture != null">
+                #{checkPicture,jdbcType=INTEGER},
+            </if>
+            <if test="picture != null">
+                #{picture,jdbcType=VARCHAR},
+            </if>
+            <if test="website != null">
+                #{website,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.job.entity.JobStep">
+        update job_step
+        <set>
+            <if test="stepType != null">
+                stepType = #{stepType,jdbcType=INTEGER},
+            </if>
+            <if test="jobId != null">
+                jobId = #{jobId,jdbcType=INTEGER},
+            </if>
+            <if test="describe != null">
+                describe = #{describe,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="checkPicture != null">
+                checkPicture = #{checkPicture,jdbcType=INTEGER},
+            </if>
+            <if test="picture != null">
+                picture = #{picture,jdbcType=VARCHAR},
+            </if>
+            <if test="website != null">
+                website = #{website,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where stepId = #{stepId,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertBatch" parameterType="com.job.entity.JobStep">
+        insert into job_step (stepType,jobId,describe,sort,checkPicture,picture,Website)
+        values
+        <foreach collection="jobStepList" item="item" index="index" separator=",">
+            (#{item.stepType},#{item.jobId},#{item.describe},#{item.sort},#{item.checkPicture},#{item.picture},#{item.website})
+        </foreach>
+    </insert>
+</mapper>
