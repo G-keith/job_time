@@ -25,15 +25,4 @@ public class JobController {
         this.jobService = jobService;
     }
 
-    @PostMapping
-    @ApiOperation("插入任务信息")
-    public ServerResponse insertJob(@RequestBody Job job){
-        return jobService.insertJob(job);
-    }
-
-    @GetMapping("/jobType")
-    @ApiOperation(value = "查询任务类型")
-    public ServerResponse findJobType(){
-        return jobService.selectJobType();
-    }
 }
