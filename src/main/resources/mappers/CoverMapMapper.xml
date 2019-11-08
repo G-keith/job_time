@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.CoverMapMapper">
+
+    <select id="findCoverMap" resultType="java.util.Map">
+        select * from cover_map
+    </select>
+    <insert id="insertCoverMap">
+        insert into cover_map (img,details) values
+        (#{img},#{details})
+    </insert>
+    <delete id="deleteCoverMap">
+        delete from cover_map where imgId=#{imgId}
+    </delete>
+    <update id="updateCoverMap">
+        update cover_map set
+        img=#{img},
+        details=#{details}
+        where imgId=#{imgId}
+    </update>
+
+
+</mapper>

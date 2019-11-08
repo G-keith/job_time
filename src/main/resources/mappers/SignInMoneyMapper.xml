@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.SignInMoneyMapper">
+
+    <select id="findAll" resultType="map">
+        select * from sign_in_money
+    </select>
+    
+    <update id="updateSignInMoney">
+        update sign_in_money set
+        money=#{money},
+        inviteMoney=#{inviteMoney}
+    </update>
+</mapper>

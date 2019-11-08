@@ -38,7 +38,6 @@ public class JobTypeService {
         jobTypeMapper.findAll();
         return ServerResponse.createBySuccess(PageVO.build(page));
     }
-
     /**
      * 添加任务类型
      * @param jobType 任务类型

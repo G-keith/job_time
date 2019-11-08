@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.SysRuleMapper">
+
+    <select id="findAll" resultType="com.job.entity.SysRule">
+        select * from sys_rule
+    </select>
+
+    <select id="selectByType" resultType="com.job.entity.SysRule">
+        select * from sys_rule where ruleType=#{ruleType}
+    </select>
+
+    <insert id="insertRule" parameterType="com.job.entity.SysRule">
+        insert into sys_rule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ruleType != null">
+                ruleType,
+            </if>
+            <if test="ruleIntroduce != null">
+                ruleIntroduce,
+            </if>
+            <if test="remarks != null">
+                remarks,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ruleType != null">
+                #{ruleType},
+            </if>
+            <if test="ruleIntroduce != null">
+                #{ruleIntroduce},
+            </if>
+            <if test="remarks != null">
+                #{remarks},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateRule" parameterType="com.job.entity.SysRule">
+        update sys_rule
+        <set>
+            <if test="ruleType != null">
+                ruleType = #{ruleType},
+            </if>
+            <if test="ruleIntroduce != null">
+                ruleIntroduce = #{ruleIntroduce},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks},
+            </if>
+        </set>
+        where ruleId = #{ruleId}
+    </update>
+</mapper>

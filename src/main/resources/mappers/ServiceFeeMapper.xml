@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.ServiceFeeMapper">
+
+    <select id="findAll" resultType="com.job.entity.ServiceFee">
+        select * from service_fee
+    </select>
+
+    <update id="updateServiceFee" parameterType="com.job.entity.ServiceFee">
+        update service_fee
+        <set>
+            <if test="commonRate != null">
+                commonRate = #{commonRate},
+            </if>
+            <if test="memberRate != null">
+                memberRate = #{memberRate},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks},
+            </if>
+        </set>
+        where serviceId = #{serviceId}
+    </update>
+</mapper>
