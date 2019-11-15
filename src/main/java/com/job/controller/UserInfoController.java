@@ -90,17 +90,4 @@ public class UserInfoController {
         return null;
     }
 
-
-    @PostMapping("/test")
-    @ApiOperation(value = "测试")
-    public String test(String code){
-        return "阿瓦达别";
-    }
-
-    @PostMapping("/test2")
-    @ApiOperation(value = "测试2")
-    public void test2(){
-        wxUtils.test();
-    }
-
 }
