@@ -11,12 +11,12 @@ public enum ResponseCode {
     /**
      * 执行失败
      */
-    ERROR(0, "SUCCESS"),
+    ERROR(0, "ERROR"),
 
     /**
      * 执行成功
      */
-    SUCCESS(1, "ERROR");
+    SUCCESS(1, "SUCCESS");
 
     private final int code;
     private final String desc;

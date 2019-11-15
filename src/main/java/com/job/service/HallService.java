@@ -10,6 +10,7 @@ import com.job.entity.UserInfo;
 import com.job.entity.UserJob;
 import com.job.entity.vo.JobCommitVo;
 import com.job.entity.vo.JobDto;
+import com.job.entity.vo.JobListVo;
 import com.job.entity.vo.JobVo;
 import com.job.mapper.HallMapper;
 import com.job.mapper.JobMapper;
@@ -60,8 +61,8 @@ public class HallService {
      * @param pageSize 每页几条
      * @return 任务列表
      */
-    public ServerResponse selectJobList(JobDto jobDto, Integer pageNo, Integer pageSize) {
-        Page<JobVo> page = PageHelper.startPage(pageNo, pageSize);
+    public ServerResponse<PageVO<JobListVo>> selectJobList(JobDto jobDto, Integer pageNo, Integer pageSize) {
+        Page<JobListVo> page = PageHelper.startPage(pageNo, pageSize);
         if (jobDto.getLabel() == 4) {
             hallMapper.findNew(jobDto);
             return ServerResponse.createBySuccess(PageVO.build(page));
@@ -79,13 +80,17 @@ public class HallService {
      * @return 任务详情
      */
     public ServerResponse selectJobDetails(Integer jobId, Integer userId) {
-        JobVo jobVo = hallMapper.selectJobDetails(userId, jobId);
-        System.out.println(jobVo);
-        if (jobVo != null) {
+        JobVo jobVo;
+        if(userId!=null){
+            jobVo = hallMapper.selectJobDetails(userId, jobId);
+        }else{
+            jobVo=hallMapper.selectJob(jobId);
+        }
+        if (userId != null) {
             hallMapper.insertFootprint(userId, jobId);
             return ServerResponse.createBySuccess(jobVo);
         }else{
-            return ServerResponse.createByError();
+            return ServerResponse.createBySuccess(jobVo);
         }
     }
 
@@ -114,6 +119,7 @@ public class HallService {
             userJob.setUserId(userId);
             userJob.setJobId(jobId);
             userJob.setEndTime(DateUtils.getDate_add(new Date(),job.getSubmissionTime(),4));
+            userJob.setEnrollTime(new Date());
             int result = hallMapper.userSignUp(userJob);
             if (result > 0) {
                 //减去任务报名次数

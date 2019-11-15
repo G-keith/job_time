@@ -3,6 +3,7 @@ package com.job.mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,7 +19,7 @@ public interface CoverMapMapper {
      * 查询所有轮播图
      * @return
      */
-    Map<String,Object> findCoverMap();
+    List<Map<String,Object>> findCoverMap();
 
     /**
      * 插入轮播图

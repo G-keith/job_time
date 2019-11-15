@@ -23,7 +23,7 @@ import java.math.BigDecimal;
  */
 @Slf4j
 @RestController
-@Api(tags = "后台轮播图接口")
+@Api(tags = "后台付费设置接口")
 @RequestMapping(value = "/fee")
 public class ServiceFeeController {
 

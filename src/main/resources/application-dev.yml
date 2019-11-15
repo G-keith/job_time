@@ -36,3 +36,8 @@ appId: 1400111151
 appKey: e1984a557f3ed83fb554ed1f76fe92cb
 templateId: 153000
 smsSign: "小蜜蜂一站式平台"
+
+wx:
+  appId: wxc8e1a3732b85cd01
+  appKey: a9eb523e05e230c6443a2526f8ccb511
+  notifyUrl: http

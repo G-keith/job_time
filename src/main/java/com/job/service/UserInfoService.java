@@ -1,15 +1,23 @@
 package com.job.service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
+import com.job.common.page.PageVO;
 import com.job.common.statuscode.ServerResponse;
+import com.job.common.utils.WxUtils;
 import com.job.entity.UserInfo;
 import com.job.mapper.UserInfoMapper;
+import com.job.mapper.UserMoneyMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.Random;
 
 /**
@@ -34,10 +42,25 @@ public class UserInfoService {
     @Value("${smsSign}")
     private String smsSign;
 
+    @Value("${wx.appId}")
+    private String wxAppId;
+
+    @Value("${wx.appKey}")
+    private String wxAppKey;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
     private final UserInfoMapper userInfoMapper;
 
-    public UserInfoService(UserInfoMapper userInfoMapper) {
+    private final UserMoneyMapper userMoneyMapper;
+
+    private final WxUtils wxUtils;
+
+    public UserInfoService(UserInfoMapper userInfoMapper, UserMoneyMapper userMoneyMapper, WxUtils wxUtils) {
         this.userInfoMapper = userInfoMapper;
+        this.userMoneyMapper = userMoneyMapper;
+        this.wxUtils = wxUtils;
     }
 
     /**
@@ -45,22 +68,42 @@ public class UserInfoService {
      * @param phone 账号密码
      * @return 0存在，1不存在
      */
-    public ServerResponse signIn(String phone) {
+    public ServerResponse signIn(String phone,String uid) {
         //查询用户信息
         UserInfo result = userInfoMapper.findByPhone(phone);
         if (result != null) {
-            return ServerResponse.createBySuccess(result);
+            if(result.getStatus()==1){
+                return ServerResponse.createByErrorCodeMessage(2,"用户未黑名单，不可登录");
+            }else{
+                return ServerResponse.createBySuccess(result);
+            }
         } else {
             UserInfo userInfo=new UserInfo();
             userInfo.setPhone(phone);
             userInfo.setUID(getUid());
+            if (uid != null && !"".equals(uid)) {
+                userInfo.setUpUID(uid);
+            }
             userInfoMapper.insertPhone(userInfo);
+            //注册时插入用户账户信息
+            userMoneyMapper.insertMoney(userInfo.getUserId());
             return ServerResponse.createBySuccess(userInfo);
         }
     }
 
-
     /**
+     * @throws
+     * @title weChatLogin
+     * @description 微信授权登录
+     * @author Kuangzc
+     * @updateTime 2019-9-12 16:00:51
+     */
+    public ServerResponse weChatLogin(String code) throws IOException {
+        return wxUtils.authorization(code);
+    }
+
+
+        /**
      * 发送验证码并存放到数据库中去
      *
      * @param phone 手机号
@@ -97,6 +140,48 @@ public class UserInfoService {
         } else {
             return ServerResponse.createByErrorMessage("验证码不正确");
         }
+    }
+
+    /**
+     * 查询所有用户信息
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    public ServerResponse findAll(Integer pageNo,Integer pageSize,String phone,Integer status){
+        Page<UserInfo> page = PageHelper.startPage(pageNo, pageSize);
+        userInfoMapper.findAll(phone,status);
+        return ServerResponse.createBySuccess(PageVO.build(page));
+    }
+
+    /**
+     * 查询所有用户信息
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    public ServerResponse findBlacklist(Integer pageNo,Integer pageSize,String phone){
+        Page<UserInfo> page = PageHelper.startPage(pageNo, pageSize);
+        userInfoMapper.findAll(phone,1);
+        return ServerResponse.createBySuccess(PageVO.build(page));
+    }
+
+    /**
+     * 更新用户信息
+     * @param userInfo 用户信息
+     * @return
+     */
+    public ServerResponse updateUserInfo(UserInfo userInfo){
+        int result=userInfoMapper.updateByPrimaryKeySelective(userInfo);
+        if(result>0){
+            return ServerResponse.createBySuccess();
+        }else{
+            return ServerResponse.createByError();
+        }
+    }
+
+    public ServerResponse openOrRenew(){
+        return null;
     }
 
     /**

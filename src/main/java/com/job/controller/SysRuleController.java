@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@Api(tags = "后台轮播图接口")
+@Api(tags = "后台规则说明接口")
 @RequestMapping(value = "/rule")
 public class SysRuleController {
 

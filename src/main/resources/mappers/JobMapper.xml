@@ -14,8 +14,8 @@
             <if test="userId != null">
                 userId,
             </if>
-            <if test="jobsource != null">
-                jobsource,
+            <if test="jobSource != null">
+                jobSource,
             </if>
             <if test="jobTitle != null">
                 jobTitle,
@@ -29,17 +29,26 @@
             <if test="jobPrice != null">
                 jobPrice,
             </if>
+            <if test="releasePrice != null">
+                releasePrice,
+            </if>
             <if test="jobNum != null">
                 jobNum,
             </if>
             <if test="endTime != null">
                 endTime,
             </if>
+            <if test="submissionTime != null">
+                submissionTime,
+            </if>
+            <if test="signUpNum != null">
+                signUpNum,
+            </if>
+            <if test="commitNum != null">
+                commitNum,
+            </if>
             <if test="finishNum != null">
                 finishNum,
-            </if>
-            <if test="auditTime != null">
-                auditTime,
             </if>
             <if test="jobStatus != null">
                 jobStatus,
@@ -53,6 +62,18 @@
             <if test="isDelete != null">
                 isDelete,
             </if>
+            <if test="label != null">
+                label,
+            </if>
+            <if test="releaseTime != null">
+                releaseTime,
+            </if>
+            <if test="auditTime != null">
+                auditTime,
+            </if>
+            <if test="refuseReason != null">
+                refuseReason,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="jobId != null">
@@ -61,8 +82,8 @@
             <if test="userId != null">
                 #{userId,jdbcType=INTEGER},
             </if>
-            <if test="jobsource != null">
-                #{jobsource,jdbcType=VARCHAR},
+            <if test="jobSource != null">
+                #{jobSource,jdbcType=VARCHAR},
             </if>
             <if test="jobTitle != null">
                 #{jobTitle,jdbcType=VARCHAR},
@@ -76,17 +97,26 @@
             <if test="jobPrice != null">
                 #{jobPrice,jdbcType=DECIMAL},
             </if>
+            <if test="releasePrice != null">
+                #{releasePrice,jdbcType=DECIMAL},
+            </if>
             <if test="jobNum != null">
                 #{jobNum,jdbcType=INTEGER},
             </if>
             <if test="endTime != null">
                 #{endTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="submissionTime != null">
+                #{submissionTime,jdbcType=INTEGER},
+            </if>
+            <if test="signUpNum != null">
+                #{signUpNum,jdbcType=INTEGER},
+            </if>
+            <if test="commitNum != null">
+                #{commitNum,jdbcType=INTEGER},
+            </if>
             <if test="finishNum != null">
                 #{finishNum,jdbcType=INTEGER},
-            </if>
-            <if test="auditTime != null">
-                #{auditTime,jdbcType=INTEGER},
             </if>
             <if test="jobStatus != null">
                 #{jobStatus,jdbcType=INTEGER},
@@ -100,52 +130,88 @@
             <if test="isDelete != null">
                 #{isDelete,jdbcType=INTEGER},
             </if>
+            <if test="label != null">
+                #{label,jdbcType=INTEGER},
+            </if>
+            <if test="releaseTime != null">
+                #{releaseTime},
+            </if>
+            <if test="auditTime != null">
+                #{auditTime},
+            </if>
+            <if test="refuseReason != null">
+                #{refuseReason},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.job.entity.Job">
         update job
-        <set>
-            <if test="userId != null">
+        <set >
+            <if test="userId != null" >
                 userId = #{userId,jdbcType=INTEGER},
             </if>
-            <if test="jobsource != null">
-                jobsource = #{jobsource,jdbcType=VARCHAR},
+            <if test="typeId != null" >
+                typeId = #{typeId,jdbcType=INTEGER},
             </if>
-            <if test="jobTitle != null">
+            <if test="jobSource != null" >
+                jobSource = #{jobSource,jdbcType=VARCHAR},
+            </if>
+            <if test="jobTitle != null" >
                 jobTitle = #{jobTitle,jdbcType=VARCHAR},
             </if>
-            <if test="introduce != null">
+            <if test="introduce != null" >
                 introduce = #{introduce,jdbcType=VARCHAR},
             </if>
-            <if test="jobRate != null">
+            <if test="jobRate != null" >
                 jobRate = #{jobRate,jdbcType=INTEGER},
             </if>
-            <if test="jobPrice != null">
+            <if test="jobPrice != null" >
                 jobPrice = #{jobPrice,jdbcType=DECIMAL},
             </if>
-            <if test="jobNum != null">
+            <if test="releasePrice != null" >
+                releasePrice = #{releasePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="jobNum != null" >
                 jobNum = #{jobNum,jdbcType=INTEGER},
             </if>
-            <if test="endTime != null">
+            <if test="endTime != null" >
                 endTime = #{endTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="finishNum != null">
+            <if test="submissionTime != null" >
+                submissionTime = #{submissionTime,jdbcType=INTEGER},
+            </if>
+            <if test="signUpNum != null" >
+                signUpNum = #{signUpNum,jdbcType=INTEGER},
+            </if>
+            <if test="commitNum != null" >
+                commitNum = #{commitNum,jdbcType=INTEGER},
+            </if>
+            <if test="finishNum != null" >
                 finishNum = #{finishNum,jdbcType=INTEGER},
             </if>
-            <if test="auditTime != null">
-                auditTime = #{auditTime,jdbcType=INTEGER},
-            </if>
-            <if test="jobStatus != null">
+            <if test="jobStatus != null" >
                 jobStatus = #{jobStatus,jdbcType=INTEGER},
             </if>
-            <if test="auditStatus != null">
+            <if test="auditStatus != null" >
                 auditStatus = #{auditStatus,jdbcType=INTEGER},
             </if>
-            <if test="isRecommend != null">
+            <if test="isRecommend != null" >
                 isRecommend = #{isRecommend,jdbcType=INTEGER},
             </if>
-            <if test="isDelete != null">
+            <if test="isDelete != null" >
                 isDelete = #{isDelete,jdbcType=INTEGER},
+            </if>
+            <if test="label != null" >
+                label = #{label,jdbcType=INTEGER},
+            </if>
+            <if test="releaseTime != null" >
+                releaseTime = #{releaseTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="auditTime != null" >
+                auditTime = #{auditTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="refuseReason != null" >
+                refuseReason = #{refuseReason,jdbcType=VARCHAR},
             </if>
         </set>
         where jobId = #{jobId,jdbcType=INTEGER}
@@ -153,8 +219,117 @@
 
 
     <select id="selectJob" resultType="com.job.entity.Job">
-        select j.*,(j.jobNum-j.signUpNum) as surplusNum from job j where j.jobId=#{jobId}
+        select j.*,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum from job j where j.jobId=#{jobId}
     </select>
 
 
+    <select id="findAll" resultType="com.job.entity.vo.JobVo">
+        select
+        i.userId,i.headimgurl,i.UID,j.jobSource,t.typeName,j.submissionTime,j.releasePrice,j.introduce,j.jobTitle,j.jobId,
+        (j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,ifnull(uj.status,0) as status
+        from job j
+        inner join user_info i on j.userId=i.userId
+        inner join job_job_type jt on j.jobId=jt.jobId
+        inner join job_type t on jt.typeId=t.typeId
+        <where>
+            j.auditStatus=2 and j.isDelete=1
+            <if test="jobTitle!=null and jobTitle!=''">
+                and (
+                j.jobTitle like concat('%',#{jobTitle},'%')
+            </if>
+            <if test="jobSource!=null and jobSource!=''">
+                and (
+                j.jobSource like concat('%',#{jobSource},'%')
+            </if>
+        </where>
+        j.releaseTime asc
+    </select>
+
+    <select id="findAllStep" resultType="com.job.entity.JobStep">
+    select stepId,stepType,sort,checkPicture,picture,website,introduce from job_step
+    where jobId=#{jobId}
+    </select>
+
+    <update id="updateJob">
+        update job
+        <set>
+            <if test="auditStatus != null">
+                auditStatus = #{auditStatus,jdbcType=INTEGER},
+            </if>
+            <if test="refuseReason != null">
+                refuseReason = #{refuseReason},
+            </if>
+            <if test="label != null">
+                label = #{label},
+            </if>
+            <if test="isRecommend != null">
+                isRecommend = #{isRecommend},
+            </if>
+        </set>
+        where jobId = #{jobId,jdbcType=INTEGER}
+    </update>
+
+    <select id="findFootprint" resultType="com.job.entity.Job">
+        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,t.typeName,j.jobSource,i.headimgurl
+        from user_footprint f
+        inner join job j on f.jobId=j.jobId
+        inner join user_info i on j.userId=i.userId
+        inner join job_job_type jt on j.jobId=jt.jobId
+        inner join job_type t on jt.typeId=t.typeId
+        where f.userId=#{userId}
+        order by f.browseTime desc
+    </select>
+
+    <select id="findRelease" resultType="com.job.entity.vo.JobVo">
+        select
+        j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,t.typeName,j.jobSource,i.headimgurl
+        from job j
+        inner join user_info i on j.userId=i.userId
+        inner join job_job_type jt on j.jobId=jt.jobId
+        inner join job_type t on jt.typeId=t.typeId
+        <where>
+            j.userId=#{userId}
+            <if test="auditStatus!=null">
+                and j.auditStatus=#{auditStatus}
+            </if>
+        </where>
+        order by j.auditStatus
+    </select>
+
+    <select id="findWillAudit" resultType="com.job.entity.vo.JobVo">
+    select
+    j.userId,j.jobId,i.headimgurl,j.jobSource,j.submissionTime,j.releasePrice,j.jobTitle,t.typeName,
+    (select count(1) from user_job where jobId=j.jobId and status=3) as num
+    from job j
+    inner join user_info i on j.userId=i.userId
+    inner join job_job_type jt on j.jobId=jt.jobId
+    inner join job_type t on jt.typeId=t.typeId
+    where jobStatus in (1,3) and j.userId=#{userId}
+    </select>
+
+    <select id="findUserJob" resultType="com.job.entity.vo.UserJobVo">
+        select uj.userId,uj.taskId,i.phone,,uj.jobId,j.jobTitle,j.jobSource,i.headimgurl,uj.commitTime
+        from user_job uj
+        inner join job j on uj.jobId=j.jobId
+        inner join user_info i on uj.userId=i.userId
+        where uj.jobId=#{jobId} and status=3
+        order by uj.commitTime desc
+    </select>
+
+    <select id="findCheckPicture" resultType="java.util.Map">
+        select sort,checkPicture from user_commit where taskId=#{taskId}
+        order by sort asc
+    </select>
+
+    <insert id="insertJobType">
+        insert into job_job_type (jobId,typeId) values (#{jobId},#{typeId})
+    </insert>
+
+    <select id="findUserIsMember" resultType="java.lang.Integer">
+        select count(1) from user_info where userId=#{userId} and isMember=2 and memberTime>=now()
+    </select>
+
+    <select id="findFee" resultType="com.job.entity.ServiceFee">
+        select * from service_fee where serviceType=1
+    </select>
 </mapper>

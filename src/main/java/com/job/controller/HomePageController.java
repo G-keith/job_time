@@ -1,7 +1,10 @@
 package com.job.controller;
 
+import com.github.pagehelper.Page;
+import com.job.common.page.PageVO;
 import com.job.common.statuscode.ServerResponse;
 import com.job.entity.vo.JobDto;
+import com.job.entity.vo.JobListVo;
 import com.job.service.HomePageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -43,7 +46,7 @@ public class HomePageController {
             @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "5"),
     })
-    public ServerResponse findJob(Integer pageNo,Integer pageSize){
+    public ServerResponse<PageVO<JobListVo>> findJob(Integer pageNo, Integer pageSize){
         return homePageService.findRecommend(pageNo, pageSize);
     }
 

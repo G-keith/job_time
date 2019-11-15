@@ -3,6 +3,7 @@ package com.job.mapper;
 import com.job.entity.JobType;
 import com.job.entity.UserJob;
 import com.job.entity.vo.JobDto;
+import com.job.entity.vo.JobListVo;
 import com.job.entity.vo.JobStepDto;
 import com.job.entity.vo.JobVo;
 import org.apache.ibatis.annotations.Param;
@@ -36,7 +37,7 @@ public interface HallMapper {
      * @param jobDto 查询条件
      * @return 任务列表
      */
-    List<JobVo> findNew(JobDto jobDto);
+    List<JobListVo> findNew(JobDto jobDto);
 
     /**
      * 插入用户浏览记录
@@ -53,6 +54,13 @@ public interface HallMapper {
      * @return 任务详情
      */
     JobVo selectJobDetails(@Param("userId") Integer userId,@Param("jobId") Integer jobId);
+
+    /**
+     * 查询任务详情
+     * @param jobId 任务id
+     * @return 任务详情
+     */
+    JobVo selectJob(@Param("jobId") Integer jobId);
 
     /**
      * 插入用户报名信息

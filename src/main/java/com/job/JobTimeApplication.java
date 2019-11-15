@@ -1,11 +1,11 @@
 package com.job;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author keith
@@ -15,11 +15,14 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 @MapperScan("com.job.mapper")
 public class JobTimeApplication {
+    @Bean
+    public RestTemplate restTemplate() {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(5000);
+        requestFactory.setReadTimeout(3000);
+        return new RestTemplate(requestFactory);
+    }
 
-//    @Bean
-//    public ObjectMapper objectMapper() {
-//        return new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-//    }
     public static void main(String[] args) {
         SpringApplication.run(JobTimeApplication.class, args);
     }

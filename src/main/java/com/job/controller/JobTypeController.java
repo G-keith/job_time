@@ -42,13 +42,13 @@ public class JobTypeController {
     @ApiOperation(value = "添加任务类型")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "typeName", value = "类型名称", dataType = "string", required = true),
-            @ApiImplicitParam(name = "describe", value = "描述", dataType = "string"),
+            @ApiImplicitParam(name = "introduce", value = "描述", dataType = "string"),
     })
-    public ServerResponse add(String typeName, String describe) {
+    public ServerResponse add(String typeName, String introduce) {
         JobType jobType = new JobType();
         jobType.setTypeName(typeName);
-        if (describe.length() > 0) {
-            jobType.setDescribe(describe);
+        if (introduce.length() > 0) {
+            jobType.setIntroduce(introduce);
         }
         return jobTypeService.add(jobType);
     }
@@ -58,14 +58,14 @@ public class JobTypeController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "typeId", value = "主键id", dataType = "string", required = true),
             @ApiImplicitParam(name = "typeName", value = "类型名称", dataType = "string", required = true),
-            @ApiImplicitParam(name = "describe", value = "描述", dataType = "string"),
+            @ApiImplicitParam(name = "introduce", value = "描述", dataType = "string"),
     })
-    public ServerResponse edit(Integer typeId, String typeName, String describe) {
+    public ServerResponse edit(Integer typeId, String typeName, String introduce) {
         JobType jobType = new JobType();
         jobType.setTypeId(typeId);
         jobType.setTypeName(typeName);
-        if (describe.length() > 0) {
-            jobType.setDescribe(describe);
+        if (introduce.length() > 0) {
+            jobType.setIntroduce(introduce);
         }
         return jobTypeService.edit(jobType);
     }

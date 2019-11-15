@@ -58,4 +58,7 @@ public class UserInfo {
 
     @ApiModelProperty(value = "是否是会员（1.不是；2是）")
     private Integer isMember;
+
+    @ApiModelProperty(value = "黑名单原因")
+    private String reason;
 }

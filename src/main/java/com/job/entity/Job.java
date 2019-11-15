@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 任务实体
@@ -21,6 +22,9 @@ public class Job {
     @ApiModelProperty(value = "发布人id")
     private Integer userId;
 
+    @ApiModelProperty(value = "类型id")
+    private Integer typeId;
+
     @ApiModelProperty(value = "项目名称")
     private String jobSource;
 
@@ -35,6 +39,9 @@ public class Job {
 
     @ApiModelProperty(value = "任务价格")
     private BigDecimal jobPrice;
+
+    @ApiModelProperty(value = "发布价格")
+    private BigDecimal releasePrice;
 
     @ApiModelProperty(value = "任务次数")
     private Integer jobNum;
@@ -54,10 +61,10 @@ public class Job {
     @ApiModelProperty(value = "已完成数量")
     private Integer finishNum;
 
-    @ApiModelProperty(value = "1.进行中 2.已结束")
+    @ApiModelProperty(value = "1.进行中 2.已结束，3.暂停")
     private Integer jobStatus;
 
-    @ApiModelProperty(value = "1.新建，2待审核，3审核通过4；审核拒绝；5.暂停")
+    @ApiModelProperty(value = "1.新建，2待审核，3审核通过4；审核拒绝；")
     private Integer auditStatus;
 
     @ApiModelProperty(value = "是否推荐（1不推荐，2推荐）")
@@ -81,4 +88,6 @@ public class Job {
     @ApiModelProperty(value = "剩余数量")
     private Integer surplusNum;
 
+    @ApiModelProperty(value = "任务步骤")
+    private List<JobStep> stepList;
 }

@@ -3,6 +3,7 @@ package com.job.mapper;
 import com.job.entity.HomePage;
 import com.job.entity.UserMoney;
 import com.job.entity.vo.JobDto;
+import com.job.entity.vo.JobListVo;
 import com.job.entity.vo.JobVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -29,7 +30,7 @@ public interface HomePageMapper {
      * 查询推荐悬赏
      * @return 推荐悬赏
      */
-    List<JobVo> findRecommend();
+    List<JobListVo> findRecommend();
 
     /**
      * 用户当天是否签到过

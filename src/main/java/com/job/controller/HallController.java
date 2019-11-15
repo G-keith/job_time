@@ -1,18 +1,17 @@
 package com.job.controller;
 
+import com.job.common.page.PageVO;
 import com.job.common.statuscode.ServerResponse;
 import com.job.entity.vo.JobCommitVo;
 import com.job.entity.vo.JobDto;
+import com.job.entity.vo.JobListVo;
 import com.job.service.HallService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author keith
@@ -46,7 +45,7 @@ public class HallController {
             @ApiImplicitParam(name = "keyWord", value = "关键词", dataType = "string"),
             @ApiImplicitParam(name = "typeId", value = "任务类型id", dataType = "int"),
     })
-    public ServerResponse jobList(Integer pageNo,Integer pageSize,Integer label,String keyWord,Integer typeId){
+    public ServerResponse<PageVO<JobListVo>> jobList(Integer pageNo, Integer pageSize, Integer label, String keyWord, Integer typeId){
         JobDto jobDto=new JobDto();
         jobDto.setLabel(label);
         if(keyWord!=null){
@@ -67,7 +66,6 @@ public class HallController {
     public ServerResponse selectJobDetails(Integer jobId,Integer userId){
         return hallService.selectJobDetails(jobId, userId);
     }
-    //报名，提交验证图
 
     @GetMapping("/signUp")
     @ApiOperation(value = "报名")
@@ -79,7 +77,7 @@ public class HallController {
         return hallService.signUp(userId, jobId);
     }
 
-    @GetMapping("/submit")
+    @PostMapping("/submit")
     @ApiOperation(value = "提交任务")
     public ServerResponse submit(@RequestBody JobCommitVo jobCommitVo){
         return hallService.submit(jobCommitVo);

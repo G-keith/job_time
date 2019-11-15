@@ -4,10 +4,10 @@
   <resultMap id="BaseResultMap" type="com.job.entity.JobType" >
     <id column="typeId" property="typeId" jdbcType="INTEGER" />
     <result column="typeName" property="typeName" jdbcType="VARCHAR" />
-    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="introduce" property="introduce" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    typeId, typeName, describe
+    typeId, typeName, introduce
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -28,8 +28,8 @@
       <if test="typeName != null" >
         typeName,
       </if>
-      <if test="describe != null" >
-        describe,
+      <if test="introduce != null" >
+        introduce,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -39,8 +39,8 @@
       <if test="typeName != null" >
         #{typeName,jdbcType=VARCHAR},
       </if>
-      <if test="describe != null" >
-        #{describe,jdbcType=VARCHAR},
+      <if test="introduce != null" >
+        #{introduce,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -50,8 +50,8 @@
       <if test="typeName != null" >
         typeName = #{typeName,jdbcType=VARCHAR},
       </if>
-      <if test="describe != null" >
-        describe = #{describe,jdbcType=VARCHAR},
+      <if test="introduce != null" >
+        introduce = #{introduce,jdbcType=VARCHAR},
       </if>
     </set>
     where typeId = #{typeId,jdbcType=INTEGER}

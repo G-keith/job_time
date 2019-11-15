@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.UserMoneyMapper">
+
+    <select id="selectById" resultType="com.job.entity.UserMoney">
+        select * from user_money  where userId=#{userId}
+    </select>
+
+    <insert id="insertMoney">
+        insert into user_money (userId)
+        values (#{userId})
+    </insert>
+
+    <update id="updateMoney" parameterType="com.job.entity.UserMoney">
+        update user_money
+        <set>
+            <if test="bond != null">
+                bond = #{bond},
+            </if>
+            <if test="balance != null">
+                balance = #{balance},
+            </if>
+            <if test="repaidBalance != null">
+                repaidBalance = #{repaidBalance},
+            </if>
+            <if test="bonus != null">
+                bonus = #{bonus},
+            </if>
+        </set>
+        where userId=#{userId}
+    </update>
+
+    <update id="updateAdmin">
+        update user_admin
+        set money=#{money}
+    </update>
+
+    <insert id="insertMoneyDetails">
+        insert into (userId,type,explain,money,tradeTime)
+        values
+        (#{userId},#{type},#{explain},#{money},#{tradeTime})
+    </insert>
+
+    <select id="money" resultType="java.math.BigDecimal">
+        select money from user_admin
+    </select>
+</mapper>

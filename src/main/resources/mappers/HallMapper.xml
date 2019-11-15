@@ -7,44 +7,46 @@
     </select>
 
     <select id="findList" resultType="com.job.entity.vo.JobVo">
-        select j.jobId,j.jobTitle,j.releasePrice,j.jobNum,j.jobSource,(j.jobNum-j.signUpNum) as surplusNum,t.typeName,i.userId,i.headimgurl
+        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as
+        surplusNum,t.typeName,j.jobSource,i.headimgurl
         from job j
-        inner join job_job_type jt on j.jobId=jt.jobId
-        inner join job_type t on jt.typeId=t.typeId
+        inner join job_type t on j.typeId=t.typeId
         inner join user_info i on j.userId=i.userId
         <where>
-        j.auditStatus=3 and j.jobStatus=1
+            j.auditStatus=3 and j.jobStatus=1 and j.isDelete=1
             <if test="label!=null and label!=''">
                 and j.label=#{label}
             </if>
             <if test="typeId!=null and typeId!=''">
-                and jt.typeId=#{typeId}
+                and j.typeId=#{typeId}
             </if>
             <if test="keyWord!=null and keyWord!=''">
                 and (
                 j.jobSource like concat('%',#{keyWord},'%')
                 or j.jobTitle like concat('%',#{keyWord},'%')
+                or t.typeName like concat('%',#{keyWord},'%')
                 )
             </if>
         </where>
         order by isRecommend desc
     </select>
 
-    <select id="findNew" resultType="com.job.entity.vo.JobVo">
-        select j.jobId,j.jobTitle,j.releasePrice,j.jobNum,j.jobSource,(j.jobNum-j.signUpNum) as surplusNum,t.typeName,i.userId,i.headimgurl
+    <select id="findNew" resultType="com.job.entity.vo.JobListVo">
+        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as
+        surplusNum,t.typeName,j.jobSource,i.headimgurl
         from job j
-        inner join job_job_type jt on j.jobId=jt.jobId
-        inner join job_type t on jt.typeId=t.typeId
+        inner join job_type t on j.typeId=t.typeId
         inner join user_info i on j.userId=i.userId
         <where>
-            j.auditStatus=3 and j.jobStatus=1
+            j.auditStatus=3 and j.jobStatus=1 and j.isDelete=1
             <if test="typeId!=null and typeId!=''">
-                and jt.typeId=#{typeId}
+                and j.typeId=#{typeId}
             </if>
             <if test="keyWord!=null and keyWord!=''">
                 and (
                 j.jobSource like concat('%',#{keyWord},'%')
                 or j.jobTitle like concat('%',#{keyWord},'%')
+                or t.typeName like concat('%',#{keyWord},'%')
                 )
             </if>
         </where>
@@ -57,28 +59,36 @@
     </insert>
 
     <resultMap id="JobDetails" type="com.job.entity.vo.JobVo">
-        <result column="jobId" property="jobId" />
-        <result column="userId" property="userId" />
-        <result column="headimgurl" property="headimgurl" />
-        <result column="UID" property="UID" />
-        <result column="jobSource" property="jobSource" />
-        <result column="typeName" property="typeName" />
-        <result column="submissionTime" property="submissionTime" />
-        <result column="releasePrice" property="releasePrice" />
-        <result column="introduce" property="introduce" />
-        <result column="jobTitle" property="jobTitle" />
-        <result column="status" property="status" />
+        <result column="jobId" property="jobId"/>
+        <result column="userId" property="userId"/>
+        <result column="headimgurl" property="headimgurl"/>
+        <result column="UID" property="UID"/>
+        <result column="jobTitle" property="jobTitle"/>
+        <result column="jobSource" property="jobSource"/>
+        <result column="typeName" property="typeName"/>
+        <result column="submissionTime" property="submissionTime"/>
+        <result column="releasePrice" property="releasePrice"/>
+        <result column="introduce" property="introduce"/>
+        <result column="status" property="status"/>
         <collection property="jobStepList" select="getJobStepList" column="jobId"/>
     </resultMap>
 
     <select id="selectJobDetails" resultMap="JobDetails">
-    select i.userId,i.headimgurl,i.UID,j.jobSource,t.typeName,j.submissionTime,j.releasePrice,j.introduce,j.jobTitle,j.jobId,
-    (j.jobNum-j.signUpNum) as surplusNum,ifnull(uj.status,0) as status
+    select j.jobId,i.userId,i.headimgurl,i.UID,j.jobTitle,j.jobSource,t.typeName,j.submissionTime,j.releasePrice,j.introduce,j.jobNum,
+    (j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,ifnull(uj.status,0) as status
     from job j
     inner join user_info i on j.userId=i.userId
-    inner join job_job_type jt on j.jobId=jt.jobId
-    inner join job_type t on jt.typeId=t.typeId
+    inner join job_type t on j.typeId=t.typeId
     left join user_job uj on uj.jobId=j.jobId and uj.userId=#{userId}
+    where j.jobId=#{jobId}
+    </select>
+
+    <select id="selectJob" resultMap="JobDetails">
+     select j.jobId,i.userId,i.headimgurl,i.UID,j.jobTitle,j.jobSource,t.typeName,j.submissionTime,j.releasePrice,j.introduce,j.jobNum,
+    (j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,0 as status
+    from job j
+    inner join user_info i on j.userId=i.userId
+    inner join job_type t on j.typeId=t.typeId
     where j.jobId=#{jobId}
     </select>
 
@@ -88,7 +98,7 @@
     </select>
 
     <insert id="userSignUp" useGeneratedKeys="true" keyProperty="taskId">
-        insert into user_job (userId,jobId,endTime) values (#{userId},#{jobId},#{endTime})
+        insert into user_job (userId,jobId,endTime,enrollTime) values (#{userId},#{jobId},#{endTime},#{enrollTime})
     </insert>
 
     <select id="selectUserJob" resultType="java.lang.Integer">
@@ -117,7 +127,7 @@
 
     <update id="updateUserJob">
         update user_job set
-        status=2,
+        status=3,
         commitTime=now()
         where userId=#{userId} and jobId=#{jobId}
     </update>
@@ -134,7 +144,7 @@
         insert into user_commit (taskId,sort,checkPicture)
         values
         <foreach collection="jobStepList" item="item" index="index" separator=",">
-            (#{taskId},#{item.sort},#{checkPicture})
+            (#{taskId},#{item.sort},#{item.checkPicture})
         </foreach>
     </insert>
 </mapper>

@@ -1,38 +1,233 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.job.mapper.UserInfoMapper" >
-  <select id="findByPhone" resultType="com.job.entity.UserInfo">
+<mapper namespace="com.job.mapper.UserInfoMapper">
+    <select id="findByPhone" resultType="com.job.entity.UserInfo">
     select * from user_info
     where phone=#{phone}
   </select>
 
-  <select id="findByUserId" resultType="com.job.entity.UserInfo">
+    <select id="findByOpenId" resultType="com.job.entity.UserInfo">
+    select * from user_info
+    where openId=#{openId}
+     </select>
+
+    <select id="findByUserId" resultType="com.job.entity.UserInfo">
     select * from user_info
     where userId=#{userId}
   </select>
 
-  <insert id="insertPhone" useGeneratedKeys="true" keyProperty="userId">
-    insert into user_info (phone,UID)
-    values (#{phone},#{UID})
-  </insert>
+    <insert id="insertPhone" useGeneratedKeys="true" keyProperty="userId">
+        insert into user_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="UID != null">
+                UID,
+            </if>
+            <if test="upUID != null">
+                upUID,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="phone != null">
+                #{phone},
+            </if>
+            <if test="UID != null">
+                #{UID},
+            </if>
+            <if test="upUID != null">
+                #{upUID},
+            </if>
+        </trim>
+    </insert>
 
-  <insert id="insertCode">
+    <insert id="insertCode">
     insert into code (phone,code,sendTime)
     values (#{phone},#{code},now())
   </insert>
 
-  <select id="findCodeByPhone" resultType="java.lang.String">
+    <select id="findCodeByPhone" resultType="java.lang.String">
     select  code,sendTime
     from code where phone=#{phone} and isUse=0 ORDER BY sendTime desc LIMIT 1
   </select>
 
-  <update id="updateCode">
+    <update id="updateCode">
     update code
     set isUse=1
     where phone=#{phone}
   </update>
 
-  <select id="UidIsExist" resultType="java.lang.Integer">
+    <select id="UidIsExist" resultType="java.lang.Integer">
     select count(1 ) from user_info where UID=#{UID}
   </select>
+
+    <select id="findAll" resultType="com.job.entity.UserInfo">
+        select * from user_info
+        <where>
+            <if test="phone!=null and phone!=''">
+                and phone like concat('%',#{phone},'%')
+            </if>
+            <if test="status!=null and status!='' or status==0">
+                and status #{status}
+            </if>
+        </where>
+        order by status asc
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.job.entity.UserInfo">
+        update user_info
+        <set>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="openid != null">
+                openid = #{openid,jdbcType=VARCHAR},
+            </if>
+            <if test="nickname != null">
+                nickname = #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="province != null">
+                province = #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null">
+                city = #{city,jdbcType=VARCHAR},
+            </if>
+            <if test="country != null">
+                country = #{country,jdbcType=VARCHAR},
+            </if>
+            <if test="headimgurl != null">
+                headimgurl = #{headimgurl,jdbcType=VARCHAR},
+            </if>
+            <if test="isAdmin != null">
+                isAdmin = #{isAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="UID != null">
+                UID = #{UID,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="upUID != null">
+                upUID = #{upUID,jdbcType=INTEGER},
+            </if>
+            <if test="memberTime != null">
+                memberTime = #{memberTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isMember != null">
+                isMember = #{isMember,jdbcType=INTEGER},
+            </if>
+            <if test="reason != null">
+                reason = #{reason,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where userId = #{userId,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertSelective" parameterType="com.job.entity.UserInfo" useGeneratedKeys="true" keyProperty="userId">
+        insert into user_info
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="userId != null" >
+                userId,
+            </if>
+            <if test="phone != null" >
+                phone,
+            </if>
+            <if test="openid != null" >
+                openid,
+            </if>
+            <if test="nickname != null" >
+                nickname,
+            </if>
+            <if test="sex != null" >
+                sex,
+            </if>
+            <if test="province != null" >
+                province,
+            </if>
+            <if test="city != null" >
+                city,
+            </if>
+            <if test="country != null" >
+                country,
+            </if>
+            <if test="headimgurl != null" >
+                headimgurl,
+            </if>
+            <if test="isAdmin != null" >
+                isAdmin,
+            </if>
+            <if test="UID != null" >
+                UID,
+            </if>
+            <if test="status != null" >
+                status,
+            </if>
+            <if test="upUID != null" >
+                upUID,
+            </if>
+            <if test="memberTime != null" >
+                memberTime,
+            </if>
+            <if test="isMember != null" >
+                isMember,
+            </if>
+            <if test="reason != null" >
+                reason,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="userId != null" >
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="phone != null" >
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="openid != null" >
+                #{openid,jdbcType=VARCHAR},
+            </if>
+            <if test="nickname != null" >
+                #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null" >
+                #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="province != null" >
+                #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null" >
+                #{city,jdbcType=VARCHAR},
+            </if>
+            <if test="country != null" >
+                #{country,jdbcType=VARCHAR},
+            </if>
+            <if test="headimgurl != null" >
+                #{headimgurl,jdbcType=VARCHAR},
+            </if>
+            <if test="isAdmin != null" >
+                #{isAdmin,jdbcType=INTEGER},
+            </if>
+            <if test="UID != null" >
+                #{UID,jdbcType=INTEGER},
+            </if>
+            <if test="status != null" >
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="upUID != null" >
+                #{upUID,jdbcType=INTEGER},
+            </if>
+            <if test="memberTime != null" >
+                #{memberTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isMember != null" >
+                #{isMember,jdbcType=INTEGER},
+            </if>
+            <if test="reason != null" >
+                #{reason,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
 </mapper>

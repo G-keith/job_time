@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.UserFollowMapper">
+
+
+    <select id="isFollow" resultType="java.lang.Integer">
+        select count(1) from user_follow where userId=#{userId} and followId=#{followId}
+    </select>
+
+    <insert id="insertFollow">
+        insert into user_follow (userId,followId) values (#{userId},#{followId})
+    </insert>
+
+    <delete id="deleteFollow">
+        delete from user_follow
+        where userId=#{userId} and followId=#{followId}
+    </delete>
+
+    <select id="findAll" resultType="com.job.entity.vo.UserInfoVo">
+        select f.userId,i.phone,i.nickname,i.headimgurl from user_follow f
+        inner join user_info i on f.userId=i.userId
+    </select>
+</mapper>

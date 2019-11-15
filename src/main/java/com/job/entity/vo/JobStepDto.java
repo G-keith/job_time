@@ -15,6 +15,6 @@ public class JobStepDto {
     private Integer sort;
 
     @ApiModelProperty(value = "验证图")
-    private Integer checkPicture;
+    private String checkPicture;
 
 }

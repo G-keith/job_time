@@ -18,5 +18,5 @@ public class JobType {
     private String typeName;
 
     @ApiModelProperty(value = "描述")
-    private String describe;
+    private String introduce;
 }

@@ -24,4 +24,7 @@ public class UserMoney {
 
     @ApiModelProperty(value = "充值余额")
     private BigDecimal repaidBalance;
+
+    @ApiModelProperty(value = "奖金余额")
+    private BigDecimal bonus;
 }

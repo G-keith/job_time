@@ -6,13 +6,12 @@
     select * from cover_map;
   </select>
 
-    <select id="findRecommend" resultType="com.job.entity.vo.JobVo">
-        select j.jobId,j.jobTitle,j.releasePrice,j.jobNum,j.jobSource,(j.jobNum-j.signUpNum) as surplusNum,t.typeName,i.userId,i.headimgurl
+    <select id="findRecommend" resultType="com.job.entity.vo.JobListVo">
+        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,t.typeName,j.jobSource,i.headimgurl
         from job j
-        inner join job_job_type jt on j.jobId=jt.jobId
-        inner join job_type t on jt.typeId=t.typeId
+        inner join job_type t on j.typeId=t.typeId
         inner join user_info i on j.userId=i.userId
-        where j.auditStatus=3 and j.jobStatus=1
+        where j.auditStatus=3 and j.jobStatus=1 and j.isDelete=1
         order by j.isRecommend desc
     </select>
 

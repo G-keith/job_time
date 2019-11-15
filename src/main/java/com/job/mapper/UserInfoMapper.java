@@ -4,6 +4,8 @@ import com.job.entity.UserInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * 用户信息数据持久层
  * @author keith
@@ -19,6 +21,13 @@ public interface UserInfoMapper {
      * @return 0没有
      */
     UserInfo findByPhone(String phone);
+
+    /**
+     * 通过openId查询是否存在
+     * @param openId openId
+     * @return 0没有
+     */
+    UserInfo findByOpenId(String openId);
 
     /**
      * 查询用户信息
@@ -62,4 +71,26 @@ public interface UserInfoMapper {
      * @return 0不存在
      */
     int UidIsExist(String UID);
+
+    /**
+     * 查询所有用户信息
+     * @param  phone
+     * @param  status
+     * @return
+     */
+    List<UserInfo> findAll(@Param("phone") String phone,@Param("status") Integer status);
+
+    /**
+     * 更新用户信息
+     * @param userInfo 用户信息
+     * @return
+     */
+    int updateByPrimaryKeySelective(UserInfo userInfo);
+
+    /**
+     * 插入用户信息
+     * @param record
+     * @return
+     */
+    int insertSelective(UserInfo record);
 }

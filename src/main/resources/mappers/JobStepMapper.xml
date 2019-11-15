@@ -5,14 +5,14 @@
         <id column="stepId" property="stepId" jdbcType="INTEGER"/>
         <result column="stepType" property="stepType" jdbcType="INTEGER"/>
         <result column="jobId" property="jobId" jdbcType="INTEGER"/>
-        <result column="describe" property="describe" jdbcType="VARCHAR"/>
+        <result column="introduce" property="introduce" jdbcType="VARCHAR"/>
         <result column="sort" property="sort" jdbcType="INTEGER"/>
         <result column="checkPicture" property="checkPicture" jdbcType="INTEGER"/>
         <result column="picture" property="picture" jdbcType="VARCHAR"/>
         <result column="Website" property="website" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Base_Column_List">
-    stepId, stepType, jobId, describe, sort, checkPicture, picture, website
+    stepId, stepType, jobId, introduce, sort, checkPicture, picture, website
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
@@ -36,8 +36,8 @@
             <if test="jobId != null">
                 jobId,
             </if>
-            <if test="describe != null">
-                describe,
+            <if test="introduce != null">
+                introduce,
             </if>
             <if test="sort != null">
                 sort,
@@ -62,8 +62,8 @@
             <if test="jobId != null">
                 #{jobId,jdbcType=INTEGER},
             </if>
-            <if test="describe != null">
-                #{describe,jdbcType=VARCHAR},
+            <if test="introduce != null">
+                #{introduce,jdbcType=VARCHAR},
             </if>
             <if test="sort != null">
                 #{sort,jdbcType=INTEGER},
@@ -88,8 +88,8 @@
             <if test="jobId != null">
                 jobId = #{jobId,jdbcType=INTEGER},
             </if>
-            <if test="describe != null">
-                describe = #{describe,jdbcType=VARCHAR},
+            <if test="introduce != null">
+                introduce = #{introduce,jdbcType=VARCHAR},
             </if>
             <if test="sort != null">
                 sort = #{sort,jdbcType=INTEGER},
@@ -108,10 +108,10 @@
     </update>
 
     <insert id="insertBatch" parameterType="com.job.entity.JobStep">
-        insert into job_step (stepType,jobId,describe,sort,checkPicture,picture,Website)
+        insert into job_step (stepType,jobId,introduce,sort,checkPicture,picture,Website)
         values
         <foreach collection="jobStepList" item="item" index="index" separator=",">
-            (#{item.stepType},#{item.jobId},#{item.describe},#{item.sort},#{item.checkPicture},#{item.picture},#{item.website})
+            (#{item.stepType},#{item.jobId},#{item.introduce},#{item.sort},#{item.checkPicture},#{item.picture},#{item.website})
         </foreach>
     </insert>
 </mapper>

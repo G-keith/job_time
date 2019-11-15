@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.job.mapper.UserCashOutMapper">
+    <resultMap id="BaseResultMap" type="com.job.entity.UserCashOut">
+        <id column="cashOutId" jdbcType="INTEGER" property="cashOutId"/>
+        <result column="userId" jdbcType="INTEGER" property="userId"/>
+        <result column="cashOutType" jdbcType="INTEGER" property="cashOutType"/>
+        <result column="tradeType" jdbcType="INTEGER" property="tradeType"/>
+        <result column="cashOutMoney" jdbcType="DECIMAL" property="cashOutMoney"/>
+        <result column="auditStatus" jdbcType="INTEGER" property="auditStatus"/>
+        <result column="applyTime" jdbcType="TIMESTAMP" property="applyTime"/>
+        <result column="auditTime" jdbcType="TIMESTAMP" property="auditTime"/>
+        <result column="refuseReason" jdbcType="VARCHAR" property="refuseReason"/>
+        <result column="zfbName" jdbcType="VARCHAR" property="zfbName"/>
+        <result column="zfbAccount" jdbcType="VARCHAR" property="zfbAccount"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    cashOutId, userId, cashOutType, tradeType, cashOutMoney, auditStatus, applyTime, 
+    auditTime,refuseReason,zfbName,zfbAccount
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user_cash_out
+        where cashOutId = #{cashOutId,jdbcType=INTEGER}
+    </select>
+    <insert id="insertSelective" parameterType="com.job.entity.UserCashOut">
+        insert into user_cash_out
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cashOutId != null">
+                cashOutId,
+            </if>
+            <if test="userId != null">
+                userId,
+            </if>
+            <if test="cashOutType != null">
+                cashOutType,
+            </if>
+            <if test="tradeType != null">
+                tradeType,
+            </if>
+            <if test="cashOutMoney != null">
+                cashOutMoney,
+            </if>
+            <if test="auditStatus != null">
+                auditStatus,
+            </if>
+            <if test="applyTime != null">
+                applyTime,
+            </if>
+            <if test="auditTime != null">
+                auditTime,
+            </if>
+            <if test="refuseReason != null">
+                refuseReason,
+            </if>
+            <if test="zfbName != null">
+                zfbName,
+            </if>
+            <if test="zfbAccount != null">
+                zfbAccount,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cashOutId != null">
+                #{cashOutId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="cashOutType != null">
+                #{cashOutType,jdbcType=INTEGER},
+            </if>
+            <if test="tradeType != null">
+                #{tradeType,jdbcType=INTEGER},
+            </if>
+            <if test="cashOutMoney != null">
+                #{cashOutMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="auditStatus != null">
+                #{auditStatus,jdbcType=INTEGER},
+            </if>
+            <if test="applyTime != null">
+                #{applyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="auditTime != null">
+                #{auditTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="refuseReason != null">
+                #{refuseReason,jdbcType=VARCHAR},
+            </if>
+            <if test="zfbName != null">
+                #{zfbName,jdbcType=VARCHAR},
+            </if>
+            <if test="zfbAccount != null">
+                #{zfbAccount,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.job.entity.UserCashOut">
+        update user_cash_out
+        <set>
+            <if test="userId != null">
+                userId = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="cashOutType != null">
+                cashOutType = #{cashOutType,jdbcType=INTEGER},
+            </if>
+            <if test="tradeType != null">
+                tradeType = #{tradeType,jdbcType=INTEGER},
+            </if>
+            <if test="cashOutMoney != null">
+                cashOutMoney = #{cashOutMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="auditStatus != null">
+                auditStatus = #{auditStatus,jdbcType=INTEGER},
+            </if>
+            <if test="applyTime != null">
+                applyTime = #{applyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="auditTime != null">
+                auditTime = #{auditTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="refuseReason != null">
+                refuseReason = #{refuseReason,jdbcType=VARCHAR},
+            </if>
+            <if test="zfbName != null">
+                zfbName = #{zfbName,jdbcType=VARCHAR},
+            </if>
+            <if test="zfbAccount != null">
+                zfbAccount = #{refuseReason,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where cashOutId = #{cashOutId,jdbcType=INTEGER}
+    </update>
+
+    <select id="findAll" resultType="com.job.entity.UserCashOut">
+        select i.phone,i.nickname,o.cashOutType,o.tradeType,o.cashOutMoney,o.auditStatus,o.applyTime from user_cash_out
+        o
+        inner join user_info i on o.userId=i.userId
+        <where>
+            <if test="phone!=null and phone!=''">
+                and i.phone like concat('%',#{phone},'%')
+            </if>
+            <if test="cashOutType!=null and cashOutType!=''">
+                and o.cashOutType =#{cashOutType}
+            </if>
+            <if test="tradeType!=null and tradeType!=''">
+                and o.tradeType=#{tradeType}
+            </if>
+            <if test="auditStatus!=null and auditStatus!=''">
+                and o.auditStatus=#{auditStatus}
+            </if>
+        </where>
+        order by auditStatus asc
+    </select>
+
+    <select id="findByUserId" resultType="com.job.entity.UserCashOut">
+        select i.phone,i.nickname,o.cashOutType,o.tradeType,o.cashOutMoney,o.auditStatus,o.applyTime from user_cash_out o
+        inner join user_info i on o.userId=i.userId
+        where o.userId=#{userId}
+        order by auditStatus desc
+    </select>
+</mapper>
