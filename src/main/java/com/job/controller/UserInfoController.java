@@ -83,11 +83,12 @@ public class UserInfoController {
     public ServerResponse findBlacklist(Integer pageNo, Integer pageSize, String phone) {
         return userInfoService.findBlacklist(pageNo, pageSize, phone);
     }
-
-    @GetMapping("/openOrRenew")
-    @ApiOperation(value = "会员充值或者续费")
-    public ServerResponse openOrRenew() {
-        return null;
-    }
-
+//
+//    @GetMapping("/openOrRenew")
+//    @ApiOperation(value = "会员充值或者续费")
+//    public ServerResponse openOrRenew() {
+//        return null;
+//    }
+//
+//}
 }
