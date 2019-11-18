@@ -38,7 +38,9 @@ public class ExtendService {
      */
     public ServerResponse selectUser(Integer userId){
         InviteVo inviteVo=extendMapper.selectInvite(userId);
-        inviteVo.setTotalMoney(new BigDecimal(inviteVo.getTotalNum()).multiply(homePageMapper.selectSignInMoney().get("inviteMoney")));
+        if(inviteVo!=null){
+            inviteVo.setTotalMoney(new BigDecimal(inviteVo.getTotalNum()).multiply(homePageMapper.selectSignInMoney().get("inviteMoney")));
+        }
         return ServerResponse.createBySuccess(inviteVo);
     }
 
