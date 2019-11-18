@@ -21,7 +21,7 @@ public class UserMoneyDetails {
     private Integer type;
 
     @ApiModelProperty(value = "说明")
-    private String explain;
+    private String introduce;
 
     @ApiModelProperty(value = "金钱")
     private BigDecimal money;

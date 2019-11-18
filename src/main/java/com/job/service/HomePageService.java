@@ -90,7 +90,7 @@ public class HomePageService {
             UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
             userMoneyDetails.setUserId(userId);
             userMoneyDetails.setType(2);
-            userMoneyDetails.setExplain("每日签到");
+            userMoneyDetails.setIntroduce("每日签到");
             userMoneyDetails.setMoney(balance);
             userMoneyDetails.setTradeTime(new Date());
             userMoneyMapper.insertMoneyDetails(userMoneyDetails);

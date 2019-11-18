@@ -1,6 +1,7 @@
 package com.job.controller;
 
 import com.job.common.statuscode.ServerResponse;
+import com.job.common.utils.MD5Util;
 import com.job.entity.UserInfo;
 import com.job.service.UserInfoService;
 import io.swagger.annotations.Api;
@@ -45,6 +46,26 @@ public class AdminUserInfoController {
     }
 
     @PutMapping
+    @ApiOperation(value = "修改管理员账户密码")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "account", value = "账户", dataType = "string",required = true),
+            @ApiImplicitParam(name = "password", value = "密码", dataType = "string",required = true),
+    })
+    public ServerResponse modifyAdminInfo(String account,String password){
+        return userInfoService.modifyAdminInfo(account, MD5Util.md5EncodeUtf8(password));
+    }
+
+    @GetMapping
+    @ApiOperation(value = "后台登录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "account", value = "账户", dataType = "string",required = true),
+            @ApiImplicitParam(name = "password", value = "密码", dataType = "string",required = true),
+    })
+    public ServerResponse loginAdminInfo(String account,String password){
+        return userInfoService.loginAdminInfo(account, MD5Util.md5EncodeUtf8(password));
+    }
+
+    @PutMapping("/blacklist")
     @ApiOperation(value = "用户加入黑名单")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int",required = true),

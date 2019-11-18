@@ -24,7 +24,7 @@ public class UserInfo {
     private String openid;
 
     @ApiModelProperty(value = "昵称")
-    private String nickName;
+    private String nickname;
 
     @ApiModelProperty(value = "1.男，2女，0未知")
     private Integer sex;

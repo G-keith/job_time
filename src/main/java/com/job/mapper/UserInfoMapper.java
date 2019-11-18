@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户信息数据持久层
@@ -86,6 +87,22 @@ public interface UserInfoMapper {
      * @return
      */
     int updateByPrimaryKeySelective(UserInfo userInfo);
+
+    /**
+     * 修改管理员账号密码
+     * @param account
+     * @param password
+     * @return
+     */
+    int modifyAdminInfo(@Param("account") String account,@Param("password")String password);
+
+    /**
+     * 后台登录
+     * @param account
+     * @param password
+     * @return
+     */
+    Map<String,Object> loginAdminInfo(@Param("account") String account, @Param("password")String password);
 
     /**
      * 插入用户信息

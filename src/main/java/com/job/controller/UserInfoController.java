@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
 
 /**
  * @author keith
@@ -83,12 +85,16 @@ public class UserInfoController {
     public ServerResponse findBlacklist(Integer pageNo, Integer pageSize, String phone) {
         return userInfoService.findBlacklist(pageNo, pageSize, phone);
     }
-//
-//    @GetMapping("/openOrRenew")
-//    @ApiOperation(value = "会员充值或者续费")
-//    public ServerResponse openOrRenew() {
-//        return null;
-//    }
-//
-//}
+
+    @GetMapping("/recharge")
+    @ApiOperation(value = "充值")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
+            @ApiImplicitParam(name = "money", value = "金额", dataType = "int", required = true),
+            @ApiImplicitParam(name = "type", value = "类型（1.代表会员充值，2代表账户充值）", dataType = "int", required = true),
+    })
+    public ServerResponse recharge(Integer userId,BigDecimal money,Integer type ,HttpServletRequest request) throws IOException {
+        return userInfoService.recharge(userId,money,type,request);
+    }
+
 }

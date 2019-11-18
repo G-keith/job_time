@@ -90,7 +90,7 @@ public class UserCashOutService {
             //插入明细
             UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
             userMoneyDetails.setUserId(userCashOut.getUserId());
-            userMoneyDetails.setExplain("审核拒绝");
+            userMoneyDetails.setIntroduce("审核拒绝");
             userMoneyDetails.setMoney(userCashOut.getCashOutMoney());
             userMoneyDetails.setTradeTime(new Date());
             if (userCashOut.getCashOutType() == 1) {
@@ -144,7 +144,7 @@ public class UserCashOutService {
             //插入明细
             UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
             userMoneyDetails.setUserId(userCashOut.getUserId());
-            userMoneyDetails.setExplain("提现申请");
+            userMoneyDetails.setIntroduce("提现申请");
             userMoneyDetails.setMoney(userCashOut.getCashOutMoney().negate().setScale(2, BigDecimal.ROUND_HALF_UP));
             userMoneyDetails.setTradeTime(new Date());
             if (userCashOut.getCashOutType() == 1) {

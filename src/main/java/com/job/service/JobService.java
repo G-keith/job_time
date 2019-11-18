@@ -178,7 +178,7 @@ public class JobService {
             UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
             userMoneyDetails.setUserId(job.getUserId());
             userMoneyDetails.setType(3);
-            userMoneyDetails.setExplain("发布任务");
+            userMoneyDetails.setIntroduce("发布任务");
             userMoneyDetails.setMoney(job.getReleasePrice().negate().setScale(2, BigDecimal.ROUND_HALF_UP));
             userMoneyDetails.setTradeTime(new Date());
             userMoneyMapper.insertMoneyDetails(userMoneyDetails);
@@ -223,7 +223,7 @@ public class JobService {
                 UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
                 userMoneyDetails.setUserId(userJob.getUserId());
                 userMoneyDetails.setType(2);
-                userMoneyDetails.setExplain("任务奖励");
+                userMoneyDetails.setIntroduce("任务奖励");
                 userMoneyDetails.setMoney(job.getReleasePrice());
                 userMoneyDetails.setTradeTime(new Date());
                 userMoneyMapper.insertMoneyDetails(userMoneyDetails);
@@ -247,7 +247,7 @@ public class JobService {
                     UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
                     userMoneyDetails.setUserId(userJob.getUserId());
                     userMoneyDetails.setType(3);
-                    userMoneyDetails.setExplain("任务退还");
+                    userMoneyDetails.setIntroduce("任务退还");
                     userMoneyDetails.setMoney(job.getJobPrice());
                     userMoneyDetails.setTradeTime(new Date());
                     userMoneyMapper.insertMoneyDetails(userMoneyDetails);
@@ -285,7 +285,7 @@ public class JobService {
                 UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
                 userMoneyDetails.setUserId(job.getUserId());
                 userMoneyDetails.setType(3);
-                userMoneyDetails.setExplain("任务退还");
+                userMoneyDetails.setIntroduce("任务退还");
                 userMoneyDetails.setMoney(surplusMoney);
                 userMoneyDetails.setTradeTime(new Date());
                 userMoneyMapper.insertMoneyDetails(userMoneyDetails);

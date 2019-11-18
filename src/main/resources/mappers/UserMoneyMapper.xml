@@ -36,9 +36,9 @@
     </update>
 
     <insert id="insertMoneyDetails">
-        insert into (userId,type,explain,money,tradeTime)
+        insert into user_money_details (userId,type,introduce,money,tradeTime)
         values
-        (#{userId},#{type},#{explain},#{money},#{tradeTime})
+        (#{userId},#{type},#{introduce},#{money},#{tradeTime})
     </insert>
 
     <select id="money" resultType="java.math.BigDecimal">

@@ -127,6 +127,17 @@
         where userId = #{userId,jdbcType=INTEGER}
     </update>
 
+    <update id="modifyAdminInfo">
+        update user_admin set
+        account=#{account},
+        password=#{password}
+    </update>
+
+    <select id="loginAdminInfo" resultType="map">
+        select * from user_admin
+        where account=#{account} and password=#{password}
+    </select>
+
     <insert id="insertSelective" parameterType="com.job.entity.UserInfo" useGeneratedKeys="true" keyProperty="userId">
         insert into user_info
         <trim prefix="(" suffix=")" suffixOverrides="," >

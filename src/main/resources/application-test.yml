@@ -40,4 +40,4 @@ smsSign: "小蜜蜂一站式平台"
 wx:
   appId: wxc8e1a3732b85cd01
   appKey: a9eb523e05e230c6443a2526f8ccb511
-  notifyUrl: http
+  notifyUrl: http://111.231.50.113/notify

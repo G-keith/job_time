@@ -6,10 +6,13 @@ import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
 import com.job.common.page.PageVO;
 import com.job.common.statuscode.ServerResponse;
+import com.job.common.utils.RandomUtil;
 import com.job.common.utils.WxUtils;
 import com.job.entity.UserInfo;
+import com.job.entity.UserOrder;
 import com.job.mapper.UserInfoMapper;
 import com.job.mapper.UserMoneyMapper;
+import com.job.mapper.UserOrderMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -57,28 +64,32 @@ public class UserInfoService {
 
     private final WxUtils wxUtils;
 
-    public UserInfoService(UserInfoMapper userInfoMapper, UserMoneyMapper userMoneyMapper, WxUtils wxUtils) {
+    private final UserOrderMapper userOrderMapper;
+
+    public UserInfoService(UserInfoMapper userInfoMapper, UserMoneyMapper userMoneyMapper, WxUtils wxUtils, UserOrderMapper userOrderMapper) {
         this.userInfoMapper = userInfoMapper;
         this.userMoneyMapper = userMoneyMapper;
         this.wxUtils = wxUtils;
+        this.userOrderMapper = userOrderMapper;
     }
 
     /**
      * 登录
+     *
      * @param phone 账号密码
      * @return 0存在，1不存在
      */
-    public ServerResponse signIn(String phone,String uid) {
+    public ServerResponse signIn(String phone, String uid) {
         //查询用户信息
         UserInfo result = userInfoMapper.findByPhone(phone);
         if (result != null) {
-            if(result.getStatus()==1){
-                return ServerResponse.createByErrorCodeMessage(2,"用户未黑名单，不可登录");
-            }else{
+            if (result.getStatus() == 1) {
+                return ServerResponse.createByErrorCodeMessage(2, "用户未黑名单，不可登录");
+            } else {
                 return ServerResponse.createBySuccess(result);
             }
         } else {
-            UserInfo userInfo=new UserInfo();
+            UserInfo userInfo = new UserInfo();
             userInfo.setPhone(phone);
             userInfo.setUID(getUid());
             if (uid != null && !"".equals(uid)) {
@@ -103,7 +114,7 @@ public class UserInfoService {
     }
 
 
-        /**
+    /**
      * 发送验证码并存放到数据库中去
      *
      * @param phone 手机号
@@ -144,44 +155,105 @@ public class UserInfoService {
 
     /**
      * 查询所有用户信息
+     *
      * @param pageNo
      * @param pageSize
      * @return
      */
-    public ServerResponse findAll(Integer pageNo,Integer pageSize,String phone,Integer status){
+    public ServerResponse findAll(Integer pageNo, Integer pageSize, String phone, Integer status) {
         Page<UserInfo> page = PageHelper.startPage(pageNo, pageSize);
-        userInfoMapper.findAll(phone,status);
+        userInfoMapper.findAll(phone, status);
         return ServerResponse.createBySuccess(PageVO.build(page));
     }
 
     /**
      * 查询所有用户信息
+     *
      * @param pageNo
      * @param pageSize
      * @return
      */
-    public ServerResponse findBlacklist(Integer pageNo,Integer pageSize,String phone){
+    public ServerResponse findBlacklist(Integer pageNo, Integer pageSize, String phone) {
         Page<UserInfo> page = PageHelper.startPage(pageNo, pageSize);
-        userInfoMapper.findAll(phone,1);
+        userInfoMapper.findAll(phone, 1);
         return ServerResponse.createBySuccess(PageVO.build(page));
     }
 
     /**
      * 更新用户信息
+     *
      * @param userInfo 用户信息
      * @return
      */
-    public ServerResponse updateUserInfo(UserInfo userInfo){
-        int result=userInfoMapper.updateByPrimaryKeySelective(userInfo);
-        if(result>0){
+    public ServerResponse updateUserInfo(UserInfo userInfo) {
+        int result = userInfoMapper.updateByPrimaryKeySelective(userInfo);
+        if (result > 0) {
             return ServerResponse.createBySuccess();
-        }else{
+        } else {
             return ServerResponse.createByError();
         }
     }
 
-    public ServerResponse openOrRenew(){
-        return null;
+    /**
+     * 修改管理员账户信息
+     *
+     * @param account
+     * @param password
+     * @return
+     */
+    public ServerResponse modifyAdminInfo(String account, String password) {
+        int result = userInfoMapper.modifyAdminInfo(account, password);
+        if (result > 0) {
+            return ServerResponse.createBySuccess();
+        } else {
+            return ServerResponse.createByError();
+        }
+    }
+
+    /**
+     * 后台登录
+     *
+     * @param account
+     * @param password
+     * @return
+     */
+    public ServerResponse loginAdminInfo(String account, String password) {
+        Map<String, Object> map = userInfoMapper.loginAdminInfo(account, password);
+        if (map != null && map.size() > 0) {
+            return ServerResponse.createBySuccess(map);
+        } else {
+            return ServerResponse.createByError();
+        }
+    }
+
+    /**
+     * 会员充值
+     * @param userId
+     * @param money
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    public ServerResponse recharge(Integer userId, BigDecimal money, Integer type,HttpServletRequest request) throws IOException {
+        UserOrder userOrder = new UserOrder();
+        userOrder.setUserId(userId);
+        if(type==1){
+            userOrder.setOrderType(1);
+            userOrder.setOrderDesc("小蜜蜂-会员充值");
+        }else{
+            userOrder.setOrderType(2);
+            userOrder.setOrderDesc("小蜜蜂-充值");
+        }
+        userOrder.setOrderNum(RandomUtil.getTimestamp() + RandomUtil.randomStr(3));
+        userOrder.setOrderType(1);
+        userOrder.setMoney(money);
+        ServerResponse response = wxUtils.appPay(userOrder, request);
+        //预支付成功成功
+        if (response.getStatus() == 1) {
+            userOrder.setCommitTime(new Date());
+            userOrderMapper.insertSelective(userOrder);
+        }
+        return response;
     }
 
     /**
@@ -230,9 +302,9 @@ public class UserInfoService {
         for (int i = 0; i < 8; i++) {
             str.append(random.nextInt(10));
         }
-        if(userInfoMapper.UidIsExist(str.toString())>0){
+        if (userInfoMapper.UidIsExist(str.toString()) > 0) {
             return getUid();
-        }else{
+        } else {
             return str.toString();
         }
     }

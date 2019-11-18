@@ -1,5 +1,7 @@
 package com.job.common.utils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -34,5 +36,21 @@ public class DateUtils {
             calendar.add(Calendar.HOUR_OF_DAY, days);
         }
         return calendar.getTime();
+    }
+
+    /**
+     * 时间字符串转时间
+     * @param time
+     * @return
+     */
+    public static Date stringToDate(String time){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        try {
+            return sdf.parse(time);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+             throw new RuntimeException();
+        }
     }
 }
