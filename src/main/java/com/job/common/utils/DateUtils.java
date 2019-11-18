@@ -48,7 +48,6 @@ public class DateUtils {
         try {
             return sdf.parse(time);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
              throw new RuntimeException();
         }

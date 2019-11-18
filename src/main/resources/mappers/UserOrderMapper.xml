@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.UserOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.job.entity.UserOrder" >
+    <id column="orderId" property="orderId" jdbcType="INTEGER" />
+    <result column="userId" property="userId" jdbcType="INTEGER" />
+    <result column="money" property="money" jdbcType="DECIMAL" />
+    <result column="prepayid" property="prepayid" jdbcType="VARCHAR" />
+    <result column="orderNum" property="orderNum" jdbcType="VARCHAR" />
+    <result column="orderDesc" property="orderDesc" jdbcType="VARCHAR" />
+    <result column="orderStatus" property="orderStatus" jdbcType="INTEGER" />
+    <result column="orderType" property="orderType" jdbcType="INTEGER" />
+    <result column="commitTime" property="commitTime" jdbcType="TIMESTAMP" />
+    <result column="finishTime" property="finishTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    orderId, userId, money, prepayid, orderNum, orderDesc, orderStatus, orderType, commitTime, 
+    finishTime
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_order
+    where orderId = #{orderId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from user_order
+    where orderId = #{orderId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.job.entity.UserOrder" >
+    insert into user_order (orderId, userId, money, 
+      prepayid, orderNum, orderDesc, 
+      orderStatus, orderType, commitTime, 
+      finishTime)
+    values (#{orderId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{money,jdbcType=DECIMAL}, 
+      #{prepayid,jdbcType=VARCHAR}, #{orderNum,jdbcType=VARCHAR}, #{orderDesc,jdbcType=VARCHAR},
+      #{orderStatus,jdbcType=INTEGER}, #{orderType,jdbcType=INTEGER}, #{commitTime,jdbcType=TIMESTAMP}, 
+      #{finishTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.job.entity.UserOrder" >
+    insert into user_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        orderId,
+      </if>
+      <if test="userId != null" >
+        userId,
+      </if>
+      <if test="money != null" >
+        money,
+      </if>
+      <if test="prepayid != null" >
+        prepayid,
+      </if>
+      <if test="orderNum != null" >
+        orderNum,
+      </if>
+      <if test="orderDesc != null" >
+        orderDesc,
+      </if>
+      <if test="orderStatus != null" >
+        orderStatus,
+      </if>
+      <if test="orderType != null" >
+        orderType,
+      </if>
+      <if test="commitTime != null" >
+        commitTime,
+      </if>
+      <if test="finishTime != null" >
+        finishTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="money != null" >
+        #{money,jdbcType=DECIMAL},
+      </if>
+      <if test="prepayid != null" >
+        #{prepayid,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null" >
+        #{orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDesc != null" >
+        #{orderDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="orderStatus != null" >
+        #{orderStatus,jdbcType=INTEGER},
+      </if>
+      <if test="orderType != null" >
+        #{orderType,jdbcType=INTEGER},
+      </if>
+      <if test="commitTime != null" >
+        #{commitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null" >
+        #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.job.entity.UserOrder" >
+    update user_order
+    <set >
+      <if test="userId != null" >
+        userId = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="money != null" >
+        money = #{money,jdbcType=DECIMAL},
+      </if>
+      <if test="prepayid != null" >
+        prepayid = #{prepayid,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null" >
+        orderNum = #{orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDesc != null" >
+        orderDesc = #{orderDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="orderStatus != null" >
+        orderStatus = #{orderStatus,jdbcType=INTEGER},
+      </if>
+      <if test="orderType != null" >
+        orderType = #{orderType,jdbcType=INTEGER},
+      </if>
+      <if test="commitTime != null" >
+        commitTime = #{commitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null" >
+        finishTime = #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where orderId = #{orderId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.job.entity.UserOrder" >
+    update user_order
+    set userId = #{userId,jdbcType=INTEGER},
+      money = #{money,jdbcType=DECIMAL},
+      prepayid = #{prepayid,jdbcType=VARCHAR},
+      orderNum = #{orderNum,jdbcType=INTEGER},
+      orderDesc = #{orderDesc,jdbcType=VARCHAR},
+      orderStatus = #{orderStatus,jdbcType=INTEGER},
+      orderType = #{orderType,jdbcType=INTEGER},
+      commitTime = #{commitTime,jdbcType=TIMESTAMP},
+      finishTime = #{finishTime,jdbcType=TIMESTAMP}
+    where orderId = #{orderId,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByOrderNum">
+    update user_order set
+    orderStatus = #{orderStatus,jdbcType=INTEGER},
+    finishTime = #{finishTime,jdbcType=TIMESTAMP}
+    where orderNum = #{orderNum,jdbcType=VARCHAR}
+  </update>
+
+  <select id="selectByOrderNum" resultType="com.job.entity.UserOrder">
+    select * from user_order where orderNum = #{orderNum,jdbcType=VARCHAR}
+  </select>
+</mapper>

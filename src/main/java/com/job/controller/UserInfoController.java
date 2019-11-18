@@ -87,7 +87,7 @@ public class UserInfoController {
     }
 
     @GetMapping("/recharge")
-    @ApiOperation(value = "充值")
+    @ApiOperation(value = "微信充值")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
             @ApiImplicitParam(name = "money", value = "金额", dataType = "int", required = true),
