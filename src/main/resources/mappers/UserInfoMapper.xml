@@ -69,7 +69,7 @@
                 and phone like concat('%',#{phone},'%')
             </if>
             <if test="status!=null and status!='' or status==0">
-                and status #{status}
+                and status=#{status}
             </if>
         </where>
         order by status asc
