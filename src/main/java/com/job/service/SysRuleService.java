@@ -2,11 +2,14 @@ package com.job.service;
 
 import com.job.common.statuscode.ServerResponse;
 import com.job.entity.SysRule;
+import com.job.entity.vo.SysRuleDetailsVo;
 import com.job.mapper.SysRuleMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @author keith
@@ -30,30 +33,31 @@ public class SysRuleService {
     }
 
     /**
-     * 更新规则信息
-     * @param sysRule
+     * 查询规则详细信息
      * @return
      */
-    public ServerResponse updateRule(SysRule sysRule){
-        int result=sysRuleMapper.updateRule(sysRule);
-        if(result>0){
-            return ServerResponse.createBySuccess();
-        }else{
-            return ServerResponse.createByError();
-        }
+    public ServerResponse findDetails(Integer ruleId){
+        return ServerResponse.createBySuccess(sysRuleMapper.findDetails(ruleId));
     }
 
-    public ServerResponse insertRule(SysRule sysRule){
-        SysRule rule=sysRuleMapper.selectByType(sysRule.getRuleType());
-        if(rule!=null){
-            return ServerResponse.createByErrorCodeMessage(2,"同类型规则已经添加，不能重复添加");
-        }else{
-            int result=sysRuleMapper.insertRule(sysRule);
+    /**
+     * 更新规则列表信息
+     * @param sysRuleDetailsVo
+     * @return
+     */
+    public ServerResponse updateRule(SysRuleDetailsVo sysRuleDetailsVo){
+        sysRuleMapper.deleteRuleDetails(sysRuleDetailsVo.getRuleId());
+        if(sysRuleDetailsVo.getSysRuleDetailsList().size()>0){
+            int result=sysRuleMapper.insertRuleDetails(sysRuleDetailsVo.getRuleId(),sysRuleDetailsVo.getSysRuleDetailsList());
             if(result>0){
                 return ServerResponse.createBySuccess();
             }else{
                 return ServerResponse.createByError();
             }
+        }else{
+            return ServerResponse.createBySuccess();
         }
     }
+
+
 }

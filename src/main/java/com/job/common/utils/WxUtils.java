@@ -169,6 +169,7 @@ public class WxUtils {
         String xmlData = mapToXml(params);
         String payUrl = "https://api.mch.weixin.qq.com/pay/unifiedorder";
         String wxRetXmlData = doPost(payUrl, xmlData);
+        System.out.println(wxRetXmlData+"===");
         Map wxRetMapData = xmlToMap(wxRetXmlData);
         Assert.notNull(wxRetMapData, ExceptionMessage.XML_DATA_INCORRECTNESS.getMessage());
         log.info("weChat pre pay result data: {}", wxRetMapData);
@@ -313,7 +314,7 @@ public class WxUtils {
      * @throws IOException
      */
     private Map<?, ?> doGet(String url) throws IOException {
-        return new ObjectMapper().readValue(restTemplate.getForEntity(url, String.class).getBody(), Map.class);
+        return new ObjectMapper().readValue(new String(Objects.requireNonNull(restTemplate.getForEntity(url, String.class).getBody()).getBytes("ISO8859-1"), StandardCharsets.UTF_8), Map.class);
     }
 
     /**
@@ -327,7 +328,7 @@ public class WxUtils {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<String> request = new HttpEntity<>(params.toString(), headers);
-        return restTemplate.postForEntity(url, request, String.class).getBody();
+        return new String(Objects.requireNonNull(restTemplate.postForEntity(url, request, String.class).getBody()).getBytes("ISO8859-1"), StandardCharsets.UTF_8);
     }
 
     /**

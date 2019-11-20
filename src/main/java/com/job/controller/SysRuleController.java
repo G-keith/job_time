@@ -2,6 +2,7 @@ package com.job.controller;
 
 import com.job.common.statuscode.ServerResponse;
 import com.job.entity.SysRule;
+import com.job.entity.vo.SysRuleDetailsVo;
 import com.job.service.SysRuleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -26,44 +27,24 @@ public class SysRuleController {
     private SysRuleService sysRuleService;
 
     @GetMapping("/all")
-    @ApiOperation(value = "查询所有规则信息")
+    @ApiOperation(value = "查询所有平台规则信息")
     public ServerResponse findAll(){
         return sysRuleService.findAll();
     }
 
-    @PutMapping
-    @ApiOperation("更新规则信息")
+    @GetMapping("/id")
+    @ApiOperation(value = "查询规则列表信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ruleId", value = "主键id", dataType = "int",required = true),
-            @ApiImplicitParam(name = "ruleType", value = "规则类型", dataType = "string",required = true),
-            @ApiImplicitParam(name = "ruleIntroduce", value = "规则介绍", dataType = "string",required = true),
-            @ApiImplicitParam(name = "remarks", value = "备注", dataType = "string"),
     })
-    public ServerResponse updateRule(Integer ruleId,Integer ruleType,String ruleIntroduce,String remarks){
-        SysRule sysRule=new SysRule();
-        sysRule.setRuleId(ruleId);
-        sysRule.setRuleIntroduce(ruleIntroduce);
-        sysRule.setRuleType(ruleType);
-        if(remarks!=null){
-            sysRule.setRemarks(remarks);
-        }
-        return sysRuleService.updateRule(sysRule);
+    public ServerResponse findDetails(Integer ruleId){
+        return sysRuleService.findDetails(ruleId);
     }
 
-    @PostMapping
-    @ApiOperation(value = "插入规则信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "ruleType", value = "规则类型", dataType = "string",required = true),
-            @ApiImplicitParam(name = "ruleIntroduce", value = "规则介绍", dataType = "string",required = true),
-            @ApiImplicitParam(name = "remarks", value = "备注", dataType = "string"),
-    })
-    public ServerResponse insertRule(Integer ruleType,String ruleIntroduce,String remarks){
-        SysRule sysRule=new SysRule();
-        sysRule.setRuleIntroduce(ruleIntroduce);
-        sysRule.setRuleType(ruleType);
-        if(remarks!=null){
-            sysRule.setRemarks(remarks);
-        }
-        return sysRuleService.insertRule(sysRule);
+    @PutMapping("/id")
+    @ApiOperation("更新规则列表信息")
+    public ServerResponse updateRuleDetails(@RequestBody SysRuleDetailsVo sysRuleDetailsVo){
+        return sysRuleService.updateRule(sysRuleDetailsVo);
     }
+
 }

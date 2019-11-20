@@ -15,8 +15,6 @@ public class SysRule {
     private Integer ruleId;
     @ApiModelProperty(value = "规则类型（1.发布规则；2接单规则；3.免责声明；4.保证金说明；5.充值说明，6.平台介绍）")
     private Integer ruleType;
-    @ApiModelProperty(value = "规则介绍")
-    private String ruleIntroduce;
     @ApiModelProperty(value = "备注")
     private String remarks;
 }

@@ -1,9 +1,12 @@
 package com.job.mapper;
 
 import com.job.entity.SysRule;
+import com.job.entity.SysRuleDetails;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author keith
@@ -14,29 +17,30 @@ import java.util.List;
 public interface SysRuleMapper {
 
     /**
-     * 插入规则描述
-     * @param sysRule
-     * @return
-     */
-    int insertRule(SysRule sysRule);
-
-    /**
-     * 根据类型查询规则
-     * @param ruleType
-     * @return
-     */
-    SysRule selectByType(Integer ruleType);
-
-    /**
      * 查询所有规则
      * @return
      */
     List<SysRule> findAll();
 
     /**
-     * 更新规则
-     * @param sysRule
+     * 查询规则详细信息
+     * @param ruleId
      * @return
      */
-    int updateRule(SysRule sysRule);
+    List<Map<String,Object>> findDetails(Integer ruleId);
+
+    /**
+     * 删除规则详细信息
+     * @param ruleId 主键id
+     * @return
+     */
+    int deleteRuleDetails(Integer ruleId);
+
+    /**
+     * 插入规则详细信息
+     * @param sysRuleDetailsList
+     * @param ruleId
+     * @return
+     */
+    int insertRuleDetails(@Param("ruleId") Integer ruleId,@Param("sysRuleDetailsList") List<SysRuleDetails> sysRuleDetailsList);
 }
