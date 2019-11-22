@@ -16,6 +16,11 @@
     where userId=#{userId}
   </select>
 
+    <select id="findByUId" resultType="com.job.entity.UserInfo">
+    select * from user_info
+    where UID=#{UID}
+  </select>
+
     <insert id="insertPhone" useGeneratedKeys="true" keyProperty="userId">
         insert into user_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -241,4 +246,5 @@
             </if>
         </trim>
     </insert>
+
 </mapper>

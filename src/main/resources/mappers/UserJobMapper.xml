@@ -31,6 +31,11 @@
         where taskId = #{taskId,jdbcType=INTEGER}
     </update>
 
+    <select id="selectJobFinishNum" resultType="java.lang.Integer">
+        select count(1) from user_job
+        where status=4 and userId=#{userId}
+    </select>
+
     <select id="findById" resultType="com.job.entity.UserJob">
         select * from user_job where taskId=#{taskId}
     </select>

@@ -9,7 +9,6 @@ import com.job.entity.vo.JobVo;
 import com.job.entity.vo.UserJobVo;
 import com.job.mapper.*;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.PortableServer.SERVANT_RETENTION_POLICY_ID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +35,18 @@ public class JobService {
 
     private final UserJobMapper userJobMapper;
 
-    public JobService(JobMapper jobMapper, JobStepMapper jobStepMapper, SysBondMapper sysBondMapper, UserMoneyMapper userMoneyMapper, UserJobMapper userJobMapper) {
+    private final UserInfoMapper userInfoMapper;
+
+    private final HomePageMapper homePageMapper;
+
+    public JobService(JobMapper jobMapper, JobStepMapper jobStepMapper, SysBondMapper sysBondMapper, UserMoneyMapper userMoneyMapper, UserJobMapper userJobMapper, UserInfoMapper userInfoMapper, HomePageMapper homePageMapper) {
         this.jobMapper = jobMapper;
         this.jobStepMapper = jobStepMapper;
         this.sysBondMapper = sysBondMapper;
         this.userMoneyMapper = userMoneyMapper;
         this.userJobMapper = userJobMapper;
+        this.userInfoMapper = userInfoMapper;
+        this.homePageMapper = homePageMapper;
     }
 
     /**
@@ -173,7 +178,7 @@ public class JobService {
             //减去用户账户钱，添加到系统账户中去
             userMoneyMapper.updateMoney(userMoney);
             //系统账户加上任务钱
-            userMoneyMapper.updateAdmin(userMoneyMapper.money().add(totalPrice));
+            userMoneyMapper.updateAdmin(addPrice(userMoneyMapper.money(),totalPrice));
             //插入明细
             UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
             userMoneyDetails.setUserId(job.getUserId());
@@ -208,6 +213,7 @@ public class JobService {
     public ServerResponse updateUserJob(Integer taskId, Integer status, String refuseReason) {
         UserJob userJob = userJobMapper.findById(taskId);
         Job job = jobMapper.selectJob(userJob.getJobId());
+        UserInfo userInfo=userInfoMapper.findByUserId(userJob.getUserId());
         int result = userJobMapper.updateUserJob(taskId, status, refuseReason);
         if (result > 0) {
             //审核通过，钱进入用户账户
@@ -217,7 +223,7 @@ public class JobService {
                 //系统账户钱减去任务发布钱
                 userMoneyMapper.updateAdmin(surplusPrice(userMoneyMapper.money(), job.getReleasePrice()));
                 //用户账户加上任务钱
-                userMoney.setBalance(userMoney.getRepaidBalance().add(job.getReleasePrice()));
+                userMoney.setBalance(addPrice(userMoney.getBalance(),job.getReleasePrice()));
                 userMoneyMapper.updateMoney(userMoney);
                 //插入明细
                 UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
@@ -231,6 +237,28 @@ public class JobService {
                 job.setCommitNum(job.getCommitNum() - 1);
                 job.setFinishNum(job.getFinishNum() + 1);
                 jobMapper.updateByPrimaryKeySelective(job);
+                // 查询用户是否是第一次做并且有没有推荐人
+                int count=userJobMapper.selectJobFinishNum(userJob.getUserId());
+                if(count==1){
+                    //代表第一次完成
+                    if(userInfo.getUpUID()!=null){
+                        //推荐人获得奖励
+                        BigDecimal inviteMoney=homePageMapper.selectSignInMoney().get("inviteMoney");
+                        //根据推荐码去查询邀请人信息
+                        Integer userId=userInfoMapper.findByUId(userInfo.getUpUID()).getUserId();
+                        UserMoney uMoney=userMoneyMapper.selectById(userId);
+                        uMoney.setBonus(addPrice(userMoney.getBonus(),inviteMoney));
+                        userMoneyMapper.updateMoney(uMoney);
+                        //插入明细
+                        UserMoneyDetails moneyDetails = new UserMoneyDetails();
+                        moneyDetails.setUserId(userId);
+                        moneyDetails.setType(4);
+                        moneyDetails.setIntroduce("邀请奖励");
+                        moneyDetails.setMoney(inviteMoney);
+                        moneyDetails.setTradeTime(new Date());
+                        userMoneyMapper.insertMoneyDetails(userMoneyDetails);
+                    }
+                }
             }
             //审核拒绝
             if (status == 5) {
@@ -241,7 +269,7 @@ public class JobService {
                     //任务已经结束，归还任务的钱
                     //发布任务用户账户加上钱
                     UserMoney userMoney = userMoneyMapper.selectById(job.getUserId());
-                    userMoney.setRepaidBalance(userMoney.getRepaidBalance().add(job.getJobPrice()));
+                    userMoney.setRepaidBalance(addPrice(userMoney.getRepaidBalance(),job.getJobPrice()));
                     userMoneyMapper.updateMoney(userMoney);
                     //插入明细
                     UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
@@ -315,7 +343,7 @@ public class JobService {
     }
 
     /**
-     * 获取任务总额
+     * 乘
      *
      * @param jobPrice
      * @param jobNum
@@ -326,7 +354,7 @@ public class JobService {
     }
 
     /**
-     * 获取任务总额
+     * 加
      *
      * @param b1
      * @param b2
@@ -337,7 +365,7 @@ public class JobService {
     }
 
     /**
-     * 获取剩余金钱
+     * 减
      *
      * @param repaidBalance
      * @param totalPrice

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.TimerTaskMapper">
+
+    <update id="cancelMember">
+        update user_info
+        set isMember=1
+        where <![CDATA[ memberTime<now()  ]]> and isMember=0
+    </update>
+
+    <update id="jobExpire">
+        update user_job
+        set status=2
+        where <![CDATA[ endTime>now()  ]]> and status=1
+    </update>
+
+    <select id="jobCommit" resultType="com.job.entity.UserJob">
+        select j.taskId,j.userId,j.jobId,j.commitTime,job.releasePrice
+        from user_job j
+        inner join job job on j.jobId=job.jobId
+        where status=3 and  <![CDATA[ commitTime<date_sub(now(),interval #{day} day)  ]]>
+    </select>
+
+    <update id="updateJobCommit">
+        update user_job set
+        status=4,
+        auditTime=now()
+        where taskId in
+        <foreach collection="userJobList" item="item" open="(" separator="," close=")">
+            #{item.taskId}
+        </foreach>
+    </update>
+</mapper>

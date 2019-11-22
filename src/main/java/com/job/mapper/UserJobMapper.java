@@ -35,5 +35,12 @@ public interface UserJobMapper {
      */
     int updateUserJob(@Param("taskId") Integer taskId,@Param("status") Integer status,@Param("refuseReason") String refuseReason);
 
+    /**
+     * 查询用户任务完成数
+     * @param userId
+     * @return
+     */
+    int selectJobFinishNum(@Param("userId") Integer userId);
+
     UserJob findById(Integer taskId);
 }
