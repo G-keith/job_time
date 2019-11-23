@@ -48,4 +48,11 @@ public interface UserCashOutMapper {
      */
     List<UserCashOut> findByUserId(Integer userId);
 
+    /**
+     * 查询用户当天有没有提现过
+     * @param userId
+     * @return
+     */
+    int countNow(Integer userId);
+
 }

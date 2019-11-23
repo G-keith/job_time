@@ -137,6 +137,10 @@ public class UserCashOutService {
      * @return
      */
     public ServerResponse insertCashOut(UserCashOut userCashOut) {
+        //查询用户有没有提现过
+        if(userCashOutMapper.countNow(userCashOut.getUserId())==1){
+            return ServerResponse.createByErrorMessage("您今天已经申请过了");
+        }
         int result = userCashOutMapper.insertSelective(userCashOut);
         if (result > 0) {
             //去除账户里的钱
@@ -155,7 +159,7 @@ public class UserCashOutService {
                 userMoney.setBond(userMoney.getBond().subtract(userCashOut.getCashOutMoney()).setScale(2, BigDecimal.ROUND_HALF_UP));
             }
             if (userCashOut.getCashOutType() == 2) {
-                if (userCashOut.getCashOutMoney().compareTo(userMoney.getBalance()) == 1) {
+                if (userCashOut.getCashOutMoney().compareTo(userMoney.getBalance()) > 0) {
                     return ServerResponse.createByErrorMessage("余额不足");
                 }
                 userMoneyDetails.setType(2);

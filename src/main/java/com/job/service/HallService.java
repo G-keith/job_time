@@ -104,16 +104,16 @@ public class HallService {
     public ServerResponse signUp(Integer userId, Integer jobId) {
         UserInfo userInfo=userInfoMapper.findByUserId(userId);
         if(userInfo.getStatus()==1){
-            return ServerResponse.createByErrorCodeMessage(2,"用户为黑名单，不能参与活动");
+            return ServerResponse.createByErrorMessage("用户为黑名单，不能参与活动");
         }
         Job job=jobMapper.selectJob(jobId);
         // 判断用户当天有没有做过，或者以前有没有做过
         Integer res=hallMapper.selectUserJob(userId,jobId,job.getJobRate());
         if(res>0){
-            return ServerResponse.createByErrorCodeMessage(3,"用户参与次数达到上限");
+            return ServerResponse.createByErrorMessage("用户参与次数达到上限");
         }
         if (job.getSurplusNum() < 0) {
-            return ServerResponse.createByErrorCodeMessage(4, "任务参与人数达到上限");
+            return ServerResponse.createByErrorMessage("任务参与人数达到上限");
         } else {
             UserJob userJob=new UserJob();
             userJob.setUserId(userId);
@@ -126,7 +126,7 @@ public class HallService {
                 hallMapper.updateJob(jobId);
                 return ServerResponse.createBySuccess();
             } else {
-                return ServerResponse.createByErrorCodeMessage(5, "报名失败");
+                return ServerResponse.createByErrorMessage("报名失败");
             }
         }
     }

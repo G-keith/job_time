@@ -10,10 +10,11 @@
     </select>
 
     <select id="countInvite" resultType="com.job.entity.vo.InviteVo">
-        select u.userId,u.headimgurl,u.nickName,count(i.inviteId) as totalNum from user_invite i
+        select u.userId,u.headimgurl,u.nickName,count(i.inviteId) as totalNum,u.phone from user_invite i
         inner join user_info u on i.userId=u.userId
         where <![CDATA[ date(inviteTime) >=DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]> and <![CDATA[ date(inviteTime)<=last_day(curdate()) ]]>
         group by u.userId,u.headimgurl,u.nickName
         order by count(i.inviteId) desc
+        LIMIT 20
     </select>
 </mapper>

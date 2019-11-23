@@ -79,6 +79,7 @@ public class HomePageService {
      * @return 0成功，1失败
      */
     public ServerResponse insertSignIn(Integer userId) {
+        System.out.println(userId+"====");
         int result = homePageMapper.insertSignIn(userId);
         if (result > 0) {
             BigDecimal balance=homePageMapper.selectSignInMoney().get("money");

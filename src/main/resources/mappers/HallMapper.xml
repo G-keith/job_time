@@ -79,7 +79,7 @@
     from job j
     inner join user_info i on j.userId=i.userId
     inner join job_type t on j.typeId=t.typeId
-    left join user_job uj on uj.jobId=j.jobId and uj.userId=#{userId}
+    left join user_job uj on uj.jobId=j.jobId and uj.userId=#{userId} and uj.status in(1,3)
     where j.jobId=#{jobId}
     </select>
 
@@ -95,6 +95,7 @@
     <select id="getJobStepList" resultType="com.job.entity.JobStep">
     select stepId,stepType,sort,checkPicture,picture,website,introduce from job_step
     where jobId=#{jobId}
+    order by sort
     </select>
 
     <insert id="userSignUp" useGeneratedKeys="true" keyProperty="taskId">
@@ -104,7 +105,7 @@
     <select id="selectUserJob" resultType="java.lang.Integer">
         select count(1) from user_job
         <where>
-            userId=#{userId} and jobId=#{jobId} and status=3
+            userId=#{userId} and jobId=#{jobId} and status=4
             <if test="type==2">
                 and date(commitTime) = curdate()
             </if>

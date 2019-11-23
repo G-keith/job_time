@@ -63,8 +63,10 @@ public class WxUtils {
 
     /**
      * 商户号
+     * 1491103722
+     * 1482664972
      */
-    private static final String MACID = "1491103722";
+    private static final String MACID = "1482664972";
 
     /**
      * API密钥
@@ -169,7 +171,6 @@ public class WxUtils {
         String xmlData = mapToXml(params);
         String payUrl = "https://api.mch.weixin.qq.com/pay/unifiedorder";
         String wxRetXmlData = doPost(payUrl, xmlData);
-        System.out.println(wxRetXmlData+"===");
         Map wxRetMapData = xmlToMap(wxRetXmlData);
         Assert.notNull(wxRetMapData, ExceptionMessage.XML_DATA_INCORRECTNESS.getMessage());
         log.info("weChat pre pay result data: {}", wxRetMapData);

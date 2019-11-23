@@ -257,6 +257,24 @@ public class UserInfoService {
     }
 
     /**
+     * 更新用户头像
+     * @param headimgurl
+     * @param userId
+     * @return
+     */
+    public ServerResponse headimgurl(String headimgurl,Integer userId){
+        UserInfo userInfo=new UserInfo();
+        userInfo.setUserId(userId);
+        userInfo.setHeadimgurl(headimgurl);
+        int result=userInfoMapper.updateByPrimaryKeySelective(userInfo);
+        if (result > 0) {
+            return ServerResponse.createBySuccess();
+        } else {
+            return ServerResponse.createByError();
+        }
+    }
+
+    /**
      * 发送短信验证码
      *
      * @param phone 手机号

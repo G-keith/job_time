@@ -27,4 +27,7 @@ public class InviteVo {
 
     @ApiModelProperty(value = "总获得奖励")
     private BigDecimal totalMoney;
+
+    @ApiModelProperty(value = "手机号")
+    private String phone;
 }
