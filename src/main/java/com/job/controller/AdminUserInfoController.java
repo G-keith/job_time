@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@Api(tags = "")
+@Api(tags = "后台用户管理")
 @RequestMapping(value = "/user/admin")
 public class AdminUserInfoController {
 

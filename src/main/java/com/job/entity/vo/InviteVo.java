@@ -20,7 +20,7 @@ public class InviteVo {
     private String headimgurl;
 
     @ApiModelProperty(value = "昵称")
-    private String nickName;
+    private String nickname;
 
     @ApiModelProperty(value = "总人数")
     private Integer totalNum;

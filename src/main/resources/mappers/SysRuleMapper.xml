@@ -9,7 +9,7 @@
     <select id="findDetails" resultType="map">
         select sort,introduce from sys_rule_details
         where ruleId=#{ruleId}
-        order by sort
+        order by sort asc
     </select>
 
     <delete id="deleteRuleDetails">

@@ -1,5 +1,6 @@
 package com.job.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -64,7 +65,7 @@ public class Job {
     @ApiModelProperty(value = "1.进行中 2.已结束，3.暂停")
     private Integer jobStatus;
 
-    @ApiModelProperty(value = "1.新建，2待审核，3审核通过4；审核拒绝；")
+    @ApiModelProperty(value = "2待审核，3审核通过4；审核拒绝；")
     private Integer auditStatus;
 
     @ApiModelProperty(value = "是否推荐（1不推荐，2推荐）")
@@ -77,9 +78,11 @@ public class Job {
     private Integer label;
 
     @ApiModelProperty(value = "发布时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date releaseTime;
 
     @ApiModelProperty(value = "审核通过时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date auditTime;
 
     @ApiModelProperty(value = "拒绝原因")
