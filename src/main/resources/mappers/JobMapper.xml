@@ -317,6 +317,7 @@
         order by sort asc
     </select>
 
+
     <insert id="insertJobType">
         insert into job_job_type (jobId,typeId) values (#{jobId},#{typeId})
     </insert>
