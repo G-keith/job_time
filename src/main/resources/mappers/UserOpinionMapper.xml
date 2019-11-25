@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.UserOpinionMapper" >
+  <resultMap id="BaseResultMap" type="com.job.entity.UserOpinion" >
+    <result column="userId" property="userId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="opinion" property="opinion" jdbcType="VARCHAR" />
+    <result column="reply" property="reply" jdbcType="VARCHAR" />
+    <result column="commitTime" property="commitTime" jdbcType="TIMESTAMP" />
+    <result column="replyTime" property="replyTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <insert id="insertSelective" parameterType="com.job.entity.UserOpinion" >
+    insert into user_opinon
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        userId,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="opinion != null" >
+        opinion,
+      </if>
+      <if test="reply != null" >
+        reply,
+      </if>
+      <if test="commitTime != null" >
+        commitTime,
+      </if>
+      <if test="replyTime != null" >
+        replyTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="opinion != null" >
+        #{opinion,jdbcType=VARCHAR},
+      </if>
+      <if test="reply != null" >
+        #{reply,jdbcType=VARCHAR},
+      </if>
+      <if test="commitTime != null" >
+        #{commitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="replyTime != null" >
+        #{replyTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.job.entity.UserOpinion">
+    update user_opinon
+    <set>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="opinion != null">
+        opinion = #{opinion,jdbcType=VARCHAR},
+      </if>
+      <if test="reply != null">
+        reply = #{reply,jdbcType=VARCHAR},
+      </if>
+      <if test="commitTime != null">
+        commitTime = #{commitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="replyTime != null">
+        replyTime = #{replyTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where opinionId = #{opinionId,jdbcType=INTEGER}
+  </update>
+
+  <select id="findAll" resultType="com.job.entity.UserOpinion">
+    select o.opinionId,o.userId,o.status,o.opinion,o.reply,o.commitTime,o.replyTime,i.phone,i.nickname,i.headimgurl from user_opinon o
+    inner join user_info i on o.userId=i.userId
+    <where>
+      <if test="userId!=null and userId!=''">
+        and o.userId=#{userId}
+      </if>
+      <if test="status!=null and status!=''">
+        and status=#{status}
+      </if>
+    </where>
+    order by status asc,commitTime asc
+  </select>
+
+</mapper>
