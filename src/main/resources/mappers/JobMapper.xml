@@ -229,8 +229,7 @@
         (j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,ifnull(uj.status,0) as status
         from job j
         inner join user_info i on j.userId=i.userId
-        inner join job_job_type jt on j.jobId=jt.jobId
-        inner join job_type t on jt.typeId=t.typeId
+        inner join job_type t on j.typeId=t.typeId
         <where>
             j.auditStatus=2 and j.isDelete=1
             <if test="jobTitle!=null and jobTitle!=''">
@@ -274,8 +273,7 @@
         from user_footprint f
         inner join job j on f.jobId=j.jobId
         inner join user_info i on j.userId=i.userId
-        inner join job_job_type jt on j.jobId=jt.jobId
-        inner join job_type t on jt.typeId=t.typeId
+        inner join job_type t on j.typeId=t.typeId
         where f.userId=#{userId}
         order by f.browseTime desc
     </select>
@@ -285,8 +283,7 @@
         j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,t.typeName,j.jobSource,i.headimgurl
         from job j
         inner join user_info i on j.userId=i.userId
-        inner join job_job_type jt on j.jobId=jt.jobId
-        inner join job_type t on jt.typeId=t.typeId
+        inner join job_type t on t.typeId=t.typeId
         <where>
             j.userId=#{userId}
             <if test="auditStatus!=null">
@@ -302,8 +299,7 @@
     (select count(1) from user_job where jobId=j.jobId and status=3) as num
     from job j
     inner join user_info i on j.userId=i.userId
-    inner join job_job_type jt on j.jobId=jt.jobId
-    inner join job_type t on jt.typeId=t.typeId
+    inner join job_type t on t.typeId=t.typeId
     where jobStatus in (1,3) and j.userId=#{userId}
     </select>
 
