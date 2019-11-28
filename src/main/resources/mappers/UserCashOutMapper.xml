@@ -163,6 +163,6 @@
     </select>
 
     <select id="countNow" resultType="java.lang.Integer">
-        select count(1) from user_cash_out where userId=#{userId} and date(applyTime) = curdate()
+        select count(1) from user_cash_out where userId=#{userId} and date(applyTime) = curdate() and cashOutType=#{cashOutType}
     </select>
 </mapper>

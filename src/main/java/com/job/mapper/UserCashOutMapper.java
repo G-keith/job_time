@@ -1,6 +1,7 @@
 package com.job.mapper;
 
 import com.job.entity.UserCashOut;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -53,6 +54,6 @@ public interface UserCashOutMapper {
      * @param userId
      * @return
      */
-    int countNow(Integer userId);
+    int countNow(@Param("userId") Integer userId,@Param("cashOutType") Integer cashOutType);
 
 }

@@ -225,23 +225,20 @@
 
     <select id="findAll" resultType="com.job.entity.vo.JobVo">
         select
-        i.userId,i.headimgurl,i.UID,j.jobSource,t.typeName,j.submissionTime,j.releasePrice,j.introduce,j.jobTitle,j.jobId,
-        (j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,ifnull(uj.status,0) as status
+        i.userId,i.headimgurl,i.UID,j.jobSource,t.typeName,j.submissionTime,j.releasePrice,j.introduce,j.jobTitle,j.jobId
         from job j
         inner join user_info i on j.userId=i.userId
         inner join job_type t on j.typeId=t.typeId
         <where>
             j.auditStatus=2 and j.isDelete=1
             <if test="jobTitle!=null and jobTitle!=''">
-                and (
-                j.jobTitle like concat('%',#{jobTitle},'%')
+                and j.jobTitle like concat('%',#{jobTitle},'%')
             </if>
             <if test="jobSource!=null and jobSource!=''">
-                and (
-                j.jobSource like concat('%',#{jobSource},'%')
+                and j.jobSource like concat('%',#{jobSource},'%')
             </if>
         </where>
-        j.releaseTime asc
+        order by j.releaseTime asc
     </select>
 
     <select id="findAllStep" resultType="com.job.entity.JobStep">

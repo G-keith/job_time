@@ -1,7 +1,9 @@
 package com.job.controller;
 
 import com.job.common.statuscode.ServerResponse;
+import com.job.common.utils.AlipayUtils;
 import com.job.common.utils.WxUtils;
+import com.job.entity.CashOutOrder;
 import com.job.service.UserInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -29,9 +31,12 @@ public class UserInfoController {
 
     private final WxUtils wxUtils;
 
-    public UserInfoController(UserInfoService userInfoService, WxUtils wxUtils) {
+    private final AlipayUtils alipayUtils;
+
+    public UserInfoController(UserInfoService userInfoService, WxUtils wxUtils, AlipayUtils alipayUtils) {
         this.userInfoService = userInfoService;
         this.wxUtils = wxUtils;
+        this.alipayUtils = alipayUtils;
     }
 
     @GetMapping("/enroll")
@@ -83,15 +88,26 @@ public class UserInfoController {
         return userInfoService.findBlacklist(pageNo, pageSize, phone);
     }
 
-    @GetMapping("/recharge")
-    @ApiOperation(value = "微信充值")
+    @GetMapping("/wxRecharge")
+    @ApiOperation(value = "获取微信充值预支付")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
             @ApiImplicitParam(name = "money", value = "金额", dataType = "int", required = true),
             @ApiImplicitParam(name = "type", value = "类型（1.代表会员充值，2代表账户充值）", dataType = "int", required = true),
     })
-    public ServerResponse recharge(Integer userId,BigDecimal money,Integer type ,HttpServletRequest request) throws IOException {
-        return userInfoService.recharge(userId,money,type,request);
+    public ServerResponse wxRecharge(Integer userId, BigDecimal money, Integer type, HttpServletRequest request) throws IOException {
+        return userInfoService.wxRecharge(userId, money, type, request);
+    }
+
+    @GetMapping("/zfbRecharge")
+    @ApiOperation(value = "获取支付宝充值信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
+            @ApiImplicitParam(name = "money", value = "金额", dataType = "int", required = true),
+            @ApiImplicitParam(name = "type", value = "类型（1.代表会员充值，2代表账户充值）", dataType = "int", required = true),
+    })
+    public ServerResponse zfbRecharge(Integer userId, BigDecimal money, Integer type) {
+        return userInfoService.zfbRecharge(userId, money, type);
     }
 
     @PutMapping("/headimgurl")
@@ -100,8 +116,7 @@ public class UserInfoController {
             @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
             @ApiImplicitParam(name = "headimgurl", value = "头像路径", dataType = "string", required = true),
     })
-    public ServerResponse headimgurl(String headimgurl,Integer userId){
+    public ServerResponse headimgurl(String headimgurl, Integer userId) {
         return userInfoService.headimgurl(headimgurl, userId);
     }
-
 }

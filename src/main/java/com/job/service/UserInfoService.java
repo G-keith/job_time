@@ -6,6 +6,7 @@ import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
 import com.job.common.page.PageVO;
 import com.job.common.statuscode.ServerResponse;
+import com.job.common.utils.AlipayUtils;
 import com.job.common.utils.RandomUtil;
 import com.job.common.utils.WxUtils;
 import com.job.entity.UserInfo;
@@ -64,12 +65,15 @@ public class UserInfoService {
 
     private final WxUtils wxUtils;
 
+    private final AlipayUtils alipayUtils;
+
     private final UserOrderMapper userOrderMapper;
 
-    public UserInfoService(UserInfoMapper userInfoMapper, UserMoneyMapper userMoneyMapper, WxUtils wxUtils, UserOrderMapper userOrderMapper) {
+    public UserInfoService(UserInfoMapper userInfoMapper, UserMoneyMapper userMoneyMapper, WxUtils wxUtils, AlipayUtils alipayUtils, UserOrderMapper userOrderMapper) {
         this.userInfoMapper = userInfoMapper;
         this.userMoneyMapper = userMoneyMapper;
         this.wxUtils = wxUtils;
+        this.alipayUtils = alipayUtils;
         this.userOrderMapper = userOrderMapper;
     }
 
@@ -227,26 +231,15 @@ public class UserInfoService {
     }
 
     /**
-     * 会员充值
+     * 充值
      * @param userId
      * @param money
      * @param request
      * @return
      * @throws IOException
      */
-    public ServerResponse recharge(Integer userId, BigDecimal money, Integer type,HttpServletRequest request) throws IOException {
-        UserOrder userOrder = new UserOrder();
-        userOrder.setUserId(userId);
-        if(type==1){
-            userOrder.setOrderType(1);
-            userOrder.setOrderDesc("小蜜蜂-会员充值");
-        }else{
-            userOrder.setOrderType(2);
-            userOrder.setOrderDesc("小蜜蜂-充值");
-        }
-        userOrder.setOrderNum(RandomUtil.getTimestamp() + RandomUtil.randomStr(3));
-        userOrder.setOrderType(1);
-        userOrder.setMoney(money);
+    public ServerResponse wxRecharge(Integer userId, BigDecimal money, Integer type,HttpServletRequest request) throws IOException {
+        UserOrder userOrder=getOrder(userId, money, type);
         ServerResponse response = wxUtils.appPay(userOrder, request);
         //预支付成功成功
         if (response.getStatus() == 1) {
@@ -254,6 +247,43 @@ public class UserInfoService {
             userOrderMapper.insertSelective(userOrder);
         }
         return response;
+    }
+
+    /**
+     * 支付宝充值
+     * @param userId
+     * @param money
+     * @return
+     */
+    public ServerResponse zfbRecharge(Integer userId, BigDecimal money, Integer type) {
+        UserOrder userOrder=getOrder(userId, money, type);
+        ServerResponse response = alipayUtils.alipay(userOrder);
+        if(response.getStatus()==1){
+            userOrder.setCommitTime(new Date());
+            userOrderMapper.insertSelective(userOrder);
+        }
+        return response;
+    }
+
+    /**
+     * 组装用户订单信息
+     * @param userId
+     * @param money
+     * @param type
+     * @return
+     */
+    private UserOrder getOrder(Integer userId, BigDecimal money, Integer type){
+        UserOrder userOrder = new UserOrder();
+        userOrder.setUserId(userId);
+        userOrder.setOrderType(1);
+        if(type==1){
+            userOrder.setOrderDesc("小蜜蜂-会员充值");
+        }else{
+            userOrder.setOrderDesc("小蜜蜂-充值");
+        }
+        userOrder.setOrderNum(RandomUtil.getTimestamp() + RandomUtil.randomStr(3));
+        userOrder.setMoney(money);
+        return userOrder;
     }
 
     /**

@@ -5,8 +5,8 @@ import com.job.common.statuscode.ExceptionMessage;
 import com.job.common.statuscode.ServerResponse;
 import com.job.entity.*;
 import com.job.mapper.UserInfoMapper;
-import com.job.mapper.UserMoneyMapper;
 import com.job.mapper.UserOrderMapper;
+import com.job.service.UserMoneyService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.ParseException;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,15 +51,18 @@ public class WxUtils {
 
     private final UserOrderMapper userOrderMapper;
 
-    private final UserMoneyMapper userMoneyMapper;
+    private final UserMoneyService userMoneyService;
+
     /**
      * 开发平台APPID
      */
-    private static final String APPID = "wxc8e1a3732b85cd01";
+    @Value("${wx.appId}")
+    private String APPID;
     /**
      * 开发平台APPSECRET
      */
-    private static final String APPSECRET = "a9eb523e05e230c6443a2526f8ccb511";
+    @Value("${wx.appKey}")
+    private String APPSECRET;
 
     /**
      * 商户号
@@ -76,11 +79,11 @@ public class WxUtils {
     @Value("${wx.notifyUrl}")
     private String notifyUrl;
 
-    public WxUtils(RestTemplate restTemplate, UserInfoMapper userInfoMapper, UserOrderMapper userOrderMapper, UserMoneyMapper userMoneyMapper) {
+    public WxUtils(RestTemplate restTemplate, UserInfoMapper userInfoMapper, UserOrderMapper userOrderMapper, UserMoneyService userMoneyService) {
         this.restTemplate = restTemplate;
         this.userInfoMapper = userInfoMapper;
         this.userOrderMapper = userOrderMapper;
-        this.userMoneyMapper = userMoneyMapper;
+        this.userMoneyService = userMoneyService;
     }
 
     /**
@@ -141,6 +144,7 @@ public class WxUtils {
      * @return
      */
     public ServerResponse appPay(UserOrder userOrder, HttpServletRequest request) throws IOException {
+        //金额转化分
         int money = userOrder.getMoney().multiply(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
         // 设置客户端的ip地址
         String spbillCreateIp = getIpAddress(request);
@@ -201,13 +205,12 @@ public class WxUtils {
      * @return
      * @throws ParseException
      */
-    public ServerResponse cashOut(CashOutOrder cashOutOrder, HttpServletRequest request) throws ParseException {
+    public ServerResponse<String> cashOut(CashOutOrder cashOutOrder, HttpServletRequest request) throws ParseException {
+        //金额转化分
+        int money = cashOutOrder.getTotalFee().multiply(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
         String spbillCreateIp = getIpAddress(request);
-
         //随机数
         String nonceStr = 1 + RandomUtil.randomStr(15);
-        //是否校验用户姓名 NO_CHECK：不校验真实姓名  FORCE_CHECK：强校验真实姓名
-        String checkName = "NO_CHECK";
         //等待确认转账金额,ip,openid的来源
         Map<String, Object> params = new HashMap<>();
         // 参数：开始生成第一次签名
@@ -216,10 +219,11 @@ public class WxUtils {
         params.put("partner_trade_no", cashOutOrder.getTradeNo());
         params.put("nonce_str", nonceStr);
         params.put("openid", cashOutOrder.getOpenid());
+        //是否校验用户姓名 NO_CHECK：不校验真实姓名  FORCE_CHECK：强校验真实姓名
         params.put("check_name", "NO_CHECK");
-        params.put("amount", cashOutOrder.getTotalFee());
+        params.put("amount",money);
         params.put("spbill_create_ip", spbillCreateIp);
-        params.put("desc", cashOutOrder.getDesc());
+        params.put("desc", cashOutOrder.getRemarks());
         String sign = sign(params, APIKEY);
         params.put("sign", sign);
         String xmlData = mapToXml(params);
@@ -230,7 +234,7 @@ public class WxUtils {
             assert wxRetMapData != null;
             if ("SUCCESS".equals(wxRetMapData.get("result_code"))) {
                 if ("SUCCESS".equals(wxRetMapData.get("return_code"))) {
-                    return ServerResponse.createBySuccess(wxRetMapData);
+                    return ServerResponse.createBySuccess(wxRetMapData.get("partner_trade_no").toString());
                 } else {
                     return ServerResponse.createByErrorMessage(wxRetMapData.get("err_code_des").toString());
                 }
@@ -256,7 +260,7 @@ public class WxUtils {
         String wxRetXml = getRequestData(request);
         Map<String, String> wxRetMap = xmlToMap(wxRetXml);
         Assert.notNull(wxRetMap, ExceptionMessage.XML_DATA_INCORRECTNESS.getMessage());
-         //当返回的return_code为SUCCESS则回调成功
+        //当返回的return_code为SUCCESS则回调成功
         if ("SUCCESS".equalsIgnoreCase(wxRetMap.get("return_code"))) {
             // 通知微信收到回调
             String resXml = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
@@ -265,42 +269,16 @@ public class WxUtils {
             out.flush();
             out.close();
             //更新订单状态
-            UserOrder userOrder=userOrderMapper.selectByOrderNum("1574063664788");
+            UserOrder userOrder = userOrderMapper.selectByOrderNum(wxRetMap.get("out_trade_no"));
             userOrder.setFinishTime(new Date());
-            userOrder.setOrderNum("1574063664788");
             if ("SUCCESS".equalsIgnoreCase(wxRetMap.get("result_code"))) {
                 userOrder.setOrderStatus(2);
+                userMoneyService.paySuccess(userOrder);
             } else {
                 userOrder.setOrderStatus(3);
             }
             //更新订单信息
-           userOrderMapper.updateByPrimaryKey(userOrder);
-            if(userOrder.getOrderType()==1){
-                //会员充值
-                UserInfo userInfo=userInfoMapper.findByUserId(userOrder.getUserId());
-                if(userInfo.getIsMember()==2 && userInfo.getMemberTime().getTime()>System.currentTimeMillis()){
-                    //会员没有到期，加上续费会员时间
-                    userInfo.setMemberTime(DateUtils.getDate_add(userInfo.getMemberTime(),30,1));
-                }else{
-                    //会员到期
-                    userInfo.setMemberTime(DateUtils.getDate_add(new Date(),30,1));
-                    userInfo.setIsMember(2);
-                }
-                userInfoMapper.updateByPrimaryKeySelective(userInfo);
-            }else{
-                //账户充值
-                UserMoney userMoney=userMoneyMapper.selectById(userOrder.getUserId());
-                userMoney.setRepaidBalance(userMoney.getRepaidBalance().add(userOrder.getMoney()).setScale(2,BigDecimal.ROUND_HALF_UP));
-                userMoneyMapper.updateMoney(userMoney);
-                //插入明细
-                UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
-                userMoneyDetails.setUserId(userOrder.getUserId());
-                userMoneyDetails.setType(3);
-                userMoneyDetails.setIntroduce("充值");
-                userMoneyDetails.setMoney(userOrder.getMoney());
-                userMoneyDetails.setTradeTime(new Date());
-                userMoneyMapper.insertMoneyDetails(userMoneyDetails);
-            }
+            userOrderMapper.updateByPrimaryKey(userOrder);
             log.info("notify success");
         } else {
             log.error("notify failed");
@@ -328,7 +306,7 @@ public class WxUtils {
     private String doPost(String url, String params) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        HttpEntity<String> request = new HttpEntity<>(params.toString(), headers);
+        HttpEntity<String> request = new HttpEntity<>(params, headers);
         return new String(Objects.requireNonNull(restTemplate.postForEntity(url, request, String.class).getBody()).getBytes("ISO8859-1"), StandardCharsets.UTF_8);
     }
 

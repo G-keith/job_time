@@ -4,17 +4,20 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.job.common.page.PageVO;
 import com.job.common.statuscode.ServerResponse;
-import com.job.entity.UserCashOut;
-import com.job.entity.UserMoney;
-import com.job.entity.UserMoneyDetails;
-import com.job.entity.vo.JobListVo;
+import com.job.common.utils.AlipayUtils;
+import com.job.common.utils.RandomUtil;
+import com.job.common.utils.WxUtils;
+import com.job.entity.*;
+import com.job.mapper.CashOutOrderMapper;
 import com.job.mapper.UserCashOutMapper;
+import com.job.mapper.UserInfoMapper;
 import com.job.mapper.UserMoneyMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -32,9 +35,21 @@ public class UserCashOutService {
 
     private final UserMoneyMapper userMoneyMapper;
 
-    public UserCashOutService(UserCashOutMapper userCashOutMapper, UserMoneyMapper userMoneyMapper) {
+    private final WxUtils wxUtils;
+
+    private final AlipayUtils alipayUtils;
+
+    private final UserInfoMapper userInfoMapper;
+
+    @Autowired
+    private CashOutOrderMapper cashOutOrderMapper;
+
+    public UserCashOutService(UserCashOutMapper userCashOutMapper, UserMoneyMapper userMoneyMapper, WxUtils wxUtils, AlipayUtils alipayUtils, UserInfoMapper userInfoMapper) {
         this.userCashOutMapper = userCashOutMapper;
         this.userMoneyMapper = userMoneyMapper;
+        this.wxUtils = wxUtils;
+        this.alipayUtils = alipayUtils;
+        this.userInfoMapper = userInfoMapper;
     }
 
     /**
@@ -59,7 +74,7 @@ public class UserCashOutService {
      * @param pageSize
      * @return
      */
-    public ServerResponse findByUserId(Integer userId,Integer pageNo, Integer pageSize) {
+    public ServerResponse findByUserId(Integer userId, Integer pageNo, Integer pageSize) {
         Page<UserCashOut> page = PageHelper.startPage(pageNo, pageSize);
         userCashOutMapper.findByUserId(userId);
         return ServerResponse.createBySuccess(PageVO.build(page));
@@ -73,24 +88,45 @@ public class UserCashOutService {
      * @param refuseReason
      * @return
      */
-    public ServerResponse updateCashOut(Integer cashOutId, Integer auditStatus, String refuseReason) {
+    public ServerResponse updateCashOut(Integer cashOutId, Integer auditStatus, String refuseReason, HttpServletRequest request) {
         UserCashOut userCashOut = userCashOutMapper.selectByPrimaryKey(cashOutId);
-        if (auditStatus == 2) {
-            if (userCashOut.getTradeType() == 1) {
-                //支付宝提现
-            }
-            if (userCashOut.getTradeType() == 2) {
-                //微信提现
-            }
+        UserInfo userInfo = userInfoMapper.findByUserId(userCashOut.getUserId());
+        ServerResponse serverResponse;
+        String tradeNo = RandomUtil.getTimestamp() + RandomUtil.randomStr(3);
+        userCashOut.setAuditStatus(auditStatus);
+        userCashOut.setAuditTime(new Date());
+        int result = 0;
+        if (auditStatus == 3) {
             //审核通过，系统账户减去提现金钱
             userMoneyMapper.updateAdmin(userMoneyMapper.money().subtract(userCashOut.getCashOutMoney()).setScale(2, BigDecimal.ROUND_HALF_UP));
+            CashOutOrder cashOutOrder = new CashOutOrder();
+            cashOutOrder.setRemarks("小蜜蜂提现");
+            cashOutOrder.setTotalFee(userCashOut.getCashOutMoney());
+            cashOutOrder.setTradeNo(tradeNo);
+            if (userCashOut.getTradeType() == 1) {
+                cashOutOrder.setZfbName(userCashOut.getZfbName());
+                //支付宝提现
+                cashOutOrder.setZfbAccount(userCashOut.getZfbAccount());
+                serverResponse = wxUtils.cashOut(cashOutOrder, request);
+            } else {
+                //微信提现
+                cashOutOrder.setOpenid(userInfo.getOpenid());
+                serverResponse = alipayUtils.cashOut(cashOutOrder);
+            }
+            if (serverResponse.getStatus() == 1) {
+                //成功,插入打款记录
+                cashOutOrderMapper.insertSelective(cashOutOrder);
+                //更新提现申请
+                result = userCashOutMapper.updateByPrimaryKeySelective(userCashOut);
+            }
+            //插入提现订单
         } else {
             //审核拒绝
             UserMoney userMoney = userMoneyMapper.selectById(userCashOut.getUserId());
             //插入明细
             UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
             userMoneyDetails.setUserId(userCashOut.getUserId());
-            userMoneyDetails.setIntroduce("审核拒绝");
+            userMoneyDetails.setIntroduce("审核拒绝,退还");
             userMoneyDetails.setMoney(userCashOut.getCashOutMoney());
             userMoneyDetails.setTradeTime(new Date());
             if (userCashOut.getCashOutType() == 1) {
@@ -115,14 +151,12 @@ public class UserCashOutService {
             userMoneyMapper.updateAdmin(userMoneyMapper.money().subtract(userCashOut.getCashOutMoney()).setScale(2, BigDecimal.ROUND_HALF_UP));
             //插入明细
             userMoneyMapper.insertMoneyDetails(userMoneyDetails);
+            userCashOut.setRefuseReason(refuseReason);
+            result = userCashOutMapper.updateByPrimaryKeySelective(userCashOut);
+            //更新提现申请
+            userCashOutMapper.updateByPrimaryKeySelective(userCashOut);
         }
         //更新提现申请
-        userCashOut.setAuditStatus(auditStatus);
-        if (refuseReason != null) {
-            userCashOut.setRefuseReason(refuseReason);
-        }
-        userCashOut.setAuditTime(new Date());
-        int result = userCashOutMapper.updateByPrimaryKeySelective(userCashOut);
         if (result > 0) {
             return ServerResponse.createBySuccess();
         } else {
@@ -138,7 +172,7 @@ public class UserCashOutService {
      */
     public ServerResponse insertCashOut(UserCashOut userCashOut) {
         //查询用户有没有提现过
-        if(userCashOutMapper.countNow(userCashOut.getUserId())==1){
+        if (userCashOutMapper.countNow(userCashOut.getUserId(), userCashOut.getCashOutType()) == 1) {
             return ServerResponse.createByErrorMessage("您今天已经申请过了");
         }
         int result = userCashOutMapper.insertSelective(userCashOut);

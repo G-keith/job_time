@@ -41,10 +41,10 @@ public class UserCashOut {
     @ApiModelProperty(value = "拒绝原因")
     private String refuseReason;
 
-    @ApiModelProperty(value = "主键id")
+    @ApiModelProperty(value = "手机号")
     private String phone;
 
-    @ApiModelProperty(value = "主键id")
+    @ApiModelProperty(value = "昵称")
     private String nickName;
 
     @ApiModelProperty(value = "姓名")

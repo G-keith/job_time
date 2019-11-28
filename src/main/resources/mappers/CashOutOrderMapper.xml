@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.CashOutOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.job.entity.CashOutOrder" >
+    <id column="cashOutId" property="cashOutId" jdbcType="INTEGER" />
+    <result column="tradeNo" property="tradeNo" jdbcType="VARCHAR" />
+    <result column="totalFee" property="totalFee" jdbcType="DECIMAL" />
+    <result column="openid" property="openid" jdbcType="INTEGER" />
+    <result column="zfbName" property="zfbName" jdbcType="VARCHAR" />
+    <result column="zfbAccount" property="zfbAccount" jdbcType="VARCHAR" />
+    <result column="payTime" property="payTime" jdbcType="TIMESTAMP" />
+    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    cashOutId, tradeNo, totalFee, openid, zfbName, zfbAccount, payTime, remarks
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from cash_out_order
+    where cashOutId = #{cashOutId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from cash_out_order
+    where cashOutId = #{cashOutId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insertSelective" parameterType="com.job.entity.CashOutOrder" >
+    insert into cash_out_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="cashOutId != null" >
+        cashOutId,
+      </if>
+      <if test="tradeNo != null" >
+        tradeNo,
+      </if>
+      <if test="totalFee != null" >
+        totalFee,
+      </if>
+      <if test="openid != null" >
+        openid,
+      </if>
+      <if test="zfbName != null" >
+        zfbName,
+      </if>
+      <if test="zfbAccount != null" >
+        zfbAccount,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="payTime != null" >
+        payTime,
+      </if>
+      <if test="remarks != null" >
+        remarks,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="cashOutId != null" >
+        #{cashOutId,jdbcType=INTEGER},
+      </if>
+      <if test="tradeNo != null" >
+        #{tradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="totalFee != null" >
+        #{totalFee,jdbcType=DECIMAL},
+      </if>
+      <if test="openid != null" >
+        #{openid,jdbcType=INTEGER},
+      </if>
+      <if test="zfbName != null" >
+        #{zfbName,jdbcType=VARCHAR},
+      </if>
+      <if test="zfbAccount != null" >
+        #{zfbAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="payTime != null" >
+        #{payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remarks != null" >
+        #{remarks,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.job.entity.CashOutOrder" >
+    update cash_out_order
+    <set >
+      <if test="tradeNo != null" >
+        tradeNo = #{tradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="totalFee != null" >
+        totalFee = #{totalFee,jdbcType=DECIMAL},
+      </if>
+      <if test="openid != null" >
+        openid = #{openid,jdbcType=INTEGER},
+      </if>
+      <if test="zfbName != null" >
+        zfbName = #{zfbName,jdbcType=VARCHAR},
+      </if>
+      <if test="zfbAccount != null" >
+        zfbAccount = #{zfbAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="payTime != null" >
+        payTime = #{payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remarks != null" >
+        remarks = #{remarks,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where cashOutId = #{cashOutId,jdbcType=INTEGER}
+  </update>
+</mapper>

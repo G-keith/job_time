@@ -44,4 +44,9 @@
     <select id="money" resultType="java.math.BigDecimal">
         select money from user_admin
     </select>
+
+    <select id="findAll" resultType="com.job.entity.UserMoneyDetails">
+        select * from user_money_details where userId=#{userId}
+        order by tradeTime desc
+    </select>
 </mapper>

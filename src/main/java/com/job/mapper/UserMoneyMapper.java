@@ -5,6 +5,7 @@ import com.job.entity.UserMoneyDetails;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author keith
@@ -48,6 +49,13 @@ public interface UserMoneyMapper {
      * @return
      */
     int insertMoneyDetails(UserMoneyDetails userMoneyDetails);
+
+    /**
+     * 查询所有用户账户明细
+     * @param userId
+     * @return
+     */
+    List<UserMoneyDetails> findAll(Integer userId);
 
     /**
      * 查询系统账户余额

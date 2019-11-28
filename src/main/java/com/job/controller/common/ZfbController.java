@@ -1,6 +1,7 @@
 package com.job.controller.common;
 
-import com.job.common.utils.WxUtils;
+import com.alipay.api.AlipayApiException;
+import com.job.common.utils.AlipayUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -18,16 +18,19 @@ import java.io.IOException;
  * @date 2019/11/18
  */
 @RestController
-@RequestMapping(value = "/wx/notify")
-@Api(tags = {"微信支付回调地址"})
-public class WxController {
+@RequestMapping(value = "/zfb/notify")
+@Api(tags = {"支付宝支付回调地址"})
+public class ZfbController {
 
-    @Autowired
-    private WxUtils wxUtils;
+    private final AlipayUtils alipayUtils;
+
+    public ZfbController(AlipayUtils alipayUtils) {
+        this.alipayUtils = alipayUtils;
+    }
 
     @GetMapping
-    @ApiOperation(value = "微信支付回调通知")
-    public void appNotify(HttpServletRequest request, HttpServletResponse response) throws IOException {
-       wxUtils.notify(request, response);
+    @ApiOperation(value = "支付宝支付回调通知")
+    public void appNotify(HttpServletRequest request) throws IOException, AlipayApiException {
+        alipayUtils.notify(request);
     }
 }

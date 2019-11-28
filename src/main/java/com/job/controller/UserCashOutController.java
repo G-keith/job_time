@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -100,7 +101,7 @@ public class UserCashOutController {
             @ApiImplicitParam(name = "auditStatus", value = "2.审核拒绝；3.审核通过", dataType = "int", required = true),
             @ApiImplicitParam(name = "refuseReason", value = "拒绝原因（拒绝时必传）", dataType = "string"),
     })
-    public ServerResponse updateCashOut(Integer cashOutId, Integer auditStatus, String refuseReason){
-        return userCashOutService.updateCashOut(cashOutId, auditStatus, refuseReason);
+    public ServerResponse updateCashOut(Integer cashOutId, Integer auditStatus, String refuseReason, HttpServletRequest request){
+        return userCashOutService.updateCashOut(cashOutId, auditStatus, refuseReason,request);
     }
 }

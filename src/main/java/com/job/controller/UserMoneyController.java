@@ -1,6 +1,8 @@
 package com.job.controller;
 
+import com.job.common.page.PageVO;
 import com.job.common.statuscode.ServerResponse;
+import com.job.entity.UserMoneyDetails;
 import com.job.service.UserMoneyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -36,5 +38,16 @@ public class UserMoneyController {
         return userMoneyService.findMoney(userId);
     }
 
+
+    @GetMapping("/details")
+    @ApiOperation(value = "查询用户账户明细")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
+            @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
+    })
+    public ServerResponse<PageVO<UserMoneyDetails>> findDetails(Integer userId, Integer pageNo, Integer pageSize){
+        return userMoneyService.findDetails(userId, pageNo, pageSize);
+    }
 
 }
