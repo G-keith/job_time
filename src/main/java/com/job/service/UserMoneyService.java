@@ -59,21 +59,69 @@ public class UserMoneyService {
      * @return
      */
     public void paySuccess(UserOrder userOrder) {
+        //会员充值
+        UserInfo userInfo = userInfoMapper.findByUserId(userOrder.getUserId());
+        UserMoney userMoney = userMoneyMapper.selectById(userOrder.getUserId());
         if (userOrder.getOrderType() == 1) {
-            //会员充值
-            UserInfo userInfo = userInfoMapper.findByUserId(userOrder.getUserId());
-            if (userInfo.getIsMember() == 2 && userInfo.getMemberTime().getTime() > System.currentTimeMillis()) {
-                //会员没有到期，加上续费会员时间
-                userInfo.setMemberTime(DateUtils.getDate_add(userInfo.getMemberTime(), 30, 1));
-            } else {
-                //会员到期
-                userInfo.setMemberTime(DateUtils.getDate_add(new Date(), 30, 1));
-                userInfo.setIsMember(2);
+            if(userOrder.getOrderMold()==1){
+                //周充值
+                if (userInfo.getWeekMemberTime().getTime() > System.currentTimeMillis()) {
+                    //会员没有到期，加上续费会员时间
+                    userInfo.setWeekMemberTime(DateUtils.getDate_add(userInfo.getYearMemberTime(), 7, 1));
+                } else {
+                    //会员到期
+                    userInfo.setWeekMemberTime(DateUtils.getDate_add(new Date(), 7, 1));
+                }
+                if(userInfo.getIsMember()<2){
+                    userInfo.setIsMember(2);
+                }
+                userMoney.setJobNum(userMoney.getJobNum()+5);
+                userMoney.setRefreshNum(userMoney.getRefreshNum()+1);
+            }
+            if(userOrder.getOrderMold()==2){
+                //月充值
+                if (userInfo.getMonthMemberTime().getTime() > System.currentTimeMillis()) {
+                    //会员没有到期，加上续费会员时间
+                    userInfo.setMonthMemberTime(DateUtils.getDate_add(userInfo.getYearMemberTime(), 1, 2));
+                } else {
+                    //会员到期
+                    userInfo.setMonthMemberTime(DateUtils.getDate_add(new Date(), 1, 2));
+                }
+                if(userInfo.getIsMember()<3){
+                    userInfo.setIsMember(3);
+                }
+                userMoney.setJobNum(userMoney.getJobNum()+8);
+                userMoney.setRefreshNum(userMoney.getRefreshNum()+5);
+            }
+            if(userOrder.getOrderMold()==3){
+                //季充值
+                if (userInfo.getSeasonMemberTime().getTime() > System.currentTimeMillis()) {
+                    //会员没有到期，加上续费会员时间
+                    userInfo.setSeasonMemberTime(DateUtils.getDate_add(userInfo.getYearMemberTime(), 3, 2));
+                } else {
+                    //会员到期
+                    userInfo.setSeasonMemberTime(DateUtils.getDate_add(new Date(), 3, 2));
+                }
+                if(userInfo.getIsMember()<4){
+                    userInfo.setIsMember(4);
+                }
+                userMoney.setRefreshNum(userMoney.getRefreshNum()+18);
+            }
+            if(userOrder.getOrderMold()==4){
+                //年充值
+                if (userInfo.getYearMemberTime().getTime() > System.currentTimeMillis()) {
+                    //会员没有到期，加上续费会员时间
+                    userInfo.setYearMemberTime(DateUtils.getDate_add(userInfo.getYearMemberTime(), 1, 3));
+                } else {
+                    //会员到期
+                    userInfo.setYearMemberTime(DateUtils.getDate_add(new Date(), 1, 3));
+                }
+                userInfo.setIsMember(5);
+                userMoney.setRefreshNum(userMoney.getRefreshNum()+88);
             }
             userInfoMapper.updateByPrimaryKeySelective(userInfo);
         } else {
             //账户充值
-            UserMoney userMoney = userMoneyMapper.selectById(userOrder.getUserId());
             userMoney.setRepaidBalance(userMoney.getRepaidBalance().add(userOrder.getMoney()).setScale(2, BigDecimal.ROUND_HALF_UP));
             userMoneyMapper.updateMoney(userMoney);
             //插入明细

@@ -119,8 +119,17 @@
             <if test="upUID != null">
                 upUID = #{upUID,jdbcType=INTEGER},
             </if>
-            <if test="memberTime != null">
-                memberTime = #{memberTime,jdbcType=TIMESTAMP},
+            <if test="weekMemberTime != null">
+                weekMemberTime = #{weekMemberTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="monthMemberTime != null">
+                monthMemberTime = #{monthMemberTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="seasonMemberTime != null">
+                seasonMemberTime = #{seasonMemberTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="yearMemberTime != null">
+                yearMemberTime = #{yearMemberTime,jdbcType=TIMESTAMP},
             </if>
             <if test="isMember != null">
                 isMember = #{isMember,jdbcType=INTEGER},
@@ -145,103 +154,103 @@
 
     <insert id="insertSelective" parameterType="com.job.entity.UserInfo" useGeneratedKeys="true" keyProperty="userId">
         insert into user_info
-        <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="userId != null" >
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
                 userId,
             </if>
-            <if test="phone != null" >
+            <if test="phone != null">
                 phone,
             </if>
-            <if test="openid != null" >
+            <if test="openid != null">
                 openid,
             </if>
-            <if test="nickname != null" >
+            <if test="nickname != null">
                 nickname,
             </if>
-            <if test="sex != null" >
+            <if test="sex != null">
                 sex,
             </if>
-            <if test="province != null" >
+            <if test="province != null">
                 province,
             </if>
-            <if test="city != null" >
+            <if test="city != null">
                 city,
             </if>
-            <if test="country != null" >
+            <if test="country != null">
                 country,
             </if>
-            <if test="headimgurl != null" >
+            <if test="headimgurl != null">
                 headimgurl,
             </if>
-            <if test="isAdmin != null" >
+            <if test="isAdmin != null">
                 isAdmin,
             </if>
-            <if test="UID != null" >
+            <if test="UID != null">
                 UID,
             </if>
-            <if test="status != null" >
+            <if test="status != null">
                 status,
             </if>
-            <if test="upUID != null" >
+            <if test="upUID != null">
                 upUID,
             </if>
-            <if test="memberTime != null" >
+            <if test="memberTime != null">
                 memberTime,
             </if>
-            <if test="isMember != null" >
+            <if test="isMember != null">
                 isMember,
             </if>
-            <if test="reason != null" >
+            <if test="reason != null">
                 reason,
             </if>
         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides="," >
-            <if test="userId != null" >
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
                 #{userId,jdbcType=INTEGER},
             </if>
-            <if test="phone != null" >
+            <if test="phone != null">
                 #{phone,jdbcType=VARCHAR},
             </if>
-            <if test="openid != null" >
+            <if test="openid != null">
                 #{openid,jdbcType=VARCHAR},
             </if>
-            <if test="nickname != null" >
+            <if test="nickname != null">
                 #{nickname,jdbcType=VARCHAR},
             </if>
-            <if test="sex != null" >
+            <if test="sex != null">
                 #{sex,jdbcType=INTEGER},
             </if>
-            <if test="province != null" >
+            <if test="province != null">
                 #{province,jdbcType=VARCHAR},
             </if>
-            <if test="city != null" >
+            <if test="city != null">
                 #{city,jdbcType=VARCHAR},
             </if>
-            <if test="country != null" >
+            <if test="country != null">
                 #{country,jdbcType=VARCHAR},
             </if>
-            <if test="headimgurl != null" >
+            <if test="headimgurl != null">
                 #{headimgurl,jdbcType=VARCHAR},
             </if>
-            <if test="isAdmin != null" >
+            <if test="isAdmin != null">
                 #{isAdmin,jdbcType=INTEGER},
             </if>
-            <if test="UID != null" >
+            <if test="UID != null">
                 #{UID,jdbcType=INTEGER},
             </if>
-            <if test="status != null" >
+            <if test="status != null">
                 #{status,jdbcType=INTEGER},
             </if>
-            <if test="upUID != null" >
+            <if test="upUID != null">
                 #{upUID,jdbcType=INTEGER},
             </if>
-            <if test="memberTime != null" >
+            <if test="memberTime != null">
                 #{memberTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="isMember != null" >
+            <if test="isMember != null">
                 #{isMember,jdbcType=INTEGER},
             </if>
-            <if test="reason != null" >
+            <if test="reason != null">
                 #{reason,jdbcType=VARCHAR},
             </if>
         </trim>

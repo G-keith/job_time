@@ -44,4 +44,7 @@ public class UserOrder {
 
     @ApiModelProperty(value = "订单完成时间")
     private Date finishTime;
+
+    @ApiModelProperty(value = "会员充值类型（1.周充值，2.月充值，3.季充值，4.年充值）")
+    private Integer orderMold;
 }

@@ -26,6 +26,12 @@
             <if test="bonus != null">
                 bonus = #{bonus},
             </if>
+            <if test="jobNum != null">
+                jobNum = #{jobNum},
+            </if>
+            <if test="refreshNum != null">
+                refreshNum = #{refreshNum},
+            </if>
         </set>
         where userId=#{userId}
     </update>
@@ -48,5 +54,9 @@
     <select id="findAll" resultType="com.job.entity.UserMoneyDetails">
         select * from user_money_details where userId=#{userId}
         order by tradeTime desc
+    </select>
+
+    <select id="countInvite" resultType="java.math.BigDecimal">
+        select sum(money) from user_money_details where userId=#{userId}
     </select>
 </mapper>

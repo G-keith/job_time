@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.UserAgentMapper">
+
+    <insert id="insertAgent">
+        insert into user_agent (content) values
+        (#{content})
+    </insert>
+
+    <delete id="deleteAgent">
+        delete from user_agent
+    </delete>
+
+    <select id="findAgent" resultType="java.lang.String">
+        select content from user_agent
+    </select>
+</mapper>

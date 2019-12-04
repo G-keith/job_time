@@ -12,8 +12,17 @@
             <if test="commonRate != null">
                 commonRate = #{commonRate},
             </if>
-            <if test="memberRate != null">
-                memberRate = #{memberRate},
+            <if test="weekRate != null">
+                weekRate = #{weekRate},
+            </if>
+            <if test="monthRate != null">
+                monthRate = #{monthRate},
+            </if>
+            <if test="seasonRate != null">
+                seasonRate = #{seasonRate},
+            </if>
+            <if test="yearRate != null">
+                yearRate = #{yearRate},
             </if>
             <if test="remarks != null">
                 remarks = #{remarks},

@@ -53,10 +53,15 @@ public class UserInfo {
     @ApiModelProperty(value = "上级用户推广码")
     private String upUID;
 
-    @ApiModelProperty(value = "会员有效期")
-    private Date memberTime;
-
-    @ApiModelProperty(value = "是否是会员（1.不是；2是）")
+    @ApiModelProperty(value = "周会员有效期")
+    private Date weekMemberTime;
+    @ApiModelProperty(value = "月会员有效期")
+    private Date monthMemberTime;
+    @ApiModelProperty(value = "季会员有效期")
+    private Date seasonMemberTime;
+    @ApiModelProperty(value = "年会员有效期")
+    private Date yearMemberTime;
+    @ApiModelProperty(value = "是否是会员（1.不是会员；2.周会员；3.月会员；4.季会员；5.年会员）")
     private Integer isMember;
 
     @ApiModelProperty(value = "黑名单原因")

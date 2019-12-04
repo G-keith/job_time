@@ -1,5 +1,8 @@
 package com.job.service;
 
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.qcloudsms.SmsSingleSender;
@@ -10,6 +13,8 @@ import com.job.common.utils.AlipayUtils;
 import com.job.common.utils.RandomUtil;
 import com.job.common.utils.WxUtils;
 import com.job.entity.UserInfo;
+import com.job.entity.UserMoney;
+import com.job.entity.UserMoneyDetails;
 import com.job.entity.UserOrder;
 import com.job.mapper.UserInfoMapper;
 import com.job.mapper.UserMoneyMapper;
@@ -238,11 +243,15 @@ public class UserInfoService {
      * @return
      * @throws IOException
      */
-    public ServerResponse wxRecharge(Integer userId, BigDecimal money, Integer type,HttpServletRequest request) throws IOException {
-        UserOrder userOrder=getOrder(userId, money, type);
+    public ServerResponse wxRecharge(Integer userId, BigDecimal money, Integer type,HttpServletRequest request,Integer mold) throws IOException {
+        UserOrder userOrder=getOrder(userId, money, type,mold);
         ServerResponse response = wxUtils.appPay(userOrder, request);
         //预支付成功成功
         if (response.getStatus() == 1) {
+            Object result=response.getData();
+            JSONObject jsonObject=JSONUtil.parseObj(result);
+            String prepayid=jsonObject.get("prepayid").toString();
+            userOrder.setPrepayid(prepayid);
             userOrder.setCommitTime(new Date());
             userOrderMapper.insertSelective(userOrder);
         }
@@ -255,8 +264,8 @@ public class UserInfoService {
      * @param money
      * @return
      */
-    public ServerResponse zfbRecharge(Integer userId, BigDecimal money, Integer type) {
-        UserOrder userOrder=getOrder(userId, money, type);
+    public ServerResponse zfbRecharge(Integer userId, BigDecimal money, Integer type,Integer mold) {
+        UserOrder userOrder=getOrder(userId, money, type,mold);
         ServerResponse response = alipayUtils.alipay(userOrder);
         if(response.getStatus()==1){
             userOrder.setCommitTime(new Date());
@@ -272,11 +281,12 @@ public class UserInfoService {
      * @param type
      * @return
      */
-    private UserOrder getOrder(Integer userId, BigDecimal money, Integer type){
+    private UserOrder getOrder(Integer userId, BigDecimal money, Integer type,Integer mold){
         UserOrder userOrder = new UserOrder();
         userOrder.setUserId(userId);
         userOrder.setOrderType(1);
         if(type==1){
+            userOrder.setOrderMold(mold);
             userOrder.setOrderDesc("小蜜蜂-会员充值");
         }else{
             userOrder.setOrderDesc("小蜜蜂-充值");
@@ -300,6 +310,39 @@ public class UserInfoService {
         if (result > 0) {
             return ServerResponse.createBySuccess();
         } else {
+            return ServerResponse.createByError();
+        }
+    }
+
+    public ServerResponse updateMoney(UserMoney userMoney){
+        int result=userMoneyMapper.updateMoney(userMoney);
+        if(result>0){
+            //插入明细
+            UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
+            userMoneyDetails.setUserId(userMoney.getUserId());
+            if(userMoney.getBalance()!=null){
+                userMoneyDetails.setType(2);
+                userMoneyDetails.setMoney(userMoney.getBalance());
+                userMoneyDetails.setIntroduce("后台手动修改账户余额");
+                userMoneyDetails.setTradeTime(new Date());
+                userMoneyMapper.insertMoneyDetails(userMoneyDetails);
+            }
+            if(userMoney.getRepaidBalance()!=null){
+                userMoneyDetails.setType(3);
+                userMoneyDetails.setMoney(userMoney.getRepaidBalance());
+                userMoneyDetails.setIntroduce("后台手动修改账户余额");
+                userMoneyDetails.setTradeTime(new Date());
+                userMoneyMapper.insertMoneyDetails(userMoneyDetails);
+            }
+            if(userMoney.getBond()!=null){
+                userMoneyDetails.setType(4);
+                userMoneyDetails.setMoney(userMoney.getBond());
+                userMoneyDetails.setIntroduce("后台手动修改账户余额");
+                userMoneyDetails.setTradeTime(new Date());
+                userMoneyMapper.insertMoneyDetails(userMoneyDetails);
+            }
+            return ServerResponse.createBySuccess();
+        }else{
             return ServerResponse.createByError();
         }
     }

@@ -1,6 +1,8 @@
 package com.job.controller;
 
 import com.job.common.statuscode.ServerResponse;
+import com.job.common.utils.WxUtils;
+import com.job.entity.CashOutOrder;
 import com.job.entity.UserCashOut;
 import com.job.service.UserCashOutService;
 import io.swagger.annotations.Api;
@@ -28,6 +30,9 @@ public class UserCashOutController {
 
     @Autowired
     private UserCashOutService userCashOutService;
+
+    @Autowired
+    private WxUtils wxUtils;
 
     @GetMapping("/all")
     @ApiOperation(value = "获取所有提现申请信息")

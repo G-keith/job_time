@@ -41,14 +41,20 @@ public class ServiceFeeController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "serviceId", value = "主键id", dataType = "int",required = true),
             @ApiImplicitParam(name = "commonRate", value = "普通用户服务费比例", dataType = "string",required = true),
-            @ApiImplicitParam(name = "memberRate", value = "会员用户服务费比例", dataType = "string",required = true),
+            @ApiImplicitParam(name = "weekRate", value = "周会员用户服务费比例", dataType = "string",required = true),
+            @ApiImplicitParam(name = "monthRate", value = "月会员用户服务费比例", dataType = "string",required = true),
+            @ApiImplicitParam(name = "seasonRate", value = "季会员用户服务费比例", dataType = "string",required = true),
+            @ApiImplicitParam(name = "yearRate", value = "年会员用户服务费比例", dataType = "string",required = true),
             @ApiImplicitParam(name = "remarks", value = "备注", dataType = "string"),
     })
-    public ServerResponse updateServiceFee(Integer serviceId, BigDecimal commonRate,BigDecimal memberRate,String remarks){
+    public ServerResponse updateServiceFee(Integer serviceId, BigDecimal commonRate,BigDecimal weekRate,BigDecimal monthRate,BigDecimal seasonRate,BigDecimal yearRate,String remarks){
         ServiceFee serviceFee=new ServiceFee();
         serviceFee.setServiceId(serviceId);
         serviceFee.setCommonRate(commonRate);
-        serviceFee.setMemberRate(memberRate);
+        serviceFee.setWeekRate(weekRate);
+        serviceFee.setMonthRate(monthRate);
+        serviceFee.setSeasonRate(seasonRate);
+        serviceFee.setYearRate(yearRate);
         if(remarks!=null){
             serviceFee.setRemarks(remarks);
         }

@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 public interface UserOrderMapper {
     int deleteByPrimaryKey(Integer orderId);
 
-    int insert(UserOrder record);
-
     int insertSelective(UserOrder record);
 
     UserOrder selectByPrimaryKey(Integer orderId);

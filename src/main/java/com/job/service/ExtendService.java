@@ -4,8 +4,8 @@ import com.job.common.statuscode.ServerResponse;
 import com.job.entity.vo.InviteVo;
 import com.job.mapper.ExtendMapper;
 import com.job.mapper.HomePageMapper;
+import com.job.mapper.UserMoneyMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +26,12 @@ public class ExtendService {
 
     private final HomePageMapper homePageMapper;
 
-    public ExtendService(ExtendMapper extendMapper, HomePageMapper homePageMapper) {
+    private final UserMoneyMapper userMoneyMapper;
+
+    public ExtendService(ExtendMapper extendMapper, HomePageMapper homePageMapper, UserMoneyMapper userMoneyMapper) {
         this.extendMapper = extendMapper;
         this.homePageMapper = homePageMapper;
+        this.userMoneyMapper = userMoneyMapper;
     }
 
     /**
@@ -39,7 +42,7 @@ public class ExtendService {
     public ServerResponse selectUser(Integer userId){
         InviteVo inviteVo=extendMapper.selectInvite(userId);
         if(inviteVo!=null){
-            inviteVo.setTotalMoney(new BigDecimal(inviteVo.getTotalNum()).multiply(homePageMapper.selectSignInMoney().get("inviteMoney")));
+            inviteVo.setTotalMoney(userMoneyMapper.countInvite(userId));
         }
         return ServerResponse.createBySuccess(inviteVo);
     }
@@ -50,9 +53,7 @@ public class ExtendService {
      */
     public ServerResponse countInvite(){
         List<InviteVo> inviteVoList=extendMapper.countInvite();
-        inviteVoList.forEach(e->{
-            e.setTotalMoney(new BigDecimal(e.getTotalNum()).multiply(homePageMapper.selectSignInMoney().get("inviteMoney")));
-        });
+        inviteVoList.forEach(e-> e.setTotalMoney(userMoneyMapper.countInvite(e.getUserId())));
         return ServerResponse.createBySuccess(inviteVoList);
     }
 }

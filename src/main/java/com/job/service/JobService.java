@@ -80,6 +80,17 @@ public class JobService {
     public ServerResponse updateJob(Integer jobId, Integer auditStatus, String refuseReason, Integer label, Integer isRecommend) {
         int result = jobMapper.updateJob(jobId, auditStatus, refuseReason, label, isRecommend);
         if (result > 0) {
+            if(auditStatus==4){
+                Job job=jobMapper.selectJob(jobId);
+                UserMoney userMoney=userMoneyMapper.selectById(job.getUserId());
+                //审核拒绝，归还用户金钱
+                BigDecimal surplusMoney = getTotalPrice(job.getJobPrice(), job.getJobNum());
+                userMoney.setRepaidBalance(addPrice(userMoney.getRepaidBalance(), surplusMoney));
+                //更新用户账户余额
+                userMoneyMapper.updateMoney(userMoney);
+                //系统账户减少
+                userMoneyMapper.updateAdmin(surplusPrice(userMoneyMapper.money(), surplusMoney));
+            }
             return ServerResponse.createBySuccess();
         } else {
             return ServerResponse.createByError();
@@ -159,15 +170,29 @@ public class JobService {
      */
     public ServerResponse insertJob(Job job) {
         UserMoney userMoney = userMoneyMapper.selectById(job.getUserId());
-        int res = jobMapper.findUserIsMember(job.getUserId());
+        UserInfo userInfo = userInfoMapper.findByUserId(job.getUserId());
         ServiceFee serviceFee = jobMapper.findFee();
-        if (res > 0) {
-            //代表是会员
-            job.setReleasePrice(getPrice(job.getJobPrice(), serviceFee.getMemberRate()));
+        if (userMoney.getJobNum() == 0 && userInfo.getIsMember() < 4) {
+            return ServerResponse.createByErrorMessage("发布任务达到上限");
+        }
+        if (userInfo.getIsMember() == 2 && userInfo.getWeekMemberTime().getTime() > System.currentTimeMillis()) {
+            //周会员
+            job.setReleasePrice(getPrice(job.getJobPrice(), serviceFee.getWeekRate()));
+        } else if (userInfo.getIsMember() == 3 && userInfo.getMonthMemberTime().getTime() > System.currentTimeMillis()) {
+            //月会员
+            job.setReleasePrice(getPrice(job.getJobPrice(), serviceFee.getMonthRate()));
+        } else if (userInfo.getIsMember() == 4 && userInfo.getSeasonMemberTime().getTime() > System.currentTimeMillis()) {
+            //季会员
+            job.setReleasePrice(getPrice(job.getJobPrice(), serviceFee.getSeasonRate()));
+        } else if (userInfo.getIsMember() == 5 && userInfo.getYearMemberTime().getTime() > System.currentTimeMillis()) {
+            //年会员
+            job.setReleasePrice(getPrice(job.getJobPrice(), serviceFee.getYearRate()));
         } else {
+            //不是会员
             job.setReleasePrice(getPrice(job.getJobPrice(), serviceFee.getCommonRate()));
         }
         job.setReleaseTime(new Date());
+        job.setRefreshTime(new Date());
         // 更新用户账户余额，钱打入系统账户
         BigDecimal totalPrice = getTotalPrice(job.getJobPrice(), job.getJobNum());
         BigDecimal surplus = surplusPrice(userMoney.getRepaidBalance(), totalPrice);
@@ -175,10 +200,11 @@ public class JobService {
             return ServerResponse.createByErrorCodeMessage(2, "账户余额不足");
         } else {
             userMoney.setRepaidBalance(surplus);
+            userMoney.setJobNum(userMoney.getJobNum() - 1);
             //减去用户账户钱，添加到系统账户中去
             userMoneyMapper.updateMoney(userMoney);
             //系统账户加上任务钱
-            userMoneyMapper.updateAdmin(addPrice(userMoneyMapper.money(),totalPrice));
+            userMoneyMapper.updateAdmin(addPrice(userMoneyMapper.money(), totalPrice));
             //插入明细
             UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
             userMoneyDetails.setUserId(job.getUserId());
@@ -191,8 +217,6 @@ public class JobService {
         //1.插入任务表；
         int result = jobMapper.insertSelective(job);
         if (result > 0) {
-            //插入任务和类型关系表
-            jobMapper.insertJobType(job.getJobId(), job.getTypeId());
             //2.插入任务步骤
             job.getStepList().forEach(e -> {
                 e.setJobId(job.getJobId());
@@ -213,7 +237,7 @@ public class JobService {
     public ServerResponse updateUserJob(Integer taskId, Integer status, String refuseReason) {
         UserJob userJob = userJobMapper.findById(taskId);
         Job job = jobMapper.selectJob(userJob.getJobId());
-        UserInfo userInfo=userInfoMapper.findByUserId(userJob.getUserId());
+        UserInfo userInfo = userInfoMapper.findByUserId(userJob.getUserId());
         int result = userJobMapper.updateUserJob(taskId, status, refuseReason);
         if (result > 0) {
             //审核通过，钱进入用户账户
@@ -223,7 +247,7 @@ public class JobService {
                 //系统账户钱减去任务发布钱
                 userMoneyMapper.updateAdmin(surplusPrice(userMoneyMapper.money(), job.getReleasePrice()));
                 //用户账户加上任务钱
-                userMoney.setBalance(addPrice(userMoney.getBalance(),job.getReleasePrice()));
+                userMoney.setBalance(addPrice(userMoney.getBalance(), job.getReleasePrice()));
                 userMoneyMapper.updateMoney(userMoney);
                 //插入明细
                 UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
@@ -237,26 +261,18 @@ public class JobService {
                 job.setCommitNum(job.getCommitNum() - 1);
                 job.setFinishNum(job.getFinishNum() + 1);
                 jobMapper.updateByPrimaryKeySelective(job);
-                // 查询用户是否是第一次做并且有没有推荐人
-                int count=userJobMapper.selectJobFinishNum(userJob.getUserId());
-                if(count==1){
-                    //代表第一次完成
-                    if(userInfo.getUpUID()!=null){
-                        //推荐人获得奖励
-                        BigDecimal inviteMoney=homePageMapper.selectSignInMoney().get("inviteMoney");
-                        //根据推荐码去查询邀请人信息
-                        Integer userId=userInfoMapper.findByUId(userInfo.getUpUID()).getUserId();
-                        UserMoney uMoney=userMoneyMapper.selectById(userId);
-                        uMoney.setBonus(addPrice(userMoney.getBonus(),inviteMoney));
-                        userMoneyMapper.updateMoney(uMoney);
-                        //插入明细
-                        UserMoneyDetails moneyDetails = new UserMoneyDetails();
-                        moneyDetails.setUserId(userId);
-                        moneyDetails.setType(4);
-                        moneyDetails.setIntroduce("邀请奖励");
-                        moneyDetails.setMoney(inviteMoney);
-                        moneyDetails.setTradeTime(new Date());
-                        userMoneyMapper.insertMoneyDetails(userMoneyDetails);
+                // 查询用户的上级
+                if (userInfo.getUpUID() != null) {
+                    //一级推广赏金比例金钱
+                    SignInMoney signInMoney = homePageMapper.selectSignInMoney();
+                    //根据推荐码去查询邀请人信息
+                    Integer userId = userInfoMapper.findByUId(userInfo.getUpUID()).getUserId();
+                    userMoneyMapper.updateMoney(inviteReward(userId,signInMoney.getOneInvite(),job.getReleasePrice()));
+                    //二级推广奖励
+                    UserInfo twoUserInfo=userInfoMapper.findByUserId(userId);
+                    if(twoUserInfo.getUpUID()!=null){
+                        Integer twoUserId = userInfoMapper.findByUId(twoUserInfo.getUpUID()).getUserId();
+                        userMoneyMapper.updateMoney(inviteReward(twoUserId,signInMoney.getTwoInvite(),job.getReleasePrice()));
                     }
                 }
             }
@@ -269,7 +285,7 @@ public class JobService {
                     //任务已经结束，归还任务的钱
                     //发布任务用户账户加上钱
                     UserMoney userMoney = userMoneyMapper.selectById(job.getUserId());
-                    userMoney.setRepaidBalance(addPrice(userMoney.getRepaidBalance(),job.getJobPrice()));
+                    userMoney.setRepaidBalance(addPrice(userMoney.getRepaidBalance(), job.getJobPrice()));
                     userMoneyMapper.updateMoney(userMoney);
                     //插入明细
                     UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
@@ -288,6 +304,31 @@ public class JobService {
         } else {
             return ServerResponse.createByError();
         }
+    }
+    /**
+     * 获取用户账户信息
+     * @param userId
+     * @param rate
+     * @param releasePrice
+     * @return
+     */
+    private UserMoney inviteReward(Integer userId,BigDecimal rate,BigDecimal releasePrice){
+        BigDecimal inviteMoney=releasePrice.multiply(rate).setScale(2, BigDecimal.ROUND_HALF_UP);
+        UserMoney userMoney = userMoneyMapper.selectById(userId);
+        userMoney.setBonus(addPrice(userMoney.getBonus(), inviteMoney));
+        //插入用户明细
+        insertDetails(userId,inviteMoney);
+        return userMoney;
+    }
+    private void insertDetails(Integer userId,BigDecimal money){
+        //插入明细
+        UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
+        userMoneyDetails.setUserId(userId);
+        userMoneyDetails.setType(4);
+        userMoneyDetails.setIntroduce("邀请奖励");
+        userMoneyDetails.setMoney(money);
+        userMoneyDetails.setTradeTime(new Date());
+        userMoneyMapper.insertMoneyDetails(userMoneyDetails);
     }
 
     /**

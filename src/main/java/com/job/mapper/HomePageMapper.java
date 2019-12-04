@@ -1,6 +1,7 @@
 package com.job.mapper;
 
 import com.job.entity.HomePage;
+import com.job.entity.SignInMoney;
 import com.job.entity.UserMoney;
 import com.job.entity.vo.JobDto;
 import com.job.entity.vo.JobListVo;
@@ -57,7 +58,7 @@ public interface HomePageMapper {
      * 查询签到金额
      * @return 签到金额
      */
-    Map<String,BigDecimal> selectSignInMoney();
+    SignInMoney selectSignInMoney();
 
     /**
      * 插入用户账户信息

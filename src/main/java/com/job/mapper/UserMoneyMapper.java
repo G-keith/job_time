@@ -58,6 +58,13 @@ public interface UserMoneyMapper {
     List<UserMoneyDetails> findAll(Integer userId);
 
     /**
+     * 统计用户邀请奖励
+     * @param userId
+     * @return
+     */
+    BigDecimal countInvite(Integer userId);
+
+    /**
      * 查询系统账户余额
      * @return
      */

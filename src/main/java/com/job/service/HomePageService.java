@@ -82,7 +82,7 @@ public class HomePageService {
         System.out.println(userId+"====");
         int result = homePageMapper.insertSignIn(userId);
         if (result > 0) {
-            BigDecimal balance=homePageMapper.selectSignInMoney().get("money");
+            BigDecimal balance=homePageMapper.selectSignInMoney().getMoney();
             //增加账户余额
             UserMoney userMoney = homePageMapper.selectByUserId(userId);
             userMoney.setBalance(userMoney.getBalance().add(balance).setScale(2,BigDecimal.ROUND_HALF_UP));

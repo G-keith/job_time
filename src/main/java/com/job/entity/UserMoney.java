@@ -1,6 +1,7 @@
 package com.job.entity;
 
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.models.auth.In;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -27,4 +28,8 @@ public class UserMoney {
 
     @ApiModelProperty(value = "奖金余额")
     private BigDecimal bonus;
+    @ApiModelProperty(value = "发布任务次数")
+    private Integer jobNum;
+    @ApiModelProperty(value = "刷新任务次数")
+    private Integer refreshNum;
 }

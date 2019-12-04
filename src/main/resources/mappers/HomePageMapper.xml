@@ -27,8 +27,8 @@
         select * from user_money where userId=#{userId}
     </select>
 
-    <select id="selectSignInMoney" resultType="map">
-        select money,inviteMoney from sign_in_money
+    <select id="selectSignInMoney" resultType="com.job.entity.SignInMoney">
+        select * from sign_in_money
     </select>
 
     <insert id="insertUserMoney" parameterType="com.job.entity.UserMoney">

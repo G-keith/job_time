@@ -94,9 +94,10 @@ public class UserInfoController {
             @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
             @ApiImplicitParam(name = "money", value = "金额", dataType = "int", required = true),
             @ApiImplicitParam(name = "type", value = "类型（1.代表会员充值，2代表账户充值）", dataType = "int", required = true),
+            @ApiImplicitParam(name = "mold", value = "1.周充值，2.月充值，3.季充值，4.年充值", dataType = "int", required = true),
     })
-    public ServerResponse wxRecharge(Integer userId, BigDecimal money, Integer type, HttpServletRequest request) throws IOException {
-        return userInfoService.wxRecharge(userId, money, type, request);
+    public ServerResponse wxRecharge(Integer userId, BigDecimal money, Integer type,Integer mold ,HttpServletRequest request) throws IOException {
+        return userInfoService.wxRecharge(userId, money, type, request,mold);
     }
 
     @GetMapping("/zfbRecharge")
@@ -105,9 +106,11 @@ public class UserInfoController {
             @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
             @ApiImplicitParam(name = "money", value = "金额", dataType = "int", required = true),
             @ApiImplicitParam(name = "type", value = "类型（1.代表会员充值，2代表账户充值）", dataType = "int", required = true),
+            @ApiImplicitParam(name = "mold", value = "1.周充值，2.月充值，3.季充值，4.年充值", dataType = "int", required = true),
+
     })
-    public ServerResponse zfbRecharge(Integer userId, BigDecimal money, Integer type) {
-        return userInfoService.zfbRecharge(userId, money, type);
+    public ServerResponse zfbRecharge(Integer userId, BigDecimal money, Integer type,Integer mold) {
+        return userInfoService.zfbRecharge(userId, money, type,mold);
     }
 
     @PutMapping("/headimgurl")

@@ -123,7 +123,7 @@ public class AlipayUtils {
         request.setBizModel(model);
         //回调地址
         request.setNotifyUrl(notifyUrl);
-        String orderString = "";
+        String orderString;
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
@@ -141,10 +141,9 @@ public class AlipayUtils {
         }
     }
 
-    public void notify(HttpServletRequest request) throws AlipayApiException, UnsupportedEncodingException {
+    public void notify(HttpServletRequest request) throws AlipayApiException {
         Map<String, String> params = new HashMap<>();
         Map requestParams = request.getParameterMap();
-        System.out.println(requestParams);
         for (Object o : requestParams.keySet()) {
             String name = (String) o;
             String[] values = (String[]) requestParams.get(name);

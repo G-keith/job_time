@@ -66,15 +66,13 @@ public class WxUtils {
 
     /**
      * 商户号
-     * 1491103722
-     * 1482664972
      */
     private static final String MACID = "1482664972";
 
     /**
      * API密钥
      */
-    private static final String APIKEY = "f4fa414a8e644bfa96c312f268b045e4";
+    private static final String APIKEY = "8scYgzukn9vvIxfuALyhhM7kZCt5MCsC";
 
     @Value("${wx.notifyUrl}")
     private String notifyUrl;
@@ -93,6 +91,7 @@ public class WxUtils {
      * @return
      */
     public ServerResponse authorization(String code) {
+        System.out.println(APPID);
         String tokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + APPID + "&secret="
                 + APPSECRET + "&code=" + code + "&grant_type=authorization_code";
         try {
@@ -159,13 +158,13 @@ public class WxUtils {
         // 随机字符串
         params.put("nonce_str", nonceStr);
         // 商品描述
-        params.put("body", userOrder.getOrderDesc());
+        params.put("body",userOrder.getOrderDesc());
         // 商户订单号
         params.put("out_trade_no", userOrder.getOrderNum());
         // 总金额(分)
         params.put("total_fee", money);
         // 终端IP
-        params.put("spbill_create_ip", spbillCreateIp);
+        params.put("spbill_create_ip", spbillCreateIp);//121.235.115.51
         // 通知/回调地址
         params.put("notify_url", notifyUrl);
         // 交易类型:JS_API=公众号支付、NATIVE=扫码支付、APP=app支付
@@ -206,6 +205,7 @@ public class WxUtils {
      * @throws ParseException
      */
     public ServerResponse<String> cashOut(CashOutOrder cashOutOrder, HttpServletRequest request) throws ParseException {
+        System.out.println(cashOutOrder);
         //金额转化分
         int money = cashOutOrder.getTotalFee().multiply(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
         String spbillCreateIp = getIpAddress(request);
@@ -231,6 +231,7 @@ public class WxUtils {
         try {
             String wxRetXmlData = doPost(cashOutUrl, xmlData);
             Map wxRetMapData = xmlToMap(wxRetXmlData);
+            System.out.println(wxRetMapData);
             assert wxRetMapData != null;
             if ("SUCCESS".equals(wxRetMapData.get("result_code"))) {
                 if ("SUCCESS".equals(wxRetMapData.get("return_code"))) {
@@ -297,7 +298,7 @@ public class WxUtils {
     }
 
     /**
-     * get方式请求
+     * post方式请求
      *
      * @param url
      * @return
@@ -305,9 +306,9 @@ public class WxUtils {
      */
     private String doPost(String url, String params) throws IOException {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<>(params, headers);
-        return new String(Objects.requireNonNull(restTemplate.postForEntity(url, request, String.class).getBody()).getBytes("ISO8859-1"), StandardCharsets.UTF_8);
+        return new String(Objects.requireNonNull(restTemplate.postForEntity(url, request, String.class).getBody()));
     }
 
     /**

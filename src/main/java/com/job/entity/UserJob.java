@@ -44,7 +44,7 @@ public class UserJob {
     private Date auditTime;
 
     @ApiModelProperty(value = "不通过理由")
-    private Integer refuseReason;
+    private String refuseReason;
 
     /**
      * 任务发布价格

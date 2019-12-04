@@ -1,4 +1,4 @@
-package com.job.entity;
+package com.job.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,33 +13,25 @@ import java.util.Date;
  * @date 2019/11/17
  */
 @Data
-public class CashOutOrder {
+public class CashOutOrderVo {
 
     @ApiModelProperty(value = "主键id")
     private Integer cashOutId;
 
-    @ApiModelProperty(value = "企业付款备注")
-    private String remarks;
-
-    @ApiModelProperty(value = "订单号")
-    private String tradeNo;
-
     @ApiModelProperty(value = "提现金额(元)")
     private BigDecimal totalFee;
-
-    @ApiModelProperty(value = "用户openid")
-    private String openid;
-
-    @ApiModelProperty(value = "支付宝姓名")
-    private String zfbName;
-
-    @ApiModelProperty(value = "支付宝账户")
-    private String zfbAccount;
 
     @ApiModelProperty(value = "打款时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date payTime;
 
-    @ApiModelProperty(value = "用户id")
-    private Integer userId;
+    @ApiModelProperty(value = "手机号")
+    private String phone;
+
+    @ApiModelProperty(value = "用户头像")
+    private String headimgurl;
+
+    @ApiModelProperty(value = "昵称")
+    private String nickname;
+
 }

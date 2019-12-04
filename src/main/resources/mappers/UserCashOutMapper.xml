@@ -7,6 +7,7 @@
         <result column="cashOutType" jdbcType="INTEGER" property="cashOutType"/>
         <result column="tradeType" jdbcType="INTEGER" property="tradeType"/>
         <result column="cashOutMoney" jdbcType="DECIMAL" property="cashOutMoney"/>
+        <result column="makeMoney" jdbcType="DECIMAL" property="makeMoney"/>
         <result column="auditStatus" jdbcType="INTEGER" property="auditStatus"/>
         <result column="applyTime" jdbcType="TIMESTAMP" property="applyTime"/>
         <result column="auditTime" jdbcType="TIMESTAMP" property="auditTime"/>
@@ -15,7 +16,7 @@
         <result column="zfbAccount" jdbcType="VARCHAR" property="zfbAccount"/>
     </resultMap>
     <sql id="Base_Column_List">
-    cashOutId, userId, cashOutType, tradeType, cashOutMoney, auditStatus, applyTime, 
+    cashOutId, userId, cashOutType, tradeType, cashOutMoney,makeMoney, auditStatus, applyTime,
     auditTime,refuseReason,zfbName,zfbAccount
   </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -41,6 +42,9 @@
             </if>
             <if test="cashOutMoney != null">
                 cashOutMoney,
+            </if>
+            <if test="makeMoney != null">
+                makeMoney,
             </if>
             <if test="auditStatus != null">
                 auditStatus,
@@ -77,6 +81,9 @@
             <if test="cashOutMoney != null">
                 #{cashOutMoney,jdbcType=DECIMAL},
             </if>
+            <if test="makeMoney != null">
+                #{makeMoney,jdbcType=DECIMAL},
+            </if>
             <if test="auditStatus != null">
                 #{auditStatus,jdbcType=INTEGER},
             </if>
@@ -112,6 +119,9 @@
             <if test="cashOutMoney != null">
                 cashOutMoney = #{cashOutMoney,jdbcType=DECIMAL},
             </if>
+            <if test="makeMoney != null">
+                makeMoney = #{makeMoney,jdbcType=DECIMAL},
+            </if>
             <if test="auditStatus != null">
                 auditStatus = #{auditStatus,jdbcType=INTEGER},
             </if>
@@ -135,7 +145,7 @@
     </update>
 
     <select id="findAll" resultType="com.job.entity.UserCashOut">
-        select i.phone,i.nickname,o.cashOutType,o.tradeType,o.cashOutMoney,o.auditStatus,o.applyTime from user_cash_out
+        select i.phone,i.nickname,o.cashOutType,o.tradeType,o.cashOutMoney,o.makeMoney,o.auditStatus,o.applyTime from user_cash_out
         o
         inner join user_info i on o.userId=i.userId
         <where>
@@ -156,7 +166,7 @@
     </select>
 
     <select id="findByUserId" resultType="com.job.entity.UserCashOut">
-        select i.phone,i.nickname,o.cashOutType,o.tradeType,o.cashOutMoney,o.auditStatus,o.applyTime from user_cash_out o
+        select i.phone,i.nickname,o.cashOutType,o.tradeType,o.cashOutMoney,o.makeMoney,o.auditStatus,o.applyTime from user_cash_out o
         inner join user_info i on o.userId=i.userId
         where o.userId=#{userId}
         order by auditStatus desc

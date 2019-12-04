@@ -14,6 +14,9 @@
             <if test="userId != null">
                 userId,
             </if>
+            <if test="typeId != null">
+                typeId,
+            </if>
             <if test="jobSource != null">
                 jobSource,
             </if>
@@ -71,6 +74,9 @@
             <if test="auditTime != null">
                 auditTime,
             </if>
+            <if test="refreshTime != null">
+                refreshTime,
+            </if>
             <if test="refuseReason != null">
                 refuseReason,
             </if>
@@ -81,6 +87,9 @@
             </if>
             <if test="userId != null">
                 #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="typeId != null">
+                #{typeId,jdbcType=INTEGER},
             </if>
             <if test="jobSource != null">
                 #{jobSource,jdbcType=VARCHAR},
@@ -138,6 +147,9 @@
             </if>
             <if test="auditTime != null">
                 #{auditTime},
+            </if>
+            <if test="refreshTime != null">
+                #{refreshTime},
             </if>
             <if test="refuseReason != null">
                 #{refuseReason},
@@ -209,6 +221,9 @@
             </if>
             <if test="auditTime != null" >
                 auditTime = #{auditTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="refreshTime != null" >
+                refreshTime = #{refreshTime,jdbcType=TIMESTAMP},
             </if>
             <if test="refuseReason != null" >
                 refuseReason = #{refuseReason,jdbcType=VARCHAR},
@@ -314,16 +329,15 @@
         order by sort asc
     </select>
 
-
-    <insert id="insertJobType">
-        insert into job_job_type (jobId,typeId) values (#{jobId},#{typeId})
-    </insert>
-
-    <select id="findUserIsMember" resultType="java.lang.Integer">
-        select count(1) from user_info where userId=#{userId} and isMember=2 and memberTime>=now()
-    </select>
-
     <select id="findFee" resultType="com.job.entity.ServiceFee">
         select * from service_fee where serviceType=1
+    </select>
+
+    <select id="findCashOut" resultType="com.job.entity.ServiceFee">
+        select * from service_fee where serviceType=2
+    </select>
+
+    <select id="findRecharge" resultType="com.job.entity.ServiceFee">
+        select * from service_fee where serviceType=3
     </select>
 </mapper>

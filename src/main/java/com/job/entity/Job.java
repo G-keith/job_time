@@ -85,6 +85,10 @@ public class Job {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date auditTime;
 
+    @ApiModelProperty(value = "刷新时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date refreshTime;
+
     @ApiModelProperty(value = "拒绝原因")
     private String refuseReason;
 

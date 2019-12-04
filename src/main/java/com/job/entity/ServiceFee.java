@@ -19,8 +19,14 @@ public class ServiceFee {
     private Integer serviceType;
     @ApiModelProperty(value = "普通用户比例")
     private BigDecimal commonRate;
-    @ApiModelProperty(value = "会员用户比例")
-    private BigDecimal memberRate;
+    @ApiModelProperty(value = "周会员用户比例")
+    private BigDecimal weekRate;
+    @ApiModelProperty(value = "月会员用户比例")
+    private BigDecimal monthRate;
+    @ApiModelProperty(value = "季会员用户比例")
+    private BigDecimal seasonRate;
+    @ApiModelProperty(value = "年会员用户比例")
+    private BigDecimal yearRate;
     @ApiModelProperty(value = "备注")
     private String remarks;
 }

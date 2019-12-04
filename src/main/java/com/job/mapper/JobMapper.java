@@ -103,23 +103,21 @@ public interface JobMapper {
     List<Map<String,Object>> findCheckPicture(Integer taskId);
 
     /**
-     * 插入任务和类型关系表
-     * @param jobId
-     * @param typeId
-     * @return
-     */
-    int insertJobType(@Param("jobId") Integer jobId,@Param("typeId") Integer typeId);
-
-    /**
-     * 查询用户是否是会员
-     * @param userId
-     * @return
-     */
-    int findUserIsMember(Integer userId);
-
-    /**
      * 查询发布任务时的服务费
      * @return
      */
     ServiceFee findFee();
+
+    /**
+     * 查询奖励提现时的服务费
+     * @return
+     */
+    ServiceFee findCashOut();
+
+    /**
+     * 查询充值时的服务费
+     * @return
+     */
+    ServiceFee findRecharge();
+
 }

@@ -12,9 +12,10 @@
     <result column="orderType" property="orderType" jdbcType="INTEGER" />
     <result column="commitTime" property="commitTime" jdbcType="TIMESTAMP" />
     <result column="finishTime" property="finishTime" jdbcType="TIMESTAMP" />
+    <result column="orderMold" property="orderMold" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    orderId, userId, money, prepayid, orderNum, orderDesc, orderStatus, orderType, commitTime, 
+    orderId, userId, money, prepayid, orderNum, orderDesc, orderStatus, orderType,orderMold, commitTime,
     finishTime
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -27,16 +28,6 @@
     delete from user_order
     where orderId = #{orderId,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.job.entity.UserOrder" >
-    insert into user_order (orderId, userId, money, 
-      prepayid, orderNum, orderDesc, 
-      orderStatus, orderType, commitTime, 
-      finishTime)
-    values (#{orderId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{money,jdbcType=DECIMAL}, 
-      #{prepayid,jdbcType=VARCHAR}, #{orderNum,jdbcType=VARCHAR}, #{orderDesc,jdbcType=VARCHAR},
-      #{orderStatus,jdbcType=INTEGER}, #{orderType,jdbcType=INTEGER}, #{commitTime,jdbcType=TIMESTAMP}, 
-      #{finishTime,jdbcType=TIMESTAMP})
-  </insert>
   <insert id="insertSelective" parameterType="com.job.entity.UserOrder" >
     insert into user_order
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -63,6 +54,9 @@
       </if>
       <if test="orderType != null" >
         orderType,
+      </if>
+     <if test="orderMold != null" >
+       orderMold,
       </if>
       <if test="commitTime != null" >
         commitTime,
@@ -95,6 +89,9 @@
       </if>
       <if test="orderType != null" >
         #{orderType,jdbcType=INTEGER},
+      </if>
+      <if test="orderMold != null" >
+        #{orderMold,jdbcType=INTEGER},
       </if>
       <if test="commitTime != null" >
         #{commitTime,jdbcType=TIMESTAMP},
