@@ -253,7 +253,7 @@
                 and j.jobSource like concat('%',#{jobSource},'%')
             </if>
         </where>
-        order by j.releaseTime asc
+        order by j.refreshTime asc
     </select>
 
     <select id="findAllStep" resultType="com.job.entity.JobStep">
@@ -269,9 +269,6 @@
             </if>
             <if test="refuseReason != null">
                 refuseReason = #{refuseReason},
-            </if>
-            <if test="label != null">
-                label = #{label},
             </if>
             <if test="isRecommend != null">
                 isRecommend = #{isRecommend},

@@ -1,6 +1,8 @@
 package com.job.mapper;
 
+import com.job.entity.UserInfo;
 import com.job.entity.UserJob;
+import com.job.entity.UserReport;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -18,7 +20,9 @@ public interface TimerTaskMapper {
      * 取消会员
      * @return
      */
-    int cancelMember();
+    int updateMember(@Param("userInfoList") List<UserInfo> userInfoList);
+
+    List<UserInfo> findMember();
 
     /**
      * 任务过期
@@ -39,4 +43,17 @@ public interface TimerTaskMapper {
      * @return
      */
     int updateJobCommit(@Param("userJobList") List<UserJob> userJobList);
+
+    /**
+     * 查询没有结束的举报信息
+     * @return
+     */
+    List<UserReport> findNotEnd();
+
+    /**
+     * 更新举报为已提交
+     * @param userReports
+     * @return
+     */
+    int updateReport(@Param("userReports") List<UserReport> userReports);
 }

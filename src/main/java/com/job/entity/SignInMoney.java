@@ -2,7 +2,6 @@ package com.job.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import sun.awt.image.PixelConverter;
 
 import java.math.BigDecimal;
 

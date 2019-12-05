@@ -1,5 +1,6 @@
 package com.job.entity;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -66,4 +67,7 @@ public class UserInfo {
 
     @ApiModelProperty(value = "黑名单原因")
     private String reason;
+
+    @ApiModelProperty(value = "是否第一次登录（1，是，2不是）")
+    private Integer isFirst;
 }

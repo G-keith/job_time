@@ -56,10 +56,9 @@ public class AdminJobController {
             @ApiImplicitParam(name ="jobId",value = "任务主键id",dataType = "int",required = true),
             @ApiImplicitParam(name ="auditStatus",value = "审核结果（通过传3，拒绝传4）",dataType = "int",required = true),
             @ApiImplicitParam(name ="refuseReason",value = "拒绝原因",dataType = "string"),
-            @ApiImplicitParam(name ="label",value = "1.新人；2，简单；3.高价",dataType = "int"),
             @ApiImplicitParam(name ="isRecommend",value = "是否推荐（1不推荐，2推荐）",dataType = "int"),
     })
-    public ServerResponse updateJob(Integer jobId,Integer auditStatus,String refuseReason,Integer label,Integer isRecommend){
-        return jobService.updateJob(jobId, auditStatus,refuseReason,label,isRecommend);
+    public ServerResponse updateJob(Integer jobId,Integer auditStatus,String refuseReason,Integer isRecommend){
+        return jobService.updateJob(jobId, auditStatus,refuseReason,isRecommend);
     }
 }

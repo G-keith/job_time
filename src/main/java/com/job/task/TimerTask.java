@@ -1,9 +1,6 @@
 package com.job.task;
 
-import com.job.entity.Job;
-import com.job.entity.UserJob;
-import com.job.entity.UserMoney;
-import com.job.entity.UserMoneyDetails;
+import com.job.entity.*;
 import com.job.mapper.JobMapper;
 import com.job.mapper.TimerTaskMapper;
 import com.job.mapper.UserMoneyMapper;
@@ -13,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,19 +41,64 @@ public class TimerTask {
     //@Scheduled(cron = "0  */1 * * * ?")
     public void cancelMember() {
         //取消会员
-        timerTaskMapper.cancelMember();
+        member();
         //任务过期
         timerTaskMapper.jobExpire();
         //自动审核任务通过
-        jobCommit();
+        //jobCommit();
+        reportCommit();
+    }
+
+
+    public void member() {
+        List<UserInfo> userInfoList = timerTaskMapper.findMember();
+        userInfoList.forEach(e -> {
+            //当前是年会员，判断年有没有过期
+            if (e.getIsMember() == 5 && e.getYearMemberTime().getTime() < System.currentTimeMillis()) {
+                e.setIsMember(4);
+            }
+            //当前是季会员，判断年有没有过期
+            if (e.getIsMember() == 4 && e.getSeasonMemberTime().getTime() < System.currentTimeMillis()) {
+                e.setIsMember(3);
+            }
+            //当前是月会员，判断年有没有过期
+            if (e.getIsMember() == 3 && e.getMonthMemberTime().getTime() < System.currentTimeMillis()) {
+                e.setIsMember(2);
+            }
+            //当前是周会员，判断年有没有过期
+            if (e.getIsMember() == 2 && e.getWeekMemberTime().getTime() < System.currentTimeMillis()) {
+                System.out.println("周会员");
+                //过期改为非会员
+                e.setIsMember(1);
+            }
+        });
+        timerTaskMapper.updateMember(userInfoList);
+    }
+
+    //举报信息自动提交
+    public void reportCommit(){
+        List<UserReport> userReports=new ArrayList<>();
+        List<UserReport> userReportList=timerTaskMapper.findNotEnd();
+        userReportList.forEach(e->{
+            if(e.getReportStatus()==1){
+                if(System.currentTimeMillis()-e.getReportTime().getTime()>86400000){
+                    userReports.add(e);
+                }
+            }
+            if(e.getReportStatus()==2){
+                if(System.currentTimeMillis()-e.getReplyTime().getTime()>86400000){
+                    userReports.add(e);
+                }
+            }
+        });
     }
 
     /**
      * 自动审核任务通过
      */
-    public void jobCommit(){
-        List<UserJob> userJobList=timerTaskMapper.jobCommit(2);
-        userJobList.forEach(e->{
+    public void jobCommit() {
+        List<UserJob> userJobList = timerTaskMapper.jobCommit(2);
+        userJobList.forEach(e -> {
             //扣除系统账户余额，钱打入用户账户中去
             UserMoney userMoney = userMoneyMapper.selectById(e.getUserId());
             //系统账户钱减去任务发布钱
@@ -72,12 +115,12 @@ public class TimerTask {
             userMoneyDetails.setTradeTime(new Date());
             userMoneyMapper.insertMoneyDetails(userMoneyDetails);
             //更新任务完成数量
-            Job job= jobMapper.selectJob(e.getJobId());
+            Job job = jobMapper.selectJob(e.getJobId());
             job.setCommitNum(job.getCommitNum() - 1);
             job.setFinishNum(job.getFinishNum() + 1);
             jobMapper.updateByPrimaryKeySelective(job);
         });
-        if(userJobList.size()>0){
+        if (userJobList.size() > 0) {
             timerTaskMapper.updateJobCommit(userJobList);
         }
     }

@@ -28,7 +28,7 @@
                 )
             </if>
         </where>
-        order by isRecommend desc
+        order by isRecommend desc,j.refreshTime desc
     </select>
 
     <select id="findNew" resultType="com.job.entity.vo.JobListVo">
@@ -50,7 +50,7 @@
                 )
             </if>
         </where>
-        order by j.releaseTime desc
+        order by j.refreshTime desc
     </select>
 
     <insert id="insertFootprint">

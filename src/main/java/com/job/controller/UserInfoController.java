@@ -4,6 +4,7 @@ import com.job.common.statuscode.ServerResponse;
 import com.job.common.utils.AlipayUtils;
 import com.job.common.utils.WxUtils;
 import com.job.entity.CashOutOrder;
+import com.job.entity.UserOrder;
 import com.job.service.UserInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -121,5 +122,33 @@ public class UserInfoController {
     })
     public ServerResponse headimgurl(String headimgurl, Integer userId) {
         return userInfoService.headimgurl(headimgurl, userId);
+    }
+
+    @GetMapping("/testAliPay")
+    @ApiOperation(value = "测试支付宝支付")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "money", value = "金钱", dataType = "string", required = true),
+    })
+    public ServerResponse testAliPay(BigDecimal money){
+        UserOrder userOrder=new UserOrder();
+        userOrder.setOrderDesc("测试");
+        userOrder.setOrderNum(String.valueOf(System.currentTimeMillis()));
+        userOrder.setMoney(money);
+        return alipayUtils.alipay(userOrder);
+    }
+
+    @GetMapping("/testAliCash")
+    @ApiOperation(value = "测试支付宝提现")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "money", value = "金钱", dataType = "string", required = true),
+    })
+    public ServerResponse testAliCash(BigDecimal money){
+        CashOutOrder cashOutOrder=new CashOutOrder();
+        cashOutOrder.setRemarks("测试");
+        cashOutOrder.setTradeNo(String.valueOf(System.currentTimeMillis()));
+        cashOutOrder.setTotalFee(money);
+        cashOutOrder.setZfbName("葛密");
+        cashOutOrder.setZfbAccount("18861815781");
+        return alipayUtils.cashOut(cashOutOrder);
     }
 }

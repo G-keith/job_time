@@ -95,6 +95,7 @@ public class UserInfoService {
             if (result.getStatus() == 1) {
                 return ServerResponse.createByErrorCodeMessage(2, "用户未黑名单，不可登录");
             } else {
+                result.setIsFirst(2);
                 return ServerResponse.createBySuccess(result);
             }
         } else {
@@ -107,6 +108,7 @@ public class UserInfoService {
             userInfoMapper.insertPhone(userInfo);
             //注册时插入用户账户信息
             userMoneyMapper.insertMoney(userInfo.getUserId());
+            userInfo.setIsFirst(1);
             return ServerResponse.createBySuccess(userInfo);
         }
     }
@@ -284,7 +286,7 @@ public class UserInfoService {
     private UserOrder getOrder(Integer userId, BigDecimal money, Integer type,Integer mold){
         UserOrder userOrder = new UserOrder();
         userOrder.setUserId(userId);
-        userOrder.setOrderType(1);
+        userOrder.setOrderType(type);
         if(type==1){
             userOrder.setOrderMold(mold);
             userOrder.setOrderDesc("小蜜蜂-会员充值");

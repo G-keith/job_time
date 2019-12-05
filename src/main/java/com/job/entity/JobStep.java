@@ -35,4 +35,7 @@ public class JobStep {
 
     @ApiModelProperty(value = "网址")
     private String website;
+
+    @ApiModelProperty(value = "用户提交的图片")
+    private String commitPicture;
 }

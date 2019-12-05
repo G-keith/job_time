@@ -39,8 +39,8 @@ public class JobController {
             @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
     })
-    public ServerResponse findByUserId(Integer userId,Integer status,Integer pageNo,Integer pageSize){
-        return userJobService.findByUserId(userId, status,pageNo,pageSize);
+    public ServerResponse findByUserId(Integer userId, Integer status, Integer pageNo, Integer pageSize) {
+        return userJobService.findByUserId(userId, status, pageNo, pageSize);
     }
 
     @GetMapping("/footprint")
@@ -50,8 +50,8 @@ public class JobController {
             @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
     })
-    public ServerResponse findFootprint(Integer userId,Integer pageNo,Integer pageSize){
-        return jobService.findFootprint(userId,pageNo,pageSize);
+    public ServerResponse findFootprint(Integer userId, Integer pageNo, Integer pageSize) {
+        return jobService.findFootprint(userId, pageNo, pageSize);
     }
 
     @GetMapping("/release")
@@ -62,7 +62,7 @@ public class JobController {
             @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
     })
-    public ServerResponse findRelease(Integer userId,Integer  auditStatus,Integer pageNo,Integer pageSize){
+    public ServerResponse findRelease(Integer userId, Integer auditStatus, Integer pageNo, Integer pageSize) {
         return jobService.findRelease(userId, auditStatus, pageNo, pageSize);
     }
 
@@ -70,9 +70,9 @@ public class JobController {
     @ApiOperation(value = "暂停或结束任务")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "jobId", value = "任务id", dataType = "int", required = true),
-            @ApiImplicitParam(name = "type", value = "类型（2.结束，3.暂停）", dataType = "int",required = true),
+            @ApiImplicitParam(name = "type", value = "类型（2.结束，3.暂停）", dataType = "int", required = true),
     })
-    public ServerResponse suspendOrEnd(Integer jobId,Integer type){
+    public ServerResponse suspendOrEnd(Integer jobId, Integer type) {
         return jobService.suspendOrEnd(jobId, type);
     }
 
@@ -83,7 +83,7 @@ public class JobController {
             @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
     })
-    public ServerResponse findWillAudit(Integer userId,Integer pageNo,Integer pageSize){
+    public ServerResponse findWillAudit(Integer userId, Integer pageNo, Integer pageSize) {
         return jobService.findWillAudit(userId, pageNo, pageSize);
     }
 
@@ -94,7 +94,7 @@ public class JobController {
             @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
     })
-    public ServerResponse findUserJob(Integer jobId,Integer pageNo,Integer pageSize){
+    public ServerResponse findUserJob(Integer jobId, Integer pageNo, Integer pageSize) {
         return jobService.findUserJob(jobId, pageNo, pageSize);
     }
 
@@ -103,13 +103,13 @@ public class JobController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "taskId", value = "验证主键id", dataType = "int", required = true),
     })
-    public ServerResponse findCheckPicture(Integer taskId){
+    public ServerResponse findCheckPicture(Integer taskId) {
         return jobService.findCheckPicture(taskId);
     }
 
     @PostMapping
     @ApiOperation(value = "插入用户发布的任务")
-    public ServerResponse insertJob(@RequestBody Job job){
+    public ServerResponse insertJob(@RequestBody Job job) {
         return jobService.insertJob(job);
     }
 
@@ -120,7 +120,15 @@ public class JobController {
             @ApiImplicitParam(name = "status", value = "审核结果（4.审核通过；5.审核拒绝）", dataType = "int", required = true),
             @ApiImplicitParam(name = "refuseReason", value = "不通过理由", dataType = "string"),
     })
-    public ServerResponse updateUserJob(Integer taskId,Integer status,String refuseReason){
-        return jobService.updateUserJob(taskId, status,refuseReason);
+    public ServerResponse updateUserJob(Integer taskId, Integer status, String refuseReason) {
+        return jobService.updateUserJob(taskId, status, refuseReason);
+    }
+
+    @PutMapping("/refreshJob")
+    @ApiOperation(value = "刷新任务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "jobId", value = "任务id", dataType = "int", required = true),})
+    public ServerResponse refreshJob(Integer jobId) {
+        return jobService.refreshJob(jobId);
     }
 }

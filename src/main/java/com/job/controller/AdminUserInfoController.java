@@ -2,17 +2,16 @@ package com.job.controller;
 
 import cn.hutool.core.date.DateUtil;
 import com.job.common.statuscode.ServerResponse;
-import com.job.common.utils.DateUtils;
 import com.job.common.utils.MD5Util;
 import com.job.entity.UserInfo;
 import com.job.entity.UserMoney;
 import com.job.service.UserInfoService;
+import com.job.task.TimerTask;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,8 +32,11 @@ public class AdminUserInfoController {
 
     private final UserInfoService userInfoService;
 
-    public AdminUserInfoController(UserInfoService userInfoService) {
+    private final TimerTask timerTask;
+
+    public AdminUserInfoController(UserInfoService userInfoService, TimerTask timerTask) {
         this.userInfoService = userInfoService;
+        this.timerTask = timerTask;
     }
 
 
@@ -160,5 +162,11 @@ public class AdminUserInfoController {
         userInfo.setUserId(userId);
         userInfo.setReason(reason);
         return userInfoService.updateUserInfo(userInfo);
+    }
+
+    @GetMapping("/testMember")
+    @ApiOperation(value = "测试会员")
+    public void testMember(){
+        timerTask.member();
     }
 }

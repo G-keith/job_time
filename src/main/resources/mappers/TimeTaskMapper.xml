@@ -2,11 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.job.mapper.TimerTaskMapper">
 
-    <update id="cancelMember">
-        update user_info
-        set isMember=1
-        where <![CDATA[ memberTime<now()  ]]> and isMember=0
+    <update id="updateMember">
+        <foreach collection="userInfoList" item="item" index="index" open="" close="" separator=";">
+            UPDATE user_info
+            <set>
+                isMember=#{item.isMember}
+            </set>
+            <where>
+                userId = #{item.userId}
+            </where>
+        </foreach>
     </update>
+
+    <select id="findMember" resultType="com.job.entity.UserInfo">
+        select * from user_info where <![CDATA[ isMember>1
+        ]]>
+    </select>
 
     <update id="jobExpire">
         update user_job
@@ -18,7 +29,8 @@
         select j.taskId,j.userId,j.jobId,j.commitTime,job.releasePrice
         from user_job j
         inner join job job on j.jobId=job.jobId
-        where status=3 and  <![CDATA[ commitTime<date_sub(now(),interval #{day} day)  ]]>
+        where status=3 and  <![CDATA[ commitTime<date_sub(now(),interval #{day} day)
+        ]]>
     </select>
 
     <update id="updateJobCommit">
@@ -28,6 +40,21 @@
         where taskId in
         <foreach collection="userJobList" item="item" open="(" separator="," close=")">
             #{item.taskId}
+        </foreach>
+    </update>
+
+    <select id="findNotEnd" resultType="com.job.entity.UserReport">
+        select * from user_report where isEnd=1 and reportStatus in (1,2)
+    </select>
+
+    <update id="updateReport">
+        update user_report set
+        reportStatus=3,
+        refuteTime=now(),
+        refuteReason='超过24小时，自动提交'
+        where reportId in
+        <foreach collection="userReports" item="item" open="(" separator="," close=")">
+            #{item}
         </foreach>
     </update>
 </mapper>

@@ -12,7 +12,7 @@
         inner join job_type t on j.typeId=t.typeId
         inner join user_info i on j.userId=i.userId
         where j.auditStatus=3 and j.jobStatus=1 and j.isDelete=1
-        order by j.isRecommend desc
+        order by j.isRecommend desc,j.refreshTime desc
     </select>
 
     <select id="isSignIn" resultType="java.lang.Integer">

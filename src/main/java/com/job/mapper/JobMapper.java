@@ -59,12 +59,10 @@ public interface JobMapper {
      * @param jobId 任务id
      * @param auditStatus 审核结果
      * @param refuseReason 拒绝原因
-     * @param label
      * @param isRecommend
      * @return
      */
-    int updateJob(@Param("jobId") Integer jobId,@Param("auditStatus") Integer auditStatus,@Param("refuseReason") String refuseReason,
-                  @Param("label") Integer label,@Param("isRecommend")Integer isRecommend);
+    int updateJob(@Param("jobId") Integer jobId,@Param("auditStatus") Integer auditStatus,@Param("refuseReason") String refuseReason,@Param("isRecommend")Integer isRecommend);
 
     /**
      * 查询用户足迹

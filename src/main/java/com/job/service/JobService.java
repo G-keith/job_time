@@ -77,8 +77,8 @@ public class JobService {
      * @param auditStatus 审核结果
      * @return
      */
-    public ServerResponse updateJob(Integer jobId, Integer auditStatus, String refuseReason, Integer label, Integer isRecommend) {
-        int result = jobMapper.updateJob(jobId, auditStatus, refuseReason, label, isRecommend);
+    public ServerResponse updateJob(Integer jobId, Integer auditStatus, String refuseReason, Integer isRecommend) {
+        int result = jobMapper.updateJob(jobId, auditStatus, refuseReason, isRecommend);
         if (result > 0) {
             if(auditStatus==4){
                 Job job=jobMapper.selectJob(jobId);
@@ -303,6 +303,34 @@ public class JobService {
             return ServerResponse.createBySuccess();
         } else {
             return ServerResponse.createByError();
+        }
+    }
+
+    /**
+     * 刷新任务
+     * @param jobId
+     * @return
+     */
+    public ServerResponse refreshJob(Integer jobId){
+        Job job=jobMapper.selectJob(jobId);
+        UserInfo userInfo=userInfoMapper.findByUserId(job.getUserId());
+        UserMoney userMoney = userMoneyMapper.selectById(job.getUserId());
+        BigDecimal surplusPrice;
+        if(userInfo.getIsMember()==1){
+            //不是会员
+            surplusPrice=surplusPrice(userMoney.getRepaidBalance(),new BigDecimal(10));
+        }else{
+            //是会员
+            surplusPrice=surplusPrice(userMoney.getRepaidBalance(),new BigDecimal(5));
+        }
+        if(surplusPrice.doubleValue()<0){
+            return ServerResponse.createByErrorMessage("账户余额不足");
+        }else{
+            job.setRefreshTime(new Date());
+            jobMapper.updateByPrimaryKeySelective(job);
+            userMoney.setRepaidBalance(surplusPrice);
+            userMoneyMapper.updateMoney(userMoney);
+            return ServerResponse.createBySuccess();
         }
     }
     /**

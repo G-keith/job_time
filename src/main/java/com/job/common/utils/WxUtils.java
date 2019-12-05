@@ -33,6 +33,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.*;
 
+import static java.awt.SystemColor.info;
+
 /**
  * 微信工具类
  *
@@ -113,6 +115,7 @@ public class WxUtils {
                     info.setProvince(infoMap.get("province").toString());
                     info.setCity(infoMap.get("city").toString());
                     info.setCountry(infoMap.get("country").toString());
+                    info.setIsFirst(1);
                     userInfoMapper.insertSelective(info);
                     return ServerResponse.createBySuccess(info);
                 } else {
@@ -123,6 +126,7 @@ public class WxUtils {
                     userInfo.setProvince(infoMap.get("province").toString());
                     userInfo.setCountry(infoMap.get("country").toString());
                     userInfo.setCity(infoMap.get("city").toString());
+                    userInfo.setIsFirst(2);
                     userInfoMapper.updateByPrimaryKeySelective(userInfo);
                     return ServerResponse.createBySuccess(userInfo);
                 }
@@ -258,8 +262,11 @@ public class WxUtils {
      * @throws IOException
      */
     public void notify(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println("进入回调接口");
+        log.error("进入回调接口");
         String wxRetXml = getRequestData(request);
         Map<String, String> wxRetMap = xmlToMap(wxRetXml);
+        System.out.println("wxRetMap："+wxRetMap);
         Assert.notNull(wxRetMap, ExceptionMessage.XML_DATA_INCORRECTNESS.getMessage());
         //当返回的return_code为SUCCESS则回调成功
         if ("SUCCESS".equalsIgnoreCase(wxRetMap.get("return_code"))) {

@@ -108,7 +108,9 @@ public class UserCashOutService {
                 //支付宝提现
                 cashOutOrder.setZfbName(userCashOut.getZfbName());
                 cashOutOrder.setZfbAccount(userCashOut.getZfbAccount());
-                serverResponse = alipayUtils.cashOut(cashOutOrder);
+               // serverResponse = alipayUtils.cashOut(cashOutOrder);
+                //todo 等代账户，先手动转账
+                serverResponse = ServerResponse.createBySuccess();
             } else {
                 //微信提现
                 cashOutOrder.setOpenid(userInfo.getOpenid());

@@ -9,6 +9,7 @@
     <update id="updateSignInMoney">
         update sign_in_money set
         money=#{money},
-        inviteMoney=#{inviteMoney}
+        oneInvite=#{oneInvite},
+        twoInvite=#{twoInvite}
     </update>
 </mapper>

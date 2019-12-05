@@ -23,8 +23,9 @@ public interface SignInMoneyMapper {
     /**
      * 更新签到或者邀请金额
      * @param money
-     * @param inviteMoney
+     * @param oneInvite
+     * @param twoInvite
      * @return
      */
-    int updateSignInMoney(@Param("money") BigDecimal money, @Param("inviteMoney") BigDecimal inviteMoney);
+    int updateSignInMoney(@Param("money") BigDecimal money,@Param("oneInvite") BigDecimal oneInvite,@Param("twoInvite")BigDecimal twoInvite);
 }

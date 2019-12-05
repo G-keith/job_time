@@ -34,11 +34,12 @@ public class SignInMoneyService {
     /**
      * 更新签到和邀请金额
      * @param money
-     * @param inviteMoney
+     * @param oneInvite
+     * @param twoInvite
      * @return
      */
-    public ServerResponse update( BigDecimal money, BigDecimal inviteMoney){
-        int result=signInMoneyMapper.updateSignInMoney(money, inviteMoney);
+    public ServerResponse update( BigDecimal money,  BigDecimal oneInvite,BigDecimal twoInvite){
+        int result=signInMoneyMapper.updateSignInMoney(money,  oneInvite,twoInvite);
         if(result>0){
             return ServerResponse.createBySuccess();
         }else{

@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,9 +26,10 @@ public class WxController {
     @Autowired
     private WxUtils wxUtils;
 
-    @GetMapping
+    @PostMapping
     @ApiOperation(value = "微信支付回调通知")
     public void appNotify(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println("回调接口controller");
        wxUtils.notify(request, response);
     }
 }

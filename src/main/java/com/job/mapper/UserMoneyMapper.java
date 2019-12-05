@@ -2,6 +2,7 @@ package com.job.mapper;
 
 import com.job.entity.UserMoney;
 import com.job.entity.UserMoneyDetails;
+import com.job.entity.vo.JobVo;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;

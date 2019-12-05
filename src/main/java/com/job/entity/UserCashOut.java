@@ -1,5 +1,6 @@
 package com.job.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -36,9 +37,11 @@ public class UserCashOut {
     private Integer auditStatus;
 
     @ApiModelProperty(value = "申请时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date applyTime;
 
     @ApiModelProperty(value = "审核时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date auditTime;
 
     @ApiModelProperty(value = "拒绝原因")

@@ -40,9 +40,10 @@ public class SignInMoneyController {
     @ApiOperation(value = "更新签到及邀请金钱信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "money", value = "签到金钱",required = true),
-            @ApiImplicitParam(name = "inviteMoney", value = "邀请金钱",required = true),
+            @ApiImplicitParam(name = "oneInvite", value = "一级推广赏金比例",required = true),
+            @ApiImplicitParam(name = "twoInvite", value = "二级推广赏金比例",required = true),
     })
-    public ServerResponse update(BigDecimal money, BigDecimal inviteMoney){
-        return signInMoneyService.update(money, inviteMoney);
+    public ServerResponse update(BigDecimal money, BigDecimal oneInvite,BigDecimal twoInvite){
+        return signInMoneyService.update(money, oneInvite,twoInvite);
     }
 }
