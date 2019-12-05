@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.job.mapper.UserReportMapper">
+    <resultMap id="BaseResultMap" type="com.job.entity.UserReport">
+        <id column="reportId" property="reportId" jdbcType="INTEGER"/>
+        <result column="userId" property="userId" jdbcType="INTEGER"/>
+        <result column="jobId" property="jobId" jdbcType="INTEGER"/>
+        <result column="taskId" property="taskId" jdbcType="INTEGER"/>
+        <result column="rewardId" property="rewardId" jdbcType="INTEGER"/>
+        <result column="reportStatus" property="reportStatus" jdbcType="INTEGER"/>
+        <result column="isEnd" property="isEnd" jdbcType="INTEGER"/>
+        <result column="reportReason" property="reportReason" jdbcType="VARCHAR"/>
+        <result column="reportImg" property="reportImg" jdbcType="VARCHAR"/>
+        <result column="replyReason" property="replyReason" jdbcType="VARCHAR"/>
+        <result column="replyImg" property="replyImg" jdbcType="VARCHAR"/>
+        <result column="refuteReason" property="refuteReason" jdbcType="VARCHAR"/>
+        <result column="auditReason" property="auditReason" jdbcType="VARCHAR"/>
+        <result column="reportTime" property="reportTime" jdbcType="TIMESTAMP"/>
+        <result column="replyTime" property="replyTime" jdbcType="TIMESTAMP"/>
+        <result column="refuteTime" property="refuteTime" jdbcType="TIMESTAMP"/>
+        <result column="auditTime" property="auditTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    reportId, userId, jobId, taskId, rewardId, reportStatus,isEnd, reportReason,reportImg, replyReason,replyImg,
+    refuteReason, auditReason, reportTime, replyTime, refuteTime, auditTime
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from user_report
+        where reportId = #{reportId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user_report
+    where reportId = #{reportId,jdbcType=INTEGER}
+  </delete>
+    <insert id="insertSelective" parameterType="com.job.entity.UserReport">
+        insert into user_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="reportId != null">
+                reportId,
+            </if>
+            <if test="userId != null">
+                userId,
+            </if>
+            <if test="jobId != null">
+                jobId,
+            </if>
+            <if test="taskId != null">
+                taskId,
+            </if>
+            <if test="rewardId != null">
+                rewardId,
+            </if>
+            <if test="reportStatus != null">
+                reportStatus,
+            </if>
+            <if test="isEnd != null">
+                isEnd,
+            </if>
+            <if test="reportReason != null">
+                reportReason,
+            </if>
+            <if test="reportImg != null">
+                reportImg,
+            </if>
+            <if test="replyReason != null">
+                replyReason,
+            </if>
+            <if test="replyImg != null">
+                replyImg,
+            </if>
+            <if test="refuteReason != null">
+                refuteReason,
+            </if>
+            <if test="auditReason != null">
+                auditReason,
+            </if>
+            <if test="reportTime != null">
+                reportTime,
+            </if>
+            <if test="replyTime != null">
+                replyTime,
+            </if>
+            <if test="refuteTime != null">
+                refuteTime,
+            </if>
+            <if test="auditTime != null">
+                auditTime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="reportId != null">
+                #{reportId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="jobId != null">
+                #{jobId,jdbcType=INTEGER},
+            </if>
+            <if test="taskId != null">
+                #{taskId,jdbcType=INTEGER},
+            </if>
+            <if test="rewardId != null">
+                #{rewardId,jdbcType=INTEGER},
+            </if>
+            <if test="reportStatus != null">
+                #{reportStatus,jdbcType=INTEGER},
+            </if>
+            <if test="isEnd != null">
+                #{isEnd,jdbcType=INTEGER},
+            </if>
+            <if test="reportReason != null">
+                #{reportReason,jdbcType=VARCHAR},
+            </if>
+            <if test="reportImg != null">
+                #{reportImg,jdbcType=VARCHAR},
+            </if>
+            <if test="replyReason != null">
+                #{replyReason,jdbcType=VARCHAR},
+            </if>
+            <if test="replyImg != null">
+                #{replyImg,jdbcType=VARCHAR},
+            </if>
+            <if test="refuteReason != null">
+                #{refuteReason,jdbcType=VARCHAR},
+            </if>
+            <if test="auditReason != null">
+                #{auditReason,jdbcType=VARCHAR},
+            </if>
+            <if test="reportTime != null">
+                #{reportTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="replyTime != null">
+                #{replyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="refuteTime != null">
+                #{refuteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="auditTime != null">
+                #{auditTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.job.entity.UserReport">
+        update user_report
+        <set>
+            <if test="userId != null">
+                userId = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="jobId != null">
+                jobId = #{jobId,jdbcType=INTEGER},
+            </if>
+            <if test="taskId != null">
+                taskId = #{taskId,jdbcType=INTEGER},
+            </if>
+            <if test="rewardId != null">
+                rewardId = #{rewardId,jdbcType=INTEGER},
+            </if>
+            <if test="reportStatus != null">
+                reportStatus = #{reportStatus,jdbcType=INTEGER},
+            </if>
+            <if test="isEnd != null">
+                isEnd = #{isEnd,jdbcType=INTEGER},
+            </if>
+            <if test="reportReason != null">
+                reportReason = #{reportReason,jdbcType=VARCHAR},
+            </if>
+            <if test="reportImg != null">
+                reportImg = #{reportImg,jdbcType=VARCHAR},
+            </if>
+            <if test="replyReason != null">
+                replyReason = #{replyReason,jdbcType=VARCHAR},
+            </if>
+            <if test="replyImg != null">
+                replyImg = #{replyImg,jdbcType=VARCHAR},
+            </if>
+            <if test="refuteReason != null">
+                refuteReason = #{refuteReason,jdbcType=VARCHAR},
+            </if>
+            <if test="auditReason != null">
+                auditReason = #{auditReason,jdbcType=VARCHAR},
+            </if>
+            <if test="reportTime != null">
+                reportTime = #{reportTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="replyTime != null">
+                replyTime = #{replyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="refuteTime != null">
+                refuteTime = #{refuteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="auditTime != null">
+                auditTime = #{auditTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where reportId = #{reportId,jdbcType=INTEGER}
+    </update>
+
+    <select id="findAll" resultType="com.job.entity.vo.UserReportVo">
+    select r.reportId,r.reportStatus,r.reportReason,r.reportImg,r.replyReason,r.replyImg,r.refuteReason,
+    r.auditReason,r.reportTime,r.replyTime,r.refuteTime,r.auditTime,j.jobTitle,j.jobSource
+    from user_report r
+    inner join job j on r.jobId=j.jobId
+    where r.isEnd=1 and r.reportStatus=#{reportStatus} and r.userId=#{userId}
+    </select>
+
+    <select id="findUserAudit" resultType="com.job.entity.vo.UserReportVo">
+    select r.reportId,r.reportStatus,r.reportReason,r.reportImg,r.replyReason,r.replyImg,r.refuteReason,
+    r.auditReason,r.reportTime,r.replyTime,r.refuteTime,r.auditTime,j.jobTitle,j.jobSource
+    from user_report r
+    inner join job j on r.jobId=j.jobId
+    where r.isEnd=2 and reportStatus in (4,5) and r.userId=#{userId}
+    </select>
+
+    <select id="findRewardAll" resultType="com.job.entity.vo.UserReportVo">
+    select r.reportId,r.reportStatus,r.reportReason,r.reportImg,r.replyReason,r.replyImg,r.refuteReason,
+    r.auditReason,r.reportTime,r.replyTime,r.refuteTime,r.auditTime,j.jobTitle,j.jobSource
+    from user_report r
+    inner join job j on r.jobId=j.jobId
+    where r.isEnd=1 and r.reportStatus=#{reportStatus} and r.rewardId=#{userId}
+    </select>
+
+    <select id="findRewardAudit" resultType="com.job.entity.vo.UserReportVo">
+    select r.reportId,r.reportStatus,r.reportReason,r.reportImg,r.replyReason,r.replyImg,r.refuteReason,
+    r.auditReason,r.reportTime,r.replyTime,r.refuteTime,r.auditTime,j.jobTitle,j.jobSource
+    from user_report r
+    inner join job j on r.jobId=j.jobId
+    where r.isEnd=2 and reportStatus in (4,5) and r.rewardId=#{userId}
+    </select>
+
+    <select id="findAudit" resultType="com.job.entity.vo.UserReportVo">
+    select r.reportId,r.reportStatus,r.reportReason,r.reportImg,r.replyReason,r.replyImg,r.refuteReason,
+    r.auditReason,r.reportTime,r.replyTime,r.refuteTime,r.auditTime,j.jobTitle,j.jobSource,j.taskId
+    from user_report r
+    inner join job j on r.jobId=j.jobId
+    where reportStatus in (4,5)
+    </select>
+
+    <select id="findWillAudit" resultType="com.job.entity.vo.UserReportVo">
+    select r.reportId,r.reportStatus,r.reportReason,r.reportImg,r.replyReason,r.replyImg,r.refuteReason,
+    r.auditReason,r.reportTime,r.replyTime,r.refuteTime,r.auditTime,j.jobTitle,j.jobSource,j.taskId
+    from user_report r
+    inner join job j on r.jobId=j.jobId
+    where reportStatus=3
+    </select>
+
+    <resultMap id="JobDetails" type="com.job.entity.vo.JobVo">
+        <result column="jobTitle" property="jobTitle"/>
+        <result column="jobSource" property="jobSource"/>
+        <result column="typeName" property="typeName"/>
+        <result column="introduce" property="introduce"/>
+        <collection property="jobStepList" select="getJobStepList" column="taskId"/>
+    </resultMap>
+    <select id="selectJobDetails" resultMap="JobDetails">
+        select j.jobTitle,j.jobSource,j.introduce,t.typeName,u.taskId from user_job u
+        inner join job j on u.jobId=j.jobId
+        inner join job_type t on j.typeId=t.typeId
+        where u.taskId=#{taskId}
+    </select>
+
+    <select id="getJobStepList" resultType="com.job.entity.JobStep">
+        select s.stepType,s.introduce,s.sort,s.picture,s.website,c.checkPicture as commitPicture
+        from user_job u
+        inner join job_step s on u.jobId=s.jobId
+        left join user_commit c on u.taskId=c.taskId and s.sort=c.sort
+        where u.taskId=#{taskId}
+        order by s.sort
+    </select>
+</mapper>
