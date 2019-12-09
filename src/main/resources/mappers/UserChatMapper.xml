@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.job.mapper.UserChatMapper">
+    <resultMap id="BaseResultMap" type="com.job.entity.UserChat">
+        <id column="newsId" jdbcType="INTEGER" property="newsId"/>
+        <result column="userId" jdbcType="INTEGER" property="userId"/>
+        <result column="targetId" jdbcType="INTEGER" property="targetId"/>
+        <result column="newsNum" jdbcType="INTEGER" property="newsNum"/>
+        <result column="newsContent" jdbcType="VARCHAR" property="newsContent"/>
+        <result column="newsTime" jdbcType="TIMESTAMP" property="newsTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    newsId, userId, targetId, newsNum, newsContent,newsTime
+  </sql>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user_news
+    where newsId = #{newsId,jdbcType=INTEGER}
+  </delete>
+    <insert id="insertSelective" parameterType="com.job.entity.UserChat">
+        insert into user_news
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="newsId != null">
+                newsId,
+            </if>
+            <if test="userId != null">
+                userId,
+            </if>
+            <if test="targetId != null">
+                targetId,
+            </if>
+            <if test="newsNum != null">
+                newsNum,
+            </if>
+            <if test="newsContent != null">
+                newsContent,
+            </if>
+            <if test="newsTime != null">
+                newsTime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="newsId != null">
+                #{newsId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="targetId != null">
+                #{targetId,jdbcType=INTEGER},
+            </if>
+            <if test="newsNum != null">
+                #{newsNum,jdbcType=INTEGER},
+            </if>
+            <if test="newsContent != null">
+                #{newsContent,jdbcType=VARCHAR},
+            </if>
+            <if test="newsTime != null">
+                #{newsTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.job.entity.UserChat">
+        update user_news
+        <set>
+            <if test="userId != null">
+                userId = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="targetId != null">
+                targetId = #{targetId,jdbcType=INTEGER},
+            </if>
+            <if test="newsNum != null">
+                newsNum = #{newsNum,jdbcType=INTEGER},
+            </if>
+            <if test="newsContent != null">
+                newsContent = #{newsContent,jdbcType=VARCHAR},
+            </if>
+            <if test="newsTime != null">
+                newsTime = #{newsTime,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where newsId = #{newsId,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByUserId" resultType="com.job.entity.UserChat">
+        select * from user_news where userId=#{userId} and targetId=#{targetId}
+    </select>
+
+    <insert id="insertRecord">
+        insert into user_chat_record (sendId,receiveId,content,chatTime) values
+        (#{userId},#{targetId},#{newsContent},now())
+    </insert>
+
+    <select id="selectRecord" resultType="com.job.entity.vo.UserChatRecordVo">
+         select r.sendId,r.receiveId,r.content,r.chatTime,
+         (select headimgurl from user_info where userId=r.sendId) as sendImg,
+         (select headimgurl from user_info where userId=r.receiveId) as receiveImg
+         from user_chat_record r
+        where (r.sendId=#{userId} and r.receiveId=#{targetId}) or (r.receiveId=#{userId} and r.sendId=#{targetId})
+        order by r.chatTime desc
+    </select>
+
+    <select id="selectNews" resultType="com.job.entity.vo.UserChatVo">
+        select n.newsId,n.userId,n.targetId,n.newsNum,n.newsContent,n.newsTime,i.headimgurl as targetImg,i.UID as UID from user_news n
+        inner join user_info i on n.targetId=i.userId
+        where n.userId=#{userId}
+        order by n.newsTime desc,n.newsNum desc
+    </select>
+</mapper>

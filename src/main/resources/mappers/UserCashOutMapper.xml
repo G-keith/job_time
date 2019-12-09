@@ -145,7 +145,7 @@
     </update>
 
     <select id="findAll" resultType="com.job.entity.UserCashOut">
-        select i.phone,i.nickname,o.cashOutType,o.tradeType,o.cashOutMoney,o.makeMoney,o.auditStatus,o.applyTime from user_cash_out
+        select i.phone,i.nickname,o.cashOutType,o.tradeType,o.cashOutMoney,o.makeMoney,o.auditStatus,o.applyTime,o.cashOutId from user_cash_out
         o
         inner join user_info i on o.userId=i.userId
         <where>

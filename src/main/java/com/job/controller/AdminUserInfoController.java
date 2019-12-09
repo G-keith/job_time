@@ -12,10 +12,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
@@ -55,9 +52,11 @@ public class AdminUserInfoController {
             @ApiImplicitParam(name = "upUID", value = "上级用户推广码", dataType = "string"),
             @ApiImplicitParam(name = "memberDate", value = "会员有效期（用户必须是会员才能选择时间）", dataType = "string"),
             @ApiImplicitParam(name = "isMember", value = "是否是会员（1.不是；2是）", dataType = "int"),
+            @ApiImplicitParam(name = "adminId", value = "管理员账户主键id", dataType = "int"),
+            @ApiImplicitParam(name = "status", value = "用户状态（0，正常，1正常）", dataType = "int"),
     })
-    public ServerResponse updateUserInfo(Integer userId, String phone, String nickname, Integer sex, String province, String city,
-                                         String country, String headimgurl, String UID, String upUID, String memberDate, Integer isMember) {
+    public ServerResponse updateUserInfo(Integer status,Integer userId, String phone, String nickname, Integer sex, String province, String city,
+                                         String country, String headimgurl, String UID, String upUID, String memberDate, Integer isMember,Integer adminId) {
         UserInfo userInfo = new UserInfo();
         userInfo.setUserId(userId);
         if (phone != null && !"".equals(phone)) {
@@ -93,7 +92,8 @@ public class AdminUserInfoController {
         if (sex != null) {
             userInfo.setSex(sex);
         }
-        return userInfoService.updateUserInfo(userInfo);
+        userInfo.setStatus(status);
+        return userInfoService.updateUserInfo(userInfo,adminId);
     }
 
     @GetMapping("/all")
@@ -135,11 +135,45 @@ public class AdminUserInfoController {
     @ApiOperation(value = "修改管理员账户密码")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "account", value = "账户", dataType = "string", required = true),
-            @ApiImplicitParam(name = "password", value = "密码", dataType = "string", required = true),
+            @ApiImplicitParam(name = "password", value = "密码", dataType = "string"),
+            @ApiImplicitParam(name = "adminId", value = "主键id", dataType = "int", required = true),
     })
-    public ServerResponse modifyAdminInfo(String account, String password) {
-        return userInfoService.modifyAdminInfo(account, MD5Util.md5EncodeUtf8(password));
+    public ServerResponse modifyAdminInfo(String account, String password,Integer adminId) {
+        String md5Password;
+        if(password!=null){
+            md5Password=MD5Util.md5EncodeUtf8(password);
+        }else{
+            md5Password= null;
+        }
+        return userInfoService.modifyAdminInfo(account, md5Password,adminId);
     }
+
+    @GetMapping("/allInfo")
+    @ApiOperation(value = "查询所有后台账号")
+    public ServerResponse selectAllAdmin(){
+        return userInfoService.selectAll();
+    }
+
+    @PostMapping
+    @ApiOperation(value = "插入管理员账户密码")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "account", value = "账户", dataType = "string", required = true),
+            @ApiImplicitParam(name = "password", value = "密码", dataType = "string", required = true),
+            @ApiImplicitParam(name = "phone", value = "手机号", dataType = "string", required = true),
+    })
+    public ServerResponse insertInfo(String account, String password,String phone){
+        return userInfoService.insertInfo(account, MD5Util.md5EncodeUtf8(password),phone);
+    }
+
+    @DeleteMapping
+    @ApiOperation(value = "删除管理员账户")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "adminId", value = "主键id", dataType = "int", required = true),
+    })
+    public ServerResponse deleteInfo(Integer adminId){
+        return userInfoService.deleteInfo(adminId);
+    }
+
 
     @GetMapping
     @ApiOperation(value = "后台登录")
@@ -156,12 +190,13 @@ public class AdminUserInfoController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
             @ApiImplicitParam(name = "reason", value = "原因", dataType = "string", required = true),
+            @ApiImplicitParam(name = "adminId", value = "管理员账户主键id", dataType = "int"),
     })
-    public ServerResponse updateUserInfo(Integer userId, String reason) {
+    public ServerResponse updateUserInfo(Integer userId, String reason,Integer adminId) {
         UserInfo userInfo = new UserInfo();
         userInfo.setUserId(userId);
         userInfo.setReason(reason);
-        return userInfoService.updateUserInfo(userInfo);
+        return userInfoService.updateBlack(userInfo,adminId);
     }
 
     @GetMapping("/testMember")
@@ -169,4 +204,18 @@ public class AdminUserInfoController {
     public void testMember(){
         timerTask.member();
     }
+
+    @GetMapping("/foot")
+    @ApiOperation(value = "后台用户足迹")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
+            @ApiImplicitParam(name = "account", value = "管理员账号", dataType = "string"),
+            @ApiImplicitParam(name = "phone", value = "手机号", dataType = "string"),
+            @ApiImplicitParam(name = "nickName", value = "昵称", dataType = "string"),
+    })
+    public ServerResponse selectFoot(Integer pageNo,Integer pageSize,String account,String phone,String nickName){
+        return userInfoService.selectFoot(pageNo, pageSize, account, phone, nickName);
+    }
+
 }

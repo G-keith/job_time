@@ -4,15 +4,14 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.job.common.page.PageVO;
 import com.job.common.statuscode.ServerResponse;
+import com.job.entity.UserInfo;
 import com.job.entity.UserMoney;
 import com.job.entity.UserMoneyDetails;
-import com.job.entity.vo.JobDto;
 import com.job.entity.vo.JobListVo;
-import com.job.entity.vo.JobVo;
 import com.job.mapper.HomePageMapper;
+import com.job.mapper.UserInfoMapper;
 import com.job.mapper.UserMoneyMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,11 +28,18 @@ import java.util.Date;
 @Transactional(rollbackFor = Exception.class)
 public class HomePageService {
 
-    @Autowired
-    private HomePageMapper homePageMapper;
+    private final HomePageMapper homePageMapper;
 
-    @Autowired
-    private UserMoneyMapper userMoneyMapper;
+    private final UserMoneyMapper userMoneyMapper;
+
+    private final UserInfoMapper userInfoMapper;
+
+    public HomePageService(HomePageMapper homePageMapper, UserMoneyMapper userMoneyMapper, UserInfoMapper userInfoMapper) {
+        this.homePageMapper = homePageMapper;
+        this.userMoneyMapper = userMoneyMapper;
+        this.userInfoMapper = userInfoMapper;
+    }
+
 
     /**
      * 查询所有首页轮播图
@@ -79,6 +85,10 @@ public class HomePageService {
      * @return 0成功，1失败
      */
     public ServerResponse insertSignIn(Integer userId) {
+        UserInfo userInfo=userInfoMapper.findByUserId(userId);
+        if(userInfo.getStatus()==1){
+            return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
+        }
         System.out.println(userId+"====");
         int result = homePageMapper.insertSignIn(userId);
         if (result > 0) {

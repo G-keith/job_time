@@ -6,9 +6,9 @@ import com.job.common.page.PageVO;
 import com.job.common.statuscode.ServerResponse;
 import com.job.entity.UserInfo;
 import com.job.entity.UserOpinion;
+import com.job.mapper.UserInfoMapper;
 import com.job.mapper.UserOpinionMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class UserOpinionService {
-    @Autowired
-    private UserOpinionMapper userOpinionMapper;
+    private final UserOpinionMapper userOpinionMapper;
+
+    private final UserInfoMapper userInfoMapper;
+
+    public UserOpinionService(UserOpinionMapper userOpinionMapper, UserInfoMapper userInfoMapper) {
+        this.userOpinionMapper = userOpinionMapper;
+        this.userInfoMapper = userInfoMapper;
+    }
+
 
     /**
      * 插入用户反馈
@@ -30,6 +37,10 @@ public class UserOpinionService {
      * @return
      */
     public ServerResponse insertSelective(UserOpinion userOpinion){
+        UserInfo userInfo=userInfoMapper.findByUserId(userOpinion.getUserId());
+        if(userInfo.getStatus()==1){
+            return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
+        }
         int result=userOpinionMapper.insertSelective(userOpinion);
         if(result>0){
             return ServerResponse.createBySuccess();
@@ -54,15 +65,14 @@ public class UserOpinionService {
 
     /**
      * 查询所有用户反馈
-     * @param userId
      * @param status
      * @param pageNo
      * @param pageSize
      * @return
      */
-    public ServerResponse findAll(Integer userId,Integer status,Integer pageNo, Integer pageSize){
+    public ServerResponse findAll(String phone,String nickName,Integer userId,Integer status,Integer pageNo, Integer pageSize){
         Page<UserOpinion> page = PageHelper.startPage(pageNo, pageSize);
-        userOpinionMapper.findAll(userId, status);
+        userOpinionMapper.findAll(phone,nickName,userId,status);
         return ServerResponse.createBySuccess(PageVO.build(page));
     }
 }

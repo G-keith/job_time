@@ -41,6 +41,9 @@ public class JobVo {
     @ApiModelProperty(value = "悬赏价格")
     private BigDecimal releasePrice;
 
+    @ApiModelProperty(value = "任务价格")
+    private BigDecimal jobPrice;
+
     @ApiModelProperty(value = "任务数量")
     private Integer jobNum;
 
@@ -61,6 +64,9 @@ public class JobVo {
 
     @ApiModelProperty(value = "状态（0.没有报名；,1.已报名；2.已提交；3.审核通过；4.审核拒绝）")
     private Integer status;
+
+    @ApiModelProperty(value = "1.进行中 2.已结束，3.暂停")
+    private Integer jobStatus;
 
     @ApiModelProperty(value = "待审核任务条数")
     private Integer num;

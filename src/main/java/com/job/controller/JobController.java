@@ -58,7 +58,7 @@ public class JobController {
     @ApiOperation(value = "查询用户所发布的任务")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
-            @ApiImplicitParam(name = "auditStatus", value = "审核状态（1.未提交；2.审核中，3审核通过；4；审核拒绝）", dataType = "int"),
+            @ApiImplicitParam(name = "auditStatus", value = "审核状态（2.审核中，3审核通过；4；审核拒绝）", dataType = "int"),
             @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
     })
@@ -66,36 +66,48 @@ public class JobController {
         return jobService.findRelease(userId, auditStatus, pageNo, pageSize);
     }
 
-    @PutMapping("/suspend-end")
-    @ApiOperation(value = "暂停或结束任务")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "jobId", value = "任务id", dataType = "int", required = true),
-            @ApiImplicitParam(name = "type", value = "类型（2.结束，3.暂停）", dataType = "int", required = true),
-    })
-    public ServerResponse suspendOrEnd(Integer jobId, Integer type) {
-        return jobService.suspendOrEnd(jobId, type);
-    }
-
-    @GetMapping("/audit")
-    @ApiOperation(value = "查询需要审核的任务列表")
+    @GetMapping("/end")
+    @ApiOperation(value = "查询用户已结束的任务")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
             @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
     })
-    public ServerResponse findWillAudit(Integer userId, Integer pageNo, Integer pageSize) {
-        return jobService.findWillAudit(userId, pageNo, pageSize);
+    public ServerResponse findEndRelease(Integer userId,Integer pageNo, Integer pageSize) {
+        return jobService.findEndRelease(userId, pageNo, pageSize);
     }
 
-    @GetMapping("/userJob")
-    @ApiOperation(value = "查询用户提交审核的列表")
+    @PutMapping("/suspend-end")
+    @ApiOperation(value = "暂停,开始或结束任务")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "jobId", value = "任务id", dataType = "int", required = true),
+            @ApiImplicitParam(name = "type", value = "类型（1，开始 2.结束，3.暂停）", dataType = "int", required = true),
+    })
+    public ServerResponse suspendOrEnd(Integer jobId, Integer type) {
+        return jobService.suspendOrEnd(jobId, type);
+    }
+
+//    @GetMapping("/audit")
+//    @ApiOperation(value = "查询需要审核的任务列表")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int", required = true),
+//            @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
+//            @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
+//    })
+//    public ServerResponse findWillAudit(Integer userId, Integer pageNo, Integer pageSize) {
+//        return jobService.findWillAudit(userId, pageNo, pageSize);
+//    }
+
+    @GetMapping("/userJob")
+    @ApiOperation(value = "查询待审核的列表")
+    @ApiImplicitParams({
             @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
+            @ApiImplicitParam(name = "status", value = "3.待审核；4.审核通过；5.审核拒绝", required = true),
+            @ApiImplicitParam(name = "userId", value = "用户id", required = true),
     })
-    public ServerResponse findUserJob(Integer jobId, Integer pageNo, Integer pageSize) {
-        return jobService.findUserJob(jobId, pageNo, pageSize);
+    public ServerResponse findUserJob(Integer status, Integer pageNo, Integer pageSize,Integer userId) {
+        return jobService.findUserJob(status, pageNo, pageSize,userId);
     }
 
     @GetMapping("/checkPicture")

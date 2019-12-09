@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author keith
  * @version 1.0
@@ -36,4 +38,10 @@ public class UserJobVo {
     @ApiModelProperty(value = "提交时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Data commitTime;
+
+    @ApiModelProperty(value = "拒绝原因")
+    private String refuseReason;
+
+    @ApiModelProperty(value = "图片")
+    private List<String> imgList;
 }

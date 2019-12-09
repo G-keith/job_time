@@ -46,7 +46,10 @@ public class TimerTask {
         timerTaskMapper.jobExpire();
         //自动审核任务通过
         //jobCommit();
+        //举报自动提交
         reportCommit();
+
+        //todo 任务自动刷新
     }
 
 
@@ -91,6 +94,7 @@ public class TimerTask {
                 }
             }
         });
+        timerTaskMapper.updateReport(userReports);
     }
 
     /**

@@ -12,10 +12,7 @@ import com.job.common.statuscode.ServerResponse;
 import com.job.common.utils.AlipayUtils;
 import com.job.common.utils.RandomUtil;
 import com.job.common.utils.WxUtils;
-import com.job.entity.UserInfo;
-import com.job.entity.UserMoney;
-import com.job.entity.UserMoneyDetails;
-import com.job.entity.UserOrder;
+import com.job.entity.*;
 import com.job.mapper.UserInfoMapper;
 import com.job.mapper.UserMoneyMapper;
 import com.job.mapper.UserOrderMapper;
@@ -93,7 +90,7 @@ public class UserInfoService {
         UserInfo result = userInfoMapper.findByPhone(phone);
         if (result != null) {
             if (result.getStatus() == 1) {
-                return ServerResponse.createByErrorCodeMessage(2, "用户未黑名单，不可登录");
+                return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可登录");
             } else {
                 result.setIsFirst(2);
                 return ServerResponse.createBySuccess(result);
@@ -114,14 +111,32 @@ public class UserInfoService {
     }
 
     /**
+     * 插入邀请码
+     * @param uid
+     * @param userId
+     * @return
+     */
+    public ServerResponse insertUid(String uid,Integer userId){
+        UserInfo userInfo=userInfoMapper.findByUserId(userId);
+        userInfo.setUpUID(uid);
+        int result=userInfoMapper.updateByPrimaryKeySelective(userInfo);
+        if(result>0){
+            return ServerResponse.createBySuccess();
+        }else{
+            return ServerResponse.createByError();
+        }
+
+    }
+
+    /**
      * @throws
      * @title weChatLogin
      * @description 微信授权登录
      * @author Kuangzc
      * @updateTime 2019-9-12 16:00:51
      */
-    public ServerResponse weChatLogin(String code) throws IOException {
-        return wxUtils.authorization(code);
+    public ServerResponse weChatLogin(String code, Integer userId) throws IOException {
+        return wxUtils.authorization(code, userId);
     }
 
 
@@ -196,9 +211,42 @@ public class UserInfoService {
      * @param userInfo 用户信息
      * @return
      */
-    public ServerResponse updateUserInfo(UserInfo userInfo) {
+    public ServerResponse updateUserInfo(UserInfo userInfo, Integer adminId) {
         int result = userInfoMapper.updateByPrimaryKeySelective(userInfo);
+        Map<String, Object> map = userInfoMapper.selectById(adminId);
         if (result > 0) {
+            userInfo = userInfoMapper.findByUserId(userInfo.getUserId());
+            String content;
+            if (userInfo.getPhone() != null) {
+                content = "管理员" + map.get("account").toString() + "修改了手机号为" + userInfo.getPhone() + "的个人信息";
+            } else {
+                content = "管理员" + map.get("account").toString() + "修改了用户呢称为" + userInfo.getPhone() + "的个人信息";
+            }
+            userInfoMapper.insertFoot(adminId, userInfo.getUserId(), content);
+            return ServerResponse.createBySuccess();
+        } else {
+            return ServerResponse.createByError();
+        }
+    }
+
+    /**
+     * 更新用户信息
+     *
+     * @param userInfo 用户信息
+     * @return
+     */
+    public ServerResponse updateBlack(UserInfo userInfo, Integer adminId) {
+        int result = userInfoMapper.updateByPrimaryKeySelective(userInfo);
+        Map<String, Object> map = userInfoMapper.selectById(adminId);
+        if (result > 0) {
+            userInfo = userInfoMapper.findByUserId(userInfo.getUserId());
+            String content;
+            if (userInfo.getPhone() != null) {
+                content = "管理员" + map.get("account").toString() + "将手机号为" + userInfo.getPhone() + "加入了黑名单";
+            } else {
+                content = "管理员" + map.get("account").toString() + "将用户呢称为" + userInfo.getPhone() + "加入了黑名单";
+            }
+            userInfoMapper.insertFoot(adminId, userInfo.getUserId(), content);
             return ServerResponse.createBySuccess();
         } else {
             return ServerResponse.createByError();
@@ -212,8 +260,12 @@ public class UserInfoService {
      * @param password
      * @return
      */
-    public ServerResponse modifyAdminInfo(String account, String password) {
-        int result = userInfoMapper.modifyAdminInfo(account, password);
+    public ServerResponse modifyAdminInfo(String account, String password, Integer adminId) {
+        int res = userInfoMapper.selectInfo(account, adminId);
+        if (res > 0) {
+            return ServerResponse.createByErrorCodeMessage(2, "账户已存在");
+        }
+        int result = userInfoMapper.updateInfo(account, password, adminId);
         if (result > 0) {
             return ServerResponse.createBySuccess();
         } else {
@@ -239,20 +291,21 @@ public class UserInfoService {
 
     /**
      * 充值
+     *
      * @param userId
      * @param money
      * @param request
      * @return
      * @throws IOException
      */
-    public ServerResponse wxRecharge(Integer userId, BigDecimal money, Integer type,HttpServletRequest request,Integer mold) throws IOException {
-        UserOrder userOrder=getOrder(userId, money, type,mold);
+    public ServerResponse wxRecharge(Integer userId, BigDecimal money, Integer type, HttpServletRequest request, Integer mold) throws IOException {
+        UserOrder userOrder = getOrder(userId, money, type, mold);
         ServerResponse response = wxUtils.appPay(userOrder, request);
         //预支付成功成功
         if (response.getStatus() == 1) {
-            Object result=response.getData();
-            JSONObject jsonObject=JSONUtil.parseObj(result);
-            String prepayid=jsonObject.get("prepayid").toString();
+            Object result = response.getData();
+            JSONObject jsonObject = JSONUtil.parseObj(result);
+            String prepayid = jsonObject.get("prepayid").toString();
             userOrder.setPrepayid(prepayid);
             userOrder.setCommitTime(new Date());
             userOrderMapper.insertSelective(userOrder);
@@ -262,14 +315,15 @@ public class UserInfoService {
 
     /**
      * 支付宝充值
+     *
      * @param userId
      * @param money
      * @return
      */
-    public ServerResponse zfbRecharge(Integer userId, BigDecimal money, Integer type,Integer mold) {
-        UserOrder userOrder=getOrder(userId, money, type,mold);
+    public ServerResponse zfbRecharge(Integer userId, BigDecimal money, Integer type, Integer mold) {
+        UserOrder userOrder = getOrder(userId, money, type, mold);
         ServerResponse response = alipayUtils.alipay(userOrder);
-        if(response.getStatus()==1){
+        if (response.getStatus() == 1) {
             userOrder.setCommitTime(new Date());
             userOrderMapper.insertSelective(userOrder);
         }
@@ -278,19 +332,20 @@ public class UserInfoService {
 
     /**
      * 组装用户订单信息
+     *
      * @param userId
      * @param money
      * @param type
      * @return
      */
-    private UserOrder getOrder(Integer userId, BigDecimal money, Integer type,Integer mold){
+    private UserOrder getOrder(Integer userId, BigDecimal money, Integer type, Integer mold) {
         UserOrder userOrder = new UserOrder();
         userOrder.setUserId(userId);
         userOrder.setOrderType(type);
-        if(type==1){
+        if (type == 1) {
             userOrder.setOrderMold(mold);
             userOrder.setOrderDesc("小蜜蜂-会员充值");
-        }else{
+        } else {
             userOrder.setOrderDesc("小蜜蜂-充值");
         }
         userOrder.setOrderNum(RandomUtil.getTimestamp() + RandomUtil.randomStr(3));
@@ -300,15 +355,16 @@ public class UserInfoService {
 
     /**
      * 更新用户头像
+     *
      * @param headimgurl
      * @param userId
      * @return
      */
-    public ServerResponse headimgurl(String headimgurl,Integer userId){
-        UserInfo userInfo=new UserInfo();
+    public ServerResponse headimgurl(String headimgurl, Integer userId) {
+        UserInfo userInfo = new UserInfo();
         userInfo.setUserId(userId);
         userInfo.setHeadimgurl(headimgurl);
-        int result=userInfoMapper.updateByPrimaryKeySelective(userInfo);
+        int result = userInfoMapper.updateByPrimaryKeySelective(userInfo);
         if (result > 0) {
             return ServerResponse.createBySuccess();
         } else {
@@ -316,27 +372,27 @@ public class UserInfoService {
         }
     }
 
-    public ServerResponse updateMoney(UserMoney userMoney){
-        int result=userMoneyMapper.updateMoney(userMoney);
-        if(result>0){
+    public ServerResponse updateMoney(UserMoney userMoney) {
+        int result = userMoneyMapper.updateMoney(userMoney);
+        if (result > 0) {
             //插入明细
             UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
             userMoneyDetails.setUserId(userMoney.getUserId());
-            if(userMoney.getBalance()!=null){
+            if (userMoney.getBalance() != null) {
                 userMoneyDetails.setType(2);
                 userMoneyDetails.setMoney(userMoney.getBalance());
                 userMoneyDetails.setIntroduce("后台手动修改账户余额");
                 userMoneyDetails.setTradeTime(new Date());
                 userMoneyMapper.insertMoneyDetails(userMoneyDetails);
             }
-            if(userMoney.getRepaidBalance()!=null){
+            if (userMoney.getRepaidBalance() != null) {
                 userMoneyDetails.setType(3);
                 userMoneyDetails.setMoney(userMoney.getRepaidBalance());
                 userMoneyDetails.setIntroduce("后台手动修改账户余额");
                 userMoneyDetails.setTradeTime(new Date());
                 userMoneyMapper.insertMoneyDetails(userMoneyDetails);
             }
-            if(userMoney.getBond()!=null){
+            if (userMoney.getBond() != null) {
                 userMoneyDetails.setType(4);
                 userMoneyDetails.setMoney(userMoney.getBond());
                 userMoneyDetails.setIntroduce("后台手动修改账户余额");
@@ -344,7 +400,63 @@ public class UserInfoService {
                 userMoneyMapper.insertMoneyDetails(userMoneyDetails);
             }
             return ServerResponse.createBySuccess();
+        } else {
+            return ServerResponse.createByError();
+        }
+    }
+
+    /**
+     * 查询所有账号
+     *
+     * @return
+     */
+    public ServerResponse selectAll() {
+        return ServerResponse.createBySuccess(userInfoMapper.selectAll());
+    }
+
+    /**
+     * 插入账户信息
+     *
+     * @param account
+     * @param password
+     * @return
+     */
+    public ServerResponse insertInfo(String account, String password, String phone) {
+        int res = userInfoMapper.selectInfo(account, -1);
+        if (res > 0) {
+            return ServerResponse.createByErrorCodeMessage(2, "账户已存在");
+        }
+        int result;
+        UserInfo userInfo = userInfoMapper.findByPhone(phone);
+        if (userInfo == null) {
+            UserInfo user = new UserInfo();
+            user.setPhone(phone);
+            user.setUID(getUid());
+            userInfoMapper.insertPhone(user);
+            //注册时插入用户账户信息
+            userMoneyMapper.insertMoney(user.getUserId());
+            result=userInfoMapper.insertInfo(account, password,user.getUserId());
         }else{
+            result=userInfoMapper.insertInfo(account, password,userInfo.getUserId());
+        }
+        if (result > 0) {
+            return ServerResponse.createBySuccess();
+        } else {
+            return ServerResponse.createByError();
+        }
+    }
+
+    /**
+     * 删除用户账号
+     *
+     * @param adminId
+     * @return
+     */
+    public ServerResponse deleteInfo(Integer adminId) {
+        int result = userInfoMapper.deleteInfo(adminId);
+        if (result > 0) {
+            return ServerResponse.createBySuccess();
+        } else {
             return ServerResponse.createByError();
         }
     }
@@ -368,6 +480,22 @@ public class UserInfoService {
             e.printStackTrace();
         }
         return res;
+    }
+
+    /**
+     * 查询用户足迹信息
+     *
+     * @param pageNo
+     * @param pageSize
+     * @param account
+     * @param phone
+     * @param nickName
+     * @return
+     */
+    public ServerResponse selectFoot(Integer pageNo, Integer pageSize, String account, String phone, String nickName) {
+        Page<AdminFoot> page = PageHelper.startPage(pageNo, pageSize);
+        userInfoMapper.selectFoot(account, phone, nickName);
+        return ServerResponse.createBySuccess(PageVO.build(page));
     }
 
     /**

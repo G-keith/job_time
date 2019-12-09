@@ -29,9 +29,10 @@ public interface UserOpinionMapper {
 
     /**
      * 查询用户反馈列表
-     * @param userId
+     * @param phone
      * @param status
+     * @param nickName
      * @return
      */
-    List<UserOpinion> findAll(@Param("userId") Integer userId, @Param("status")Integer status);
+    List<UserOpinion> findAll(@Param("phone") String phone,@Param("nickName") String nickName,@Param("userId") Integer userId ,@Param("status")Integer status);
 }

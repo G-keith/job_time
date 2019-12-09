@@ -113,7 +113,7 @@
             <if test="UID != null">
                 UID = #{UID,jdbcType=INTEGER},
             </if>
-            <if test="status != null">
+            <if test="status != null or status==0">
                 status = #{status,jdbcType=INTEGER},
             </if>
             <if test="upUID != null">
@@ -145,11 +145,48 @@
         update user_admin set
         account=#{account},
         password=#{password}
+        where admnId=#{adminId}
     </update>
 
     <select id="loginAdminInfo" resultType="map">
         select * from user_admin
         where account=#{account} and password=#{password}
+    </select>
+
+    <insert id="insertInfo">
+        insert into user_admin (account,password,userId)
+        values (#{account},#{password},#{userId})
+    </insert>
+
+    <select id="selectInfo" resultType="java.lang.Integer">
+        select count(1) from user_admin
+        <where>
+            account=#{account}
+            <if test="adminId!=null and adminId!=''">
+                and <![CDATA[ adminId <> #{adminId} ]]>
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteInfo">
+        delete from user_admin where adminId=#{adminId}
+    </delete>
+
+    <update id="updateInfo">
+        update user_admin
+        <set>
+            <if test="account != null">
+                account = #{account,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where adminId=#{adminId}
+    </update>
+
+    <select id="selectAll" resultType="java.util.Map">
+        select a.adminId,a.account,i.phone from user_admin a left join user_info i on a.userId=i.userId
     </select>
 
     <insert id="insertSelective" parameterType="com.job.entity.UserInfo" useGeneratedKeys="true" keyProperty="userId">
@@ -194,8 +231,17 @@
             <if test="upUID != null">
                 upUID,
             </if>
-            <if test="memberTime != null">
-                memberTime,
+            <if test="weekMemberTime != null">
+                weekMemberTime,
+            </if>
+            <if test="monthMemberTime != null">
+                monthMemberTime,
+            </if>
+            <if test="seasonMemberTime != null">
+                seasonMemberTime,
+            </if>
+            <if test="yearMemberTime != null">
+                yearMemberTime,
             </if>
             <if test="isMember != null">
                 isMember,
@@ -244,8 +290,17 @@
             <if test="upUID != null">
                 #{upUID,jdbcType=INTEGER},
             </if>
-            <if test="memberTime != null">
-                #{memberTime,jdbcType=TIMESTAMP},
+            <if test="weekMemberTime != null">
+                #{weekMemberTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="monthMemberTime != null">
+                #{monthMemberTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="seasonMemberTime != null">
+                #{seasonMemberTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="yearMemberTime != null">
+                #{yearMemberTime,jdbcType=TIMESTAMP},
             </if>
             <if test="isMember != null">
                 #{isMember,jdbcType=INTEGER},
@@ -255,5 +310,34 @@
             </if>
         </trim>
     </insert>
+
+    <insert id="insertFoot">
+        insert into admin_foot (adminId,userId,content,modifyTime)
+        values
+        (#{adminId},#{userId},#{content},now())
+    </insert>
+
+    <select id="selectFoot" resultType="com.job.entity.AdminFoot">
+        select f.footId,a.account,i.phone,i.nickName,f.content,f.modifyTime from
+        admin_foot f
+        inner join user_admin a on f.adminId=a.adminId
+        inner join user_info i on i.userId=f.userId
+        <where>
+            <if test="account!=null and account!=''">
+                and a.account like concat('%',#{account},'%')
+            </if>
+            <if test="phone!=null and phone!=''">
+                and i.phone like concat('%',#{phone},'%')
+            </if>
+            <if test="nickName!=null and nickName!=''">
+                and i.nickName like concat('%',#{nickName},'%')
+            </if>
+        </where>
+        order by f.modifyTime desc
+    </select>
+
+    <select id="selectById" resultType="java.util.Map">
+        select * from user_admin where adminId=#{adminId}
+    </select>
 
 </mapper>

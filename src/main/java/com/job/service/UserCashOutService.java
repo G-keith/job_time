@@ -114,8 +114,8 @@ public class UserCashOutService {
             } else {
                 //微信提现
                 cashOutOrder.setOpenid(userInfo.getOpenid());
-                // serverResponse = wxUtils. cashOut(cashOutOrder, request);
-                serverResponse = ServerResponse.createBySuccess();
+                 serverResponse = wxUtils.cashOut(cashOutOrder, request);
+               // serverResponse = ServerResponse.createBySuccess();
             }
             if (serverResponse.getStatus() == 1) {
                 //审核通过，系统账户减去提现金钱
@@ -175,6 +175,10 @@ public class UserCashOutService {
      * @return
      */
     public ServerResponse insertCashOut(UserCashOut userCashOut) {
+        UserInfo userInfo=userInfoMapper.findByUserId(userCashOut.getUserId());
+        if(userInfo.getStatus()==1){
+            return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
+        }
         //查询用户有没有提现过
         if (userCashOutMapper.countNow(userCashOut.getUserId(), userCashOut.getCashOutType()) == 1) {
             return ServerResponse.createByErrorMessage("您今天已经申请过了");

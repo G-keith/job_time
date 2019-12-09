@@ -1,5 +1,7 @@
 package com.job.mapper;
 
+import com.job.entity.AdminFoot;
+import com.job.entity.ServiceFee;
 import com.job.entity.UserInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -125,10 +127,74 @@ public interface UserInfoMapper {
     Map<String, Object> loginAdminInfo(@Param("account") String account, @Param("password") String password);
 
     /**
+     * 后台让他添加账户
+     * @param account
+     * @param password
+     * @param userId
+     * @return
+     */
+    int insertInfo(@Param("account") String account, @Param("password") String password,@Param("userId") Integer userId);
+
+    /**
+     * 后台账户是否存在
+     * @param account
+     * @param adminId
+     * @return
+     */
+    int selectInfo(@Param("account") String account,@Param("adminId") Integer adminId);
+
+    /**
+     * 删除账户
+     * @param adminId
+     * @return
+     */
+    int deleteInfo(@Param("adminId") Integer adminId);
+
+    /**
+     * 更新账户密码
+     * @param account
+     * @param password
+     * @param adminId
+     * @return
+     */
+    int updateInfo(@Param("account") String account, @Param("password") String password,@Param("adminId") Integer adminId);
+
+    /**
+     * 查询所有
+     * @return
+     */
+    List<Map<String,Object>> selectAll();
+
+    /**
      * 插入用户信息
      *
      * @param record
      * @return
      */
     int insertSelective(UserInfo record);
+
+    /**
+     * 插入用户足迹
+     * @param adminId
+     * @param userId
+     * @param content
+     * @return
+     */
+    int insertFoot(@Param("adminId") Integer adminId,@Param("userId") Integer userId,@Param("content") String content);
+
+    /**
+     * 查询用户足迹
+     * @param account
+     * @param phone
+     * @param nickName
+     * @return
+     */
+    List<AdminFoot> selectFoot(@Param("account") String account,@Param("phone") String phone,@Param("nickName") String nickName);
+
+    /**
+     * 根据主键查询账户信息
+     * @param adminId
+     * @return
+     */
+    Map<String,Object> selectById(Integer adminId);
 }

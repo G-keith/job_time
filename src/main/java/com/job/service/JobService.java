@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author keith
@@ -54,9 +55,9 @@ public class JobService {
      *
      * @return
      */
-    public ServerResponse findAll(String jobTitle, String jobSource, Integer pageNo, Integer pageSize) {
+    public ServerResponse findAll(String jobTitle, String jobSource,Integer typeId, Integer pageNo, Integer pageSize) {
         Page<JobVo> page = PageHelper.startPage(pageNo, pageSize);
-        jobMapper.findAll(jobTitle, jobSource);
+        jobMapper.findAll(jobTitle, jobSource,typeId);
         return ServerResponse.createBySuccess(PageVO.build(page));
     }
 
@@ -125,6 +126,20 @@ public class JobService {
     }
 
     /**
+     * 查询用户已结束的任务
+     *
+     * @param userId      用户id
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    public ServerResponse findEndRelease(Integer userId ,Integer pageNo, Integer pageSize) {
+        Page<JobVo> page = PageHelper.startPage(pageNo, pageSize);
+        jobMapper.findEndRelease(userId);
+        return ServerResponse.createBySuccess(PageVO.build(page));
+    }
+
+    /**
      * 查询需要审核任务列表
      *
      * @param userId   用户id
@@ -141,14 +156,14 @@ public class JobService {
     /**
      * 查询任务审核列表
      *
-     * @param jobId
      * @param pageNo
      * @param pageSize
      * @return
      */
-    public ServerResponse findUserJob(Integer jobId, Integer pageNo, Integer pageSize) {
+    public ServerResponse findUserJob(Integer status, Integer pageNo, Integer pageSize,Integer userId) {
         Page<UserJobVo> page = PageHelper.startPage(pageNo, pageSize);
-        jobMapper.findUserJob(jobId);
+        List<UserJobVo> userJobVoList= jobMapper.findUserJob(status,userId);
+        userJobVoList.forEach(e-> e.setImgList(jobMapper.findCheckPicture(e.getTaskId())));
         return ServerResponse.createBySuccess(PageVO.build(page));
     }
 
@@ -171,6 +186,9 @@ public class JobService {
     public ServerResponse insertJob(Job job) {
         UserMoney userMoney = userMoneyMapper.selectById(job.getUserId());
         UserInfo userInfo = userInfoMapper.findByUserId(job.getUserId());
+        if(userInfo.getStatus()==1){
+            return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
+        }
         ServiceFee serviceFee = jobMapper.findFee();
         if (userMoney.getJobNum() == 0 && userInfo.getIsMember() < 4) {
             return ServerResponse.createByErrorMessage("发布任务达到上限");
@@ -238,6 +256,9 @@ public class JobService {
         UserJob userJob = userJobMapper.findById(taskId);
         Job job = jobMapper.selectJob(userJob.getJobId());
         UserInfo userInfo = userInfoMapper.findByUserId(userJob.getUserId());
+        if(userInfo.getStatus()==1){
+            return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
+        }
         int result = userJobMapper.updateUserJob(taskId, status, refuseReason);
         if (result > 0) {
             //审核通过，钱进入用户账户
@@ -260,6 +281,9 @@ public class JobService {
                 //更新任务完成数量
                 job.setCommitNum(job.getCommitNum() - 1);
                 job.setFinishNum(job.getFinishNum() + 1);
+                if(job.getJobNum().equals(job.getFinishNum())){
+                    job.setJobStatus(2);
+                }
                 jobMapper.updateByPrimaryKeySelective(job);
                 // 查询用户的上级
                 if (userInfo.getUpUID() != null) {
@@ -314,6 +338,9 @@ public class JobService {
     public ServerResponse refreshJob(Integer jobId){
         Job job=jobMapper.selectJob(jobId);
         UserInfo userInfo=userInfoMapper.findByUserId(job.getUserId());
+        if(userInfo.getStatus()==1){
+            return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
+        }
         UserMoney userMoney = userMoneyMapper.selectById(job.getUserId());
         BigDecimal surplusPrice;
         if(userInfo.getIsMember()==1){
@@ -368,6 +395,10 @@ public class JobService {
      */
     public ServerResponse suspendOrEnd(Integer jobId, Integer type) {
         Job job = jobMapper.selectJob(jobId);
+        UserInfo userInfo=userInfoMapper.findByUserId(job.getUserId());
+        if(userInfo.getStatus()==1){
+            return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
+        }
         UserMoney userMoney = userMoneyMapper.selectById(job.getUserId());
         if (type == 2) {
             //任务结束，剩余钱返还

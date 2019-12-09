@@ -50,13 +50,24 @@ public class UserInfoController {
         return userInfoService.signIn(phone, uid);
     }
 
+    @PutMapping("/uid")
+    @ApiOperation(value = "插入邀请码")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", dataType = "string",required = true),
+            @ApiImplicitParam(name = "uid", value = "邀请人uid", dataType = "string",required = true),
+    })
+    public ServerResponse insertUid(String uid,Integer userId){
+        return userInfoService.insertUid(uid, userId);
+    }
+
     @GetMapping("/weChatLogin")
     @ApiOperation(value = "微信授权登录")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "用户换取access_token的code，仅在ErrCode为0时有效", required = true, dataType = "String")
+            @ApiImplicitParam(name = "code", value = "用户换取access_token的code，仅在ErrCode为0时有效", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int")
     })
-    public ServerResponse weChatLogin(String code) throws IOException {
-        return userInfoService.weChatLogin(code);
+    public ServerResponse weChatLogin(String code,Integer userId) throws IOException {
+        return userInfoService.weChatLogin(code,userId);
     }
 
     @GetMapping("code")

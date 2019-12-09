@@ -80,13 +80,19 @@
     inner join user_info i on o.userId=i.userId
     <where>
       <if test="userId!=null and userId!=''">
-        and o.userId=#{userId}
+        and i.userId=#{userId}
+      </if>
+      <if test="phone!=null and phone!=''">
+        and i.phone like concat('%',#{phone},'%')
+      </if>
+      <if test="nickName!=null and nickName!=''">
+        and i.nickName like concat('%',#{nickName},'%')
       </if>
       <if test="status!=null and status!=''">
-        and status=#{status}
+        and o.status=#{status}
       </if>
     </where>
-    order by status asc,commitTime asc
+    order by o.status asc,o.commitTime asc
   </select>
 
 </mapper>

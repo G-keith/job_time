@@ -39,6 +39,7 @@
     <update id="updateAdmin">
         update user_admin
         set money=#{money}
+        where adminId=1
     </update>
 
     <insert id="insertMoneyDetails">
@@ -48,7 +49,7 @@
     </insert>
 
     <select id="money" resultType="java.math.BigDecimal">
-        select money from user_admin
+        select money from user_admin where adminId=1
     </select>
 
     <select id="findAll" resultType="com.job.entity.UserMoneyDetails">

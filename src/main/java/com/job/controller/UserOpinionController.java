@@ -62,10 +62,12 @@ public class UserOpinionController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
+            @ApiImplicitParam(name = "phone", value = "手机号", dataType = "string"),
+            @ApiImplicitParam(name = "nickName", value = "昵称", dataType = "string"),
             @ApiImplicitParam(name = "userId", value = "用户id", dataType = "int"),
             @ApiImplicitParam(name = "status", value = "1.未处理，2已处理", dataType = "int"),
     })
-    public ServerResponse findAll(Integer userId,Integer status,Integer pageNo, Integer pageSize){
-        return userOpinionService.findAll(userId, status, pageNo, pageSize);
+    public ServerResponse findAll(String phone,String nickName,Integer userId,Integer status,Integer pageNo, Integer pageSize){
+        return userOpinionService.findAll(phone,nickName,userId, status, pageNo, pageSize);
     }
 }

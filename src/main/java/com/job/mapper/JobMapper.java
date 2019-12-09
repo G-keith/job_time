@@ -46,7 +46,7 @@ public interface JobMapper {
      * 查询所有待审核任务
      * @return
      */
-    List<JobVo> findAll(@Param("jobTitle") String jobTitle,@Param("jobSource") String jobSource);
+    List<JobVo> findAll(@Param("jobTitle") String jobTitle,@Param("jobSource") String jobSource,@Param("typeId") Integer typeId);
 
     /**
      * 查询任务步骤详情
@@ -80,6 +80,13 @@ public interface JobMapper {
     List<JobVo> findRelease(Integer userId,Integer auditStatus);
 
     /**
+     * 查询用户结束的任务
+     * @param userId 用户id
+     * @return
+     */
+    List<JobVo> findEndRelease(Integer userId);
+
+    /**
      * 查询需要审核任务列表
      * @param userId
      * @return
@@ -88,17 +95,18 @@ public interface JobMapper {
 
     /**
      * 查询任务待审核列表
-     * @param jobId 任务id
+     * @param status 状态
+     * @param userId 用户id
      * @return
      */
-    List<UserJobVo> findUserJob(Integer jobId);
+    List<UserJobVo> findUserJob(@Param("status") Integer status,@Param("userId") Integer userId);
 
     /**
      * 查询验证图
      * @param taskId
      * @return
      */
-    List<Map<String,Object>> findCheckPicture(Integer taskId);
+    List<String> findCheckPicture(Integer taskId);
 
     /**
      * 查询发布任务时的服务费

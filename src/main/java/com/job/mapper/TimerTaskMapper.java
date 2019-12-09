@@ -51,9 +51,9 @@ public interface TimerTaskMapper {
     List<UserReport> findNotEnd();
 
     /**
-     * 更新举报为已提交
+     *
      * @param userReports
      * @return
      */
-    int updateReport(@Param("userReports") List<UserReport> userReports);
+    int updateReport(List<UserReport> userReports);
 }

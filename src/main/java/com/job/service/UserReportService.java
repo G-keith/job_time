@@ -129,6 +129,10 @@ public class UserReportService {
      * @return
      */
     public ServerResponse insertReport(UserReport report){
+        UserInfo userInfo=userInfoMapper.findByUserId(report.getUserId());
+        if(userInfo.getStatus()==1){
+            return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
+        }
         UserJob userJob=userJobMapper.findById(report.getTaskId());
         Job job=jobMapper.selectJob(userJob.getJobId());
         report.setJobId(userJob.getJobId());

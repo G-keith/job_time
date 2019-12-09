@@ -5,10 +5,12 @@ import com.job.common.statuscode.ExceptionMessage;
 import com.job.common.statuscode.ServerResponse;
 import com.job.entity.*;
 import com.job.mapper.UserInfoMapper;
+import com.job.mapper.UserMoneyMapper;
 import com.job.mapper.UserOrderMapper;
 import com.job.service.UserMoneyService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpEntity;
@@ -76,6 +78,9 @@ public class WxUtils {
      */
     private static final String APIKEY = "8scYgzukn9vvIxfuALyhhM7kZCt5MCsC";
 
+    @Autowired
+    private  UserMoneyMapper userMoneyMapper;
+
     @Value("${wx.notifyUrl}")
     private String notifyUrl;
 
@@ -92,7 +97,7 @@ public class WxUtils {
      * @param code 授权码
      * @return
      */
-    public ServerResponse authorization(String code) {
+    public ServerResponse authorization(String code,Integer userId) {
         System.out.println(APPID);
         String tokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + APPID + "&secret="
                 + APPSECRET + "&code=" + code + "&grant_type=authorization_code";
@@ -115,10 +120,16 @@ public class WxUtils {
                     info.setProvince(infoMap.get("province").toString());
                     info.setCity(infoMap.get("city").toString());
                     info.setCountry(infoMap.get("country").toString());
+                    info.setUID(getUid());
                     info.setIsFirst(1);
                     userInfoMapper.insertSelective(info);
+                    //注册时插入用户账户信息
+                    userMoneyMapper.insertMoney(info.getUserId());
                     return ServerResponse.createBySuccess(info);
                 } else {
+                    if(userId!=null) {
+                        userInfo = userInfoMapper.findByUserId(userId);
+                    }
                     userInfo.setOpenid(openid);
                     userInfo.setNickname(infoMap.get("nickname").toString());
                     userInfo.setHeadimgurl(infoMap.get("headimgurl").toString());
@@ -456,6 +467,24 @@ public class WxUtils {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * 产生uid
+     *
+     * @return 8位数UID
+     */
+    private String getUid() {
+        StringBuilder str = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 8; i++) {
+            str.append(random.nextInt(10));
+        }
+        if (userInfoMapper.UidIsExist(str.toString()) > 0) {
+            return getUid();
+        } else {
+            return str.toString();
+        }
     }
 
     /**

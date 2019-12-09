@@ -240,7 +240,8 @@
 
     <select id="findAll" resultType="com.job.entity.vo.JobVo">
         select
-        i.userId,i.headimgurl,i.UID,j.jobSource,t.typeName,j.submissionTime,j.releasePrice,j.introduce,j.jobTitle,j.jobId
+        i.userId,i.headimgurl,i.UID,j.jobSource,t.typeName,j.submissionTime,j.releasePrice,j.introduce,j.jobTitle,j.jobId,
+        j.jobPrice,j.jobNum
         from job j
         inner join user_info i on j.userId=i.userId
         inner join job_type t on j.typeId=t.typeId
@@ -251,6 +252,9 @@
             </if>
             <if test="jobSource!=null and jobSource!=''">
                 and j.jobSource like concat('%',#{jobSource},'%')
+            </if>
+            <if test="typeId!=null and typeId!=''">
+                and j.typeId=#{typeId}
             </if>
         </where>
         order by j.refreshTime asc
@@ -289,17 +293,26 @@
 
     <select id="findRelease" resultType="com.job.entity.vo.JobVo">
         select
-        j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,t.typeName,j.jobSource,i.headimgurl
+        j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,t.typeName,j.jobSource,i.headimgurl,j.jobStatus
         from job j
         inner join user_info i on j.userId=i.userId
-        inner join job_type t on t.typeId=t.typeId
+        inner join job_type t on j.typeId=t.typeId
         <where>
-            j.userId=#{userId}
+            j.userId=#{userId} and jobStatus in (1,3)
             <if test="auditStatus!=null">
                 and j.auditStatus=#{auditStatus}
             </if>
         </where>
         order by j.auditStatus
+    </select>
+
+    <select id="findEndRelease" resultType="com.job.entity.vo.JobVo">
+        select
+        j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,t.typeName,j.jobSource,i.headimgurl
+        from job j
+        inner join user_info i on j.userId=i.userId
+        inner join job_type t on j.typeId=t.typeId
+        where j.userId=#{userId} and j.jobStatus=2
     </select>
 
     <select id="findWillAudit" resultType="com.job.entity.vo.JobVo">
@@ -308,21 +321,21 @@
     (select count(1) from user_job where jobId=j.jobId and status=3) as num
     from job j
     inner join user_info i on j.userId=i.userId
-    inner join job_type t on t.typeId=t.typeId
+    inner join job_type t on j.typeId=t.typeId
     where jobStatus in (1,3) and j.userId=#{userId}
     </select>
 
     <select id="findUserJob" resultType="com.job.entity.vo.UserJobVo">
-        select uj.userId,uj.taskId,i.phone,,uj.jobId,j.jobTitle,j.jobSource,i.headimgurl,uj.commitTime
+        select uj.userId,uj.taskId,i.phone,uj.jobId,j.jobTitle,j.jobSource,i.headimgurl,uj.commitTime,uj.refuseReason
         from user_job uj
         inner join job j on uj.jobId=j.jobId
         inner join user_info i on uj.userId=i.userId
-        where uj.jobId=#{jobId} and status=3
+        where uj.status=#{status} and j.userId=#{userId}
         order by uj.commitTime desc
     </select>
 
-    <select id="findCheckPicture" resultType="java.util.Map">
-        select sort,checkPicture from user_commit where taskId=#{taskId}
+    <select id="findCheckPicture" resultType="java.lang.String">
+        select checkPicture from user_commit where taskId=#{taskId}
         order by sort asc
     </select>
 

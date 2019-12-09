@@ -34,11 +34,12 @@ public class AdminJobController {
     @ApiImplicitParams({
             @ApiImplicitParam(name ="jobTitle",value = "任务标题",dataType = "string"),
             @ApiImplicitParam(name ="jobSource",value = "项目名称",dataType = "string"),
+            @ApiImplicitParam(name ="typeId",value = "项目类型",dataType = "int"),
             @ApiImplicitParam(name = "pageNo", value = "第几页", dataType = "int", defaultValue = "1"),
             @ApiImplicitParam(name = "pageSize", value = "每页几条", dataType = "int", defaultValue = "10"),
     })
-    public ServerResponse findAll(String jobTitle,String jobSource,Integer pageNo,Integer pageSize){
-        return jobService.findAll( jobTitle,jobSource,pageNo,pageSize);
+    public ServerResponse findAll(String jobTitle,String jobSource,Integer typeId,Integer pageNo,Integer pageSize){
+        return jobService.findAll( jobTitle,jobSource,typeId,pageNo,pageSize);
     }
 
     @GetMapping("/step")
