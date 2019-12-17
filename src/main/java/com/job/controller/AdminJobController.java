@@ -30,7 +30,7 @@ public class AdminJobController {
     }
 
     @GetMapping("/all")
-    @ApiOperation(value = "获得所有待审核列表")
+    @ApiOperation(value = "获得所有任务列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name ="jobTitle",value = "任务标题",dataType = "string"),
             @ApiImplicitParam(name ="jobSource",value = "项目名称",dataType = "string"),

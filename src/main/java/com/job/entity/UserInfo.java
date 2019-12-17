@@ -22,6 +22,9 @@ public class UserInfo {
     @ApiModelProperty(value = "手机号")
     private String phone;
 
+    @ApiModelProperty(value = "密码")
+    private String password;
+
     private String openid;
 
     @ApiModelProperty(value = "昵称")

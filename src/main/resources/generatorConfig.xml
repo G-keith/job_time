@@ -37,7 +37,7 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         <!--生成对应表及类名-->
-        <table tableName="cash_out_order" domainObjectName="CashOutOrder" enableCountByExample="false" enableUpdateByExample="false"
+        <table tableName="user_news" domainObjectName="UserChat" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
             <property name="useActualColumnNames" value="true" />
         </table>

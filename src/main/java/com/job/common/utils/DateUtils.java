@@ -1,5 +1,7 @@
 package com.job.common.utils;
 
+import cn.hutool.core.date.DateUtil;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -51,5 +53,14 @@ public class DateUtils {
             e.printStackTrace();
              throw new RuntimeException();
         }
+    }
+
+    /**
+     * 获取指定格式的日期
+     * @return String 指定格式的当前日期
+     * @return String 日期格式的字符串或者星期几
+     */
+    public static String getDate(Date date) {
+        return DateUtil.format(date,"yyyy-MM-dd HH:mm:ss");
     }
 }

@@ -54,7 +54,19 @@
         refuteReason='超过24小时，自动提交'
         where reportId in
         <foreach collection="userReports" item="item" open="(" separator="," close=")">
-            #{item}
+            #{item.reportId}
         </foreach>
     </update>
+
+    <select id="selectRefresh" resultType="com.job.entity.UserMoney">
+        select m.userId,m.refreshNum
+        from user_money m
+        where m.refreshNum>0 and userId=#{userId}
+    </select>
+
+    <select id="selectJob" resultType="com.job.entity.Job">
+       select j.userId,j.jobId,j.refreshTime
+        from  job j
+        where j.jobStatus=1 and j.auditStatus=3 and DATE_FORMAT(j.refreshTime,'%Y-%m-%d %H')=DATE_FORMAT(now(),'%Y-%m-%d %H')
+    </select>
 </mapper>

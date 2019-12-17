@@ -42,6 +42,9 @@ public class UserJobVo {
     @ApiModelProperty(value = "拒绝原因")
     private String refuseReason;
 
+    @ApiModelProperty(value = "提交信息")
+    private String commitInfo;
+
     @ApiModelProperty(value = "图片")
     private List<String> imgList;
 }

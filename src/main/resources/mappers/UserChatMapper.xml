@@ -81,6 +81,10 @@
         where newsId = #{newsId,jdbcType=INTEGER}
     </update>
 
+    <update id="updateByUserId">
+        update
+    </update>
+
     <select id="selectByUserId" resultType="com.job.entity.UserChat">
         select * from user_news where userId=#{userId} and targetId=#{targetId}
     </select>

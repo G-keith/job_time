@@ -46,6 +46,9 @@ public class UserJob {
     @ApiModelProperty(value = "不通过理由")
     private String refuseReason;
 
+    @ApiModelProperty(value = "提交信息")
+    private String commitInfo;
+
     /**
      * 任务发布价格
      */

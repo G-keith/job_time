@@ -37,10 +37,13 @@ public class HallService {
 
     private final JobMapper jobMapper;
 
-    public HallService(HallMapper hallMapper, UserInfoMapper userInfoMapper, JobMapper jobMapper) {
+    private final UserChatService userChatService;
+
+    public HallService(HallMapper hallMapper, UserInfoMapper userInfoMapper, JobMapper jobMapper, UserChatService userChatService) {
         this.hallMapper = hallMapper;
         this.userInfoMapper = userInfoMapper;
         this.jobMapper = jobMapper;
+        this.userChatService = userChatService;
     }
 
     /**
@@ -101,12 +104,20 @@ public class HallService {
      * @param jobId  任务id
      * @return 0成功，1失败
      */
-    public ServerResponse signUp(Integer userId, Integer jobId) {
+    public synchronized ServerResponse signUp(Integer userId, Integer jobId) {
+        //判断有没有异常存在报名或提交的任务了
+        int count=userInfoMapper.findJob(userId, jobId);
+        if(count>0){
+            return ServerResponse.createByErrorMessage("不能重复报名");
+        }
         UserInfo userInfo=userInfoMapper.findByUserId(userId);
         if(userInfo.getStatus()==1){
             return ServerResponse.createByErrorMessage("用户为黑名单，不能参与活动");
         }
         Job job=jobMapper.selectJob(jobId);
+        if(job.getJobStatus()!=1){
+            return ServerResponse.createByErrorMessage("该任务已经结束");
+        }
         // 判断用户当天有没有做过，或者以前有没有做过
         Integer res=hallMapper.selectUserJob(userId,jobId,job.getJobRate());
         if(res>0){
@@ -136,14 +147,16 @@ public class HallService {
      * @param jobCommitVo 验证信息
      * @return 0失败
      */
-    public ServerResponse submit(JobCommitVo jobCommitVo){
+    public synchronized ServerResponse submit(JobCommitVo jobCommitVo){
         if(hallMapper.userCommit(jobCommitVo.getUserId(),jobCommitVo.getJobId())>3){
             return ServerResponse.createByErrorCodeMessage(2,"您提交次数太多");
         }else{
+            Job job=jobMapper.selectJob(jobCommitVo.getJobId());
+            userChatService.insetChatRecord(32,job.getUserId(), "您有一条新的任务待审核！");
             //更新任务表
             hallMapper.updateCommitNum(jobCommitVo.getJobId());
             //更新用户任务关系表
-            hallMapper.updateUserJob(jobCommitVo.getUserId(),jobCommitVo.getJobId());
+            hallMapper.updateUserJob(jobCommitVo.getUserId(),jobCommitVo.getJobId(),jobCommitVo.getCommitInfo());
             //插入提交任务
             if(jobCommitVo.getJobStepDtoList().size()>0){
                 int result=hallMapper.insertBatch(jobCommitVo.getJobStepDtoList(),hallMapper.selectId(jobCommitVo.getUserId(),jobCommitVo.getJobId()));

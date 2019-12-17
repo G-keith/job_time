@@ -16,6 +16,9 @@ import java.util.Date;
 public class JobListVo {
 
     @ApiModelProperty(value = "主键id")
+    private Integer taskId;
+
+    @ApiModelProperty(value = "任务id")
     private Integer jobId;
 
     @ApiModelProperty(value = "用户id")
@@ -56,4 +59,16 @@ public class JobListVo {
 
     @ApiModelProperty(value = "状态（1.已报名；2.已过期;3.已提交；4.审核通过；5.审核拒绝；）")
     private Integer status;
+
+    @ApiModelProperty(value = "不通过原因")
+    private String refuseReason;
+
+    @ApiModelProperty(value = "提交信息")
+    private String commitInfo;
+
+    @ApiModelProperty(value = "是否推荐（1不推荐，2推荐）")
+    private Integer isRecommend;
+
+    @ApiModelProperty(value = "是否是会员（1.不是会员；2.周会员；3.月会员；4.季会员；5.年会员）")
+    private Integer isMember;
 }

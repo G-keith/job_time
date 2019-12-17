@@ -1,5 +1,6 @@
 package com.job.entity.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.job.entity.JobStep;
 import io.swagger.annotations.ApiModelProperty;
@@ -71,6 +72,16 @@ public class JobVo {
     @ApiModelProperty(value = "待审核任务条数")
     private Integer num;
 
-    @ApiModelProperty(value = "审核状态（1.未提交；2.审核中，3审核通过；4；审核拒绝）")
+    @ApiModelProperty(value = "审核状态（2.审核中，3审核通过；4；审核拒绝）")
     private Integer auditStatus;
+
+    @ApiModelProperty(value = "发布时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date releaseTime;
+
+    @ApiModelProperty(value = "是否推荐（1不推荐，2推荐）")
+    private Integer isRecommend;
+
+    @ApiModelProperty(value = "是否是会员（1.不是会员；2.周会员；3.月会员；4.季会员；5.年会员）")
+    private Integer isMember;
 }

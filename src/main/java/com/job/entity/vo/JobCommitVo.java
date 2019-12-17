@@ -19,6 +19,9 @@ public class JobCommitVo {
     @ApiModelProperty(value = "发布人id")
     private Integer userId;
 
+    @ApiModelProperty(value = "提交信息")
+    private String commitInfo;
+
     @ApiModelProperty(value = "任务验证步骤")
     private List<JobStepDto> jobStepDtoList;
 }

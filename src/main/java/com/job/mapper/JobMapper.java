@@ -126,4 +126,11 @@ public interface JobMapper {
      */
     ServiceFee findRecharge();
 
+    /**
+     * 查询正在进行中的任务数量
+     * @param userId
+     * @return
+     */
+    int countIn(Integer userId);
+
 }

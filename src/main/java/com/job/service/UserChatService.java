@@ -77,7 +77,7 @@ public class UserChatService {
         return ServerResponse.createBySuccess(PageVO.build(page));
     }
 
-    private void chatList(Integer userId, Integer targetId, String newsContent){
+    public void chatList(Integer userId, Integer targetId, String newsContent){
         //插入或者更新聊天列表
         UserChat userChat=userChatMapper.selectByUserId(userId,targetId);
         if(userChat!=null){
@@ -112,7 +112,9 @@ public class UserChatService {
 
     private void updateNewsNum(Integer userId,Integer targetId){
         UserChat userChat=userChatMapper.selectByUserId(userId,targetId);
-        userChat.setNewsNum(0);
-        userChatMapper.updateByPrimaryKeySelective(userChat);
+        if(userChat!=null){
+            userChat.setNewsNum(0);
+            userChatMapper.updateByPrimaryKeySelective(userChat);
+        }
     }
 }

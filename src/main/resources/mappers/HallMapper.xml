@@ -6,9 +6,8 @@
         select * from job_type
     </select>
 
-    <select id="findList" resultType="com.job.entity.vo.JobVo">
-        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as
-        surplusNum,t.typeName,j.jobSource,i.headimgurl
+    <select id="findList" resultType="com.job.entity.vo.JobListVo">
+        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,j.jobNum as surplusNum,t.typeName,j.jobSource,i.headimgurl,i.isMember,j.isRecommend
         from job j
         inner join job_type t on j.typeId=t.typeId
         inner join user_info i on j.userId=i.userId
@@ -32,8 +31,7 @@
     </select>
 
     <select id="findNew" resultType="com.job.entity.vo.JobListVo">
-        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as
-        surplusNum,t.typeName,j.jobSource,i.headimgurl
+        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,j.jobNum as surplusNum,t.typeName,j.jobSource,i.headimgurl,i.isMember,j.isRecommend
         from job j
         inner join job_type t on j.typeId=t.typeId
         inner join user_info i on j.userId=i.userId
@@ -70,12 +68,14 @@
         <result column="releasePrice" property="releasePrice"/>
         <result column="introduce" property="introduce"/>
         <result column="status" property="status"/>
+        <result column="isMember" property="isMember"/>
+        <result column="isRecommend" property="isRecommend"/>
         <collection property="jobStepList" select="getJobStepList" column="jobId"/>
     </resultMap>
 
     <select id="selectJobDetails" resultMap="JobDetails">
     select j.jobId,i.userId,i.headimgurl,i.UID,j.jobTitle,j.jobSource,t.typeName,j.submissionTime,j.releasePrice,j.introduce,j.jobNum,
-    (j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,ifnull(uj.status,0) as status
+    j.jobNum as surplusNum,ifnull(uj.status,0) as status,i.isMember,j.isRecommend
     from job j
     inner join user_info i on j.userId=i.userId
     inner join job_type t on j.typeId=t.typeId
@@ -85,7 +85,7 @@
 
     <select id="selectJob" resultMap="JobDetails">
      select j.jobId,i.userId,i.headimgurl,i.UID,j.jobTitle,j.jobSource,t.typeName,j.submissionTime,j.releasePrice,j.introduce,j.jobNum,
-    (j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,0 as status
+    j.jobNum as surplusNum,0 as status,i.isMember,j.isRecommend
     from job j
     inner join user_info i on j.userId=i.userId
     inner join job_type t on j.typeId=t.typeId
@@ -129,6 +129,7 @@
     <update id="updateUserJob">
         update user_job set
         status=3,
+        commitInfo=#{commitInfo},
         commitTime=now()
         where userId=#{userId} and jobId=#{jobId}
     </update>

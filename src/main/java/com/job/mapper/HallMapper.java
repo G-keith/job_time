@@ -30,7 +30,7 @@ public interface HallMapper {
      * @param jobDto 查询条件
      * @return 任务列表
      */
-    List<JobVo> findList(JobDto jobDto);
+    List<JobListVo> findList(JobDto jobDto);
 
     /**
      * 查询任务列表详情
@@ -97,9 +97,10 @@ public interface HallMapper {
      * 更新用户任务关系表
      * @param userId 用户id
      * @param jobId 任务id
+     * @param commitInfo 提交信息
      * @return 0失败
      */
-    int updateUserJob(@Param("userId") Integer userId,@Param("jobId") Integer jobId);
+    int updateUserJob(@Param("userId") Integer userId,@Param("jobId") Integer jobId,@Param("commitInfo") String commitInfo);
 
     /**
      * 查询任务主键id

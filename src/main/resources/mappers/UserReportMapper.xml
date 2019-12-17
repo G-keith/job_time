@@ -232,7 +232,7 @@
 
     <select id="findAudit" resultType="com.job.entity.vo.UserReportVo">
     select r.reportId,r.reportStatus,r.reportReason,r.reportImg,r.replyReason,r.replyImg,r.refuteReason,
-    r.auditReason,r.reportTime,r.replyTime,r.refuteTime,r.auditTime,j.jobTitle,j.jobSource,j.taskId
+    r.auditReason,r.reportTime,r.replyTime,r.refuteTime,r.auditTime,j.jobTitle,j.jobSource,r.taskId
     from user_report r
     inner join job j on r.jobId=j.jobId
     where reportStatus in (4,5)
@@ -240,7 +240,7 @@
 
     <select id="findWillAudit" resultType="com.job.entity.vo.UserReportVo">
     select r.reportId,r.reportStatus,r.reportReason,r.reportImg,r.replyReason,r.replyImg,r.refuteReason,
-    r.auditReason,r.reportTime,r.replyTime,r.refuteTime,r.auditTime,j.jobTitle,j.jobSource,j.taskId
+    r.auditReason,r.reportTime,r.replyTime,r.refuteTime,r.auditTime,j.jobTitle,j.jobSource,r.taskId
     from user_report r
     inner join job j on r.jobId=j.jobId
     where reportStatus=3

@@ -36,6 +36,8 @@ public interface UserChatMapper {
      */
     int updateByPrimaryKeySelective(UserChat record);
 
+    int updateByUserId(@Param("userId")Integer userId,@Param("targetId")Integer targetId);
+
     /**
      * 查询列表是否存在
      * @param userId

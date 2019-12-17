@@ -40,7 +40,9 @@ public class JobService {
 
     private final HomePageMapper homePageMapper;
 
-    public JobService(JobMapper jobMapper, JobStepMapper jobStepMapper, SysBondMapper sysBondMapper, UserMoneyMapper userMoneyMapper, UserJobMapper userJobMapper, UserInfoMapper userInfoMapper, HomePageMapper homePageMapper) {
+    private final UserChatService userChatService;
+
+    public JobService(JobMapper jobMapper, JobStepMapper jobStepMapper, SysBondMapper sysBondMapper, UserMoneyMapper userMoneyMapper, UserJobMapper userJobMapper, UserInfoMapper userInfoMapper, HomePageMapper homePageMapper, UserChatService userChatService) {
         this.jobMapper = jobMapper;
         this.jobStepMapper = jobStepMapper;
         this.sysBondMapper = sysBondMapper;
@@ -48,6 +50,7 @@ public class JobService {
         this.userJobMapper = userJobMapper;
         this.userInfoMapper = userInfoMapper;
         this.homePageMapper = homePageMapper;
+        this.userChatService = userChatService;
     }
 
     /**
@@ -55,9 +58,9 @@ public class JobService {
      *
      * @return
      */
-    public ServerResponse findAll(String jobTitle, String jobSource,Integer typeId, Integer pageNo, Integer pageSize) {
+    public ServerResponse findAll(String jobTitle, String jobSource, Integer typeId, Integer pageNo, Integer pageSize) {
         Page<JobVo> page = PageHelper.startPage(pageNo, pageSize);
-        jobMapper.findAll(jobTitle, jobSource,typeId);
+        jobMapper.findAll(jobTitle, jobSource, typeId);
         return ServerResponse.createBySuccess(PageVO.build(page));
     }
 
@@ -78,24 +81,31 @@ public class JobService {
      * @param auditStatus 审核结果
      * @return
      */
-    public ServerResponse updateJob(Integer jobId, Integer auditStatus, String refuseReason, Integer isRecommend) {
-        int result = jobMapper.updateJob(jobId, auditStatus, refuseReason, isRecommend);
-        if (result > 0) {
-            if(auditStatus==4){
-                Job job=jobMapper.selectJob(jobId);
-                UserMoney userMoney=userMoneyMapper.selectById(job.getUserId());
-                //审核拒绝，归还用户金钱
-                BigDecimal surplusMoney = getTotalPrice(job.getJobPrice(), job.getJobNum());
-                userMoney.setRepaidBalance(addPrice(userMoney.getRepaidBalance(), surplusMoney));
-                //更新用户账户余额
-                userMoneyMapper.updateMoney(userMoney);
-                //系统账户减少
-                userMoneyMapper.updateAdmin(surplusPrice(userMoneyMapper.money(), surplusMoney));
-            }
-            return ServerResponse.createBySuccess();
+    public synchronized ServerResponse updateJob(Integer jobId, Integer auditStatus, String refuseReason, Integer isRecommend) {
+        Job job1 = new Job();
+        job1.setJobId(jobId);
+        job1.setAuditStatus(auditStatus);
+        job1.setRefuseReason(refuseReason);
+        job1.setIsRecommend(isRecommend);
+        if (auditStatus == 4) {
+            job1.setJobStatus(2);
+            //更新用户状态
+            jobMapper.updateByPrimaryKeySelective(job1);
+            Job job = jobMapper.selectJob(jobId);
+            UserMoney userMoney = userMoneyMapper.selectById(job.getUserId());
+            //审核拒绝，归还用户金钱
+            BigDecimal surplusMoney = getTotalPrice(job.getJobPrice(), job.getJobNum());
+            userMoney.setRepaidBalance(addPrice(userMoney.getRepaidBalance(), surplusMoney));
+            //更新用户账户余额
+            userMoneyMapper.updateMoney(userMoney);
+            //系统账户减少
+            userMoneyMapper.updateAdmin(surplusPrice(userMoneyMapper.money(), surplusMoney));
         } else {
-            return ServerResponse.createByError();
+            //发送系消息
+            Job job = jobMapper.selectJob(jobId);
+            userChatService.insetChatRecord(32, job.getUserId(), "您有一条新的任务审核通过啦");
         }
+        return ServerResponse.createBySuccess();
     }
 
     /**
@@ -128,12 +138,12 @@ public class JobService {
     /**
      * 查询用户已结束的任务
      *
-     * @param userId      用户id
+     * @param userId   用户id
      * @param pageNo
      * @param pageSize
      * @return
      */
-    public ServerResponse findEndRelease(Integer userId ,Integer pageNo, Integer pageSize) {
+    public ServerResponse findEndRelease(Integer userId, Integer pageNo, Integer pageSize) {
         Page<JobVo> page = PageHelper.startPage(pageNo, pageSize);
         jobMapper.findEndRelease(userId);
         return ServerResponse.createBySuccess(PageVO.build(page));
@@ -160,10 +170,10 @@ public class JobService {
      * @param pageSize
      * @return
      */
-    public ServerResponse findUserJob(Integer status, Integer pageNo, Integer pageSize,Integer userId) {
+    public ServerResponse findUserJob(Integer status, Integer pageNo, Integer pageSize, Integer userId) {
         Page<UserJobVo> page = PageHelper.startPage(pageNo, pageSize);
-        List<UserJobVo> userJobVoList= jobMapper.findUserJob(status,userId);
-        userJobVoList.forEach(e-> e.setImgList(jobMapper.findCheckPicture(e.getTaskId())));
+        List<UserJobVo> userJobVoList = jobMapper.findUserJob(status, userId);
+        userJobVoList.forEach(e -> e.setImgList(jobMapper.findCheckPicture(e.getTaskId())));
         return ServerResponse.createBySuccess(PageVO.build(page));
     }
 
@@ -186,12 +196,17 @@ public class JobService {
     public ServerResponse insertJob(Job job) {
         UserMoney userMoney = userMoneyMapper.selectById(job.getUserId());
         UserInfo userInfo = userInfoMapper.findByUserId(job.getUserId());
-        if(userInfo.getStatus()==1){
+        if (userInfo.getStatus() == 1) {
             return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
         }
         ServiceFee serviceFee = jobMapper.findFee();
-        if (userMoney.getJobNum() == 0 && userInfo.getIsMember() < 4) {
-            return ServerResponse.createByErrorMessage("发布任务达到上限");
+        int count = jobMapper.countIn(job.getUserId());
+        if (userInfo.getIsMember() == 1 && count > 3) {
+            return ServerResponse.createByErrorCodeMessage(3, "发布任务达到上限");
+        } else if (userInfo.getIsMember() == 2 && count > 5) {
+            return ServerResponse.createByErrorCodeMessage(3, "发布任务达到上限");
+        } else if (userInfo.getIsMember() == 3 && count > 8) {
+            return ServerResponse.createByErrorCodeMessage(3, "发布任务达到上限");
         }
         if (userInfo.getIsMember() == 2 && userInfo.getWeekMemberTime().getTime() > System.currentTimeMillis()) {
             //周会员
@@ -215,7 +230,7 @@ public class JobService {
         BigDecimal totalPrice = getTotalPrice(job.getJobPrice(), job.getJobNum());
         BigDecimal surplus = surplusPrice(userMoney.getRepaidBalance(), totalPrice);
         if (surplus.doubleValue() < 0) {
-            return ServerResponse.createByErrorCodeMessage(2, "账户余额不足");
+            return ServerResponse.createByErrorCodeMessage(4, "账户余额不足");
         } else {
             userMoney.setRepaidBalance(surplus);
             userMoney.setJobNum(userMoney.getJobNum() - 1);
@@ -256,7 +271,7 @@ public class JobService {
         UserJob userJob = userJobMapper.findById(taskId);
         Job job = jobMapper.selectJob(userJob.getJobId());
         UserInfo userInfo = userInfoMapper.findByUserId(userJob.getUserId());
-        if(userInfo.getStatus()==1){
+        if (userInfo.getStatus() == 1) {
             return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
         }
         int result = userJobMapper.updateUserJob(taskId, status, refuseReason);
@@ -281,7 +296,7 @@ public class JobService {
                 //更新任务完成数量
                 job.setCommitNum(job.getCommitNum() - 1);
                 job.setFinishNum(job.getFinishNum() + 1);
-                if(job.getJobNum().equals(job.getFinishNum())){
+                if (job.getJobNum().equals(job.getFinishNum())) {
                     job.setJobStatus(2);
                 }
                 jobMapper.updateByPrimaryKeySelective(job);
@@ -291,12 +306,12 @@ public class JobService {
                     SignInMoney signInMoney = homePageMapper.selectSignInMoney();
                     //根据推荐码去查询邀请人信息
                     Integer userId = userInfoMapper.findByUId(userInfo.getUpUID()).getUserId();
-                    userMoneyMapper.updateMoney(inviteReward(userId,signInMoney.getOneInvite(),job.getReleasePrice()));
+                    userMoneyMapper.updateMoney(inviteReward(userId, signInMoney.getOneInvite(), job.getReleasePrice()));
                     //二级推广奖励
-                    UserInfo twoUserInfo=userInfoMapper.findByUserId(userId);
-                    if(twoUserInfo.getUpUID()!=null){
+                    UserInfo twoUserInfo = userInfoMapper.findByUserId(userId);
+                    if (twoUserInfo.getUpUID() != null) {
                         Integer twoUserId = userInfoMapper.findByUId(twoUserInfo.getUpUID()).getUserId();
-                        userMoneyMapper.updateMoney(inviteReward(twoUserId,signInMoney.getTwoInvite(),job.getReleasePrice()));
+                        userMoneyMapper.updateMoney(inviteReward(twoUserId, signInMoney.getTwoInvite(), job.getReleasePrice()));
                     }
                 }
             }
@@ -332,50 +347,64 @@ public class JobService {
 
     /**
      * 刷新任务
+     *
      * @param jobId
      * @return
      */
-    public ServerResponse refreshJob(Integer jobId){
-        Job job=jobMapper.selectJob(jobId);
-        UserInfo userInfo=userInfoMapper.findByUserId(job.getUserId());
-        if(userInfo.getStatus()==1){
+    public synchronized ServerResponse refreshJob(Integer jobId) {
+        Job job = jobMapper.selectJob(jobId);
+        UserInfo userInfo = userInfoMapper.findByUserId(job.getUserId());
+        if (userInfo.getStatus() == 1) {
             return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
         }
         UserMoney userMoney = userMoneyMapper.selectById(job.getUserId());
+        //插入明细
+        UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
+        userMoneyDetails.setUserId(job.getUserId());
+        userMoneyDetails.setType(3);
+        userMoneyDetails.setIntroduce("刷新任务");
+        userMoneyDetails.setTradeTime(new Date());
         BigDecimal surplusPrice;
-        if(userInfo.getIsMember()==1){
+        if (userInfo.getIsMember() == 1) {
             //不是会员
-            surplusPrice=surplusPrice(userMoney.getRepaidBalance(),new BigDecimal(10));
-        }else{
+            surplusPrice = surplusPrice(userMoney.getRepaidBalance(), new BigDecimal(10));
+            userMoneyDetails.setMoney(new BigDecimal(10).negate().setScale(2, BigDecimal.ROUND_HALF_UP));
+        } else {
             //是会员
-            surplusPrice=surplusPrice(userMoney.getRepaidBalance(),new BigDecimal(5));
+            surplusPrice = surplusPrice(userMoney.getRepaidBalance(), new BigDecimal(5));
+            userMoneyDetails.setMoney(new BigDecimal(5).negate().setScale(2, BigDecimal.ROUND_HALF_UP));
+
         }
-        if(surplusPrice.doubleValue()<0){
-            return ServerResponse.createByErrorMessage("账户余额不足");
-        }else{
+        if (surplusPrice.doubleValue() < 0) {
+            return ServerResponse.createByErrorCodeMessage(4, "账户余额不足");
+        } else {
             job.setRefreshTime(new Date());
             jobMapper.updateByPrimaryKeySelective(job);
             userMoney.setRepaidBalance(surplusPrice);
             userMoneyMapper.updateMoney(userMoney);
+            userMoneyMapper.insertMoneyDetails(userMoneyDetails);
             return ServerResponse.createBySuccess();
         }
     }
+
     /**
      * 获取用户账户信息
+     *
      * @param userId
      * @param rate
      * @param releasePrice
      * @return
      */
-    private UserMoney inviteReward(Integer userId,BigDecimal rate,BigDecimal releasePrice){
-        BigDecimal inviteMoney=releasePrice.multiply(rate).setScale(2, BigDecimal.ROUND_HALF_UP);
+    private UserMoney inviteReward(Integer userId, BigDecimal rate, BigDecimal releasePrice) {
+        BigDecimal inviteMoney = releasePrice.multiply(rate).setScale(2, BigDecimal.ROUND_HALF_UP);
         UserMoney userMoney = userMoneyMapper.selectById(userId);
         userMoney.setBonus(addPrice(userMoney.getBonus(), inviteMoney));
         //插入用户明细
-        insertDetails(userId,inviteMoney);
+        insertDetails(userId, inviteMoney);
         return userMoney;
     }
-    private void insertDetails(Integer userId,BigDecimal money){
+
+    private void insertDetails(Integer userId, BigDecimal money) {
         //插入明细
         UserMoneyDetails userMoneyDetails = new UserMoneyDetails();
         userMoneyDetails.setUserId(userId);
@@ -395,8 +424,8 @@ public class JobService {
      */
     public ServerResponse suspendOrEnd(Integer jobId, Integer type) {
         Job job = jobMapper.selectJob(jobId);
-        UserInfo userInfo=userInfoMapper.findByUserId(job.getUserId());
-        if(userInfo.getStatus()==1){
+        UserInfo userInfo = userInfoMapper.findByUserId(job.getUserId());
+        if (userInfo.getStatus() == 1) {
             return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");
         }
         UserMoney userMoney = userMoneyMapper.selectById(job.getUserId());

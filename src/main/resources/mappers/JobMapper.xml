@@ -234,19 +234,19 @@
 
 
     <select id="selectJob" resultType="com.job.entity.Job">
-        select j.*,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum from job j where j.jobId=#{jobId}
+        select j.*,j.jobNum as surplusNum from job j where j.jobId=#{jobId}
     </select>
 
 
     <select id="findAll" resultType="com.job.entity.vo.JobVo">
         select
         i.userId,i.headimgurl,i.UID,j.jobSource,t.typeName,j.submissionTime,j.releasePrice,j.introduce,j.jobTitle,j.jobId,
-        j.jobPrice,j.jobNum
+        j.jobPrice,j.jobNum,j.jobStatus,j.auditStatus,j.releaseTime
         from job j
         inner join user_info i on j.userId=i.userId
         inner join job_type t on j.typeId=t.typeId
         <where>
-            j.auditStatus=2 and j.isDelete=1
+            j.isDelete=1
             <if test="jobTitle!=null and jobTitle!=''">
                 and j.jobTitle like concat('%',#{jobTitle},'%')
             </if>
@@ -257,7 +257,7 @@
                 and j.typeId=#{typeId}
             </if>
         </where>
-        order by j.refreshTime asc
+        order by j.auditStatus asc,j.jobStatus asc
     </select>
 
     <select id="findAllStep" resultType="com.job.entity.JobStep">
@@ -282,7 +282,7 @@
     </update>
 
     <select id="findFootprint" resultType="com.job.entity.Job">
-        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,t.typeName,j.jobSource,i.headimgurl
+        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,j.jobNum as surplusNum,t.typeName,j.jobSource,i.headimgurl
         from user_footprint f
         inner join job j on f.jobId=j.jobId
         inner join user_info i on j.userId=i.userId
@@ -293,7 +293,7 @@
 
     <select id="findRelease" resultType="com.job.entity.vo.JobVo">
         select
-        j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,t.typeName,j.jobSource,i.headimgurl,j.jobStatus
+        j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,j.jobNum as surplusNum,t.typeName,j.jobSource,i.headimgurl,j.jobStatus
         from job j
         inner join user_info i on j.userId=i.userId
         inner join job_type t on j.typeId=t.typeId
@@ -308,7 +308,7 @@
 
     <select id="findEndRelease" resultType="com.job.entity.vo.JobVo">
         select
-        j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,t.typeName,j.jobSource,i.headimgurl
+        j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,j.jobNum as surplusNum,t.typeName,j.jobSource,i.headimgurl
         from job j
         inner join user_info i on j.userId=i.userId
         inner join job_type t on j.typeId=t.typeId
@@ -326,7 +326,7 @@
     </select>
 
     <select id="findUserJob" resultType="com.job.entity.vo.UserJobVo">
-        select uj.userId,uj.taskId,i.phone,uj.jobId,j.jobTitle,j.jobSource,i.headimgurl,uj.commitTime,uj.refuseReason
+        select uj.userId,uj.taskId,i.phone,uj.jobId,j.jobTitle,j.jobSource,i.headimgurl,uj.commitTime,uj.refuseReason,uj.commitInfo
         from user_job uj
         inner join job j on uj.jobId=j.jobId
         inner join user_info i on uj.userId=i.userId
@@ -349,5 +349,9 @@
 
     <select id="findRecharge" resultType="com.job.entity.ServiceFee">
         select * from service_fee where serviceType=3
+    </select>
+
+    <select id="countIn" resultType="java.lang.Integer">
+        select count(1) from job where userId=#{userId} and jobStatus in (1,3) and auditStatus=3
     </select>
 </mapper>

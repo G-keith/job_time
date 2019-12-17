@@ -92,62 +92,23 @@ public class WxUtils {
     }
 
     /**
-     * 授权登录
+     * 获取用户信息
      *
      * @param code 授权码
      * @return
      */
-    public ServerResponse authorization(String code,Integer userId) {
-        System.out.println(APPID);
+    public Map<?, ?> authorization(String code) throws IOException {
+        if(code==null){
+            throw new RuntimeException("code为null");
+        }
         String tokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + APPID + "&secret="
                 + APPSECRET + "&code=" + code + "&grant_type=authorization_code";
-        try {
             Map<?, ?> tokenMap = doGet(tokenUrl);
             String openid = tokenMap.get("openid").toString();
             String token = tokenMap.get("access_token").toString();
             String infoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=" + token + "&openid=" + openid
                     + "&lang=zh_CN";
-            Map<?, ?> infoMap = doGet(infoUrl);
-            //成功获取授权,以下部分为业务逻辑处理了，
-            if (infoMap != null && openid != null) {
-                UserInfo userInfo = userInfoMapper.findByOpenId(openid);
-                if (userInfo == null) {
-                    UserInfo info = new UserInfo();
-                    info.setOpenid(openid);
-                    info.setNickname(infoMap.get("nickname").toString());
-                    info.setHeadimgurl(infoMap.get("headimgurl").toString());
-                    info.setSex(Integer.valueOf(infoMap.get("sex").toString()));
-                    info.setProvince(infoMap.get("province").toString());
-                    info.setCity(infoMap.get("city").toString());
-                    info.setCountry(infoMap.get("country").toString());
-                    info.setUID(getUid());
-                    info.setIsFirst(1);
-                    userInfoMapper.insertSelective(info);
-                    //注册时插入用户账户信息
-                    userMoneyMapper.insertMoney(info.getUserId());
-                    return ServerResponse.createBySuccess(info);
-                } else {
-                    if(userId!=null) {
-                        userInfo = userInfoMapper.findByUserId(userId);
-                    }
-                    userInfo.setOpenid(openid);
-                    userInfo.setNickname(infoMap.get("nickname").toString());
-                    userInfo.setHeadimgurl(infoMap.get("headimgurl").toString());
-                    userInfo.setSex(Integer.valueOf(infoMap.get("sex").toString()));
-                    userInfo.setProvince(infoMap.get("province").toString());
-                    userInfo.setCountry(infoMap.get("country").toString());
-                    userInfo.setCity(infoMap.get("city").toString());
-                    userInfo.setIsFirst(2);
-                    userInfoMapper.updateByPrimaryKeySelective(userInfo);
-                    return ServerResponse.createBySuccess(userInfo);
-                }
-            } else {
-                return ServerResponse.createByErrorMessage("授权登录失败");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ServerResponse.createByErrorMessage("授权登录失败");
-        }
+        return doGet(infoUrl);
     }
 
     /**

@@ -84,7 +84,7 @@ public class HomePageService {
      * @param userId 用户id
      * @return 0成功，1失败
      */
-    public ServerResponse insertSignIn(Integer userId) {
+    public synchronized ServerResponse insertSignIn(Integer userId) {
         UserInfo userInfo=userInfoMapper.findByUserId(userId);
         if(userInfo.getStatus()==1){
             return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可进行操作");

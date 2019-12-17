@@ -1,5 +1,6 @@
 package com.job.task;
 
+import com.job.common.utils.DateUtils;
 import com.job.entity.*;
 import com.job.mapper.JobMapper;
 import com.job.mapper.TimerTaskMapper;
@@ -38,7 +39,7 @@ public class TimerTask {
         this.jobMapper = jobMapper;
     }
 
-    //@Scheduled(cron = "0  */1 * * * ?")
+    @Scheduled(cron = "0  */3 * * * ?")
     public void cancelMember() {
         //取消会员
         member();
@@ -49,9 +50,22 @@ public class TimerTask {
         //举报自动提交
         reportCommit();
 
-        //todo 任务自动刷新
+        //任务自动刷新
+        jobRefresh();
     }
 
+    public void jobRefresh() {
+        List<Job> jobList = timerTaskMapper.selectJob();
+        jobList.forEach(e -> {
+            UserMoney userMoney = timerTaskMapper.selectRefresh(e.getUserId());
+            if (userMoney != null) {
+                e.setRefreshTime(DateUtils.getDate_add(e.getRefreshTime(), 1, 1));
+                jobMapper.updateByPrimaryKeySelective(e);
+                userMoney.setRefreshNum(userMoney.getRefreshNum() - 1);
+                userMoneyMapper.updateMoney(userMoney);
+            }
+        });
+    }
 
     public void member() {
         List<UserInfo> userInfoList = timerTaskMapper.findMember();
@@ -75,26 +89,30 @@ public class TimerTask {
                 e.setIsMember(1);
             }
         });
-        timerTaskMapper.updateMember(userInfoList);
+        if(userInfoList.size()>0){
+            timerTaskMapper.updateMember(userInfoList);
+        }
     }
 
     //举报信息自动提交
-    public void reportCommit(){
-        List<UserReport> userReports=new ArrayList<>();
-        List<UserReport> userReportList=timerTaskMapper.findNotEnd();
-        userReportList.forEach(e->{
-            if(e.getReportStatus()==1){
-                if(System.currentTimeMillis()-e.getReportTime().getTime()>86400000){
+    public void reportCommit() {
+        List<UserReport> userReports = new ArrayList<>();
+        List<UserReport> userReportList = timerTaskMapper.findNotEnd();
+        userReportList.forEach(e -> {
+            if (e.getReportStatus() == 1) {
+                if (System.currentTimeMillis() - e.getReportTime().getTime() > 86400000) {
                     userReports.add(e);
                 }
             }
-            if(e.getReportStatus()==2){
-                if(System.currentTimeMillis()-e.getReplyTime().getTime()>86400000){
+            if (e.getReportStatus() == 2) {
+                if (System.currentTimeMillis() - e.getReplyTime().getTime() > 86400000) {
                     userReports.add(e);
                 }
             }
         });
-        timerTaskMapper.updateReport(userReports);
+        if(userReports.size()>0){
+            timerTaskMapper.updateReport(userReports);
+        }
     }
 
     /**

@@ -27,6 +27,14 @@ public interface UserInfoMapper {
     UserInfo findByPhone(String phone);
 
     /**
+     * 查询账户通过密码
+     * @param phone
+     * @param password
+     * @return
+     */
+    UserInfo findPassword(@Param("phone") String phone,@Param("password") String password);
+
+    /**
      * 通过openId查询是否存在
      *
      * @param openId openId
@@ -41,6 +49,14 @@ public interface UserInfoMapper {
      * @return 0没有
      */
     UserInfo findByUserId(Integer userId);
+
+    /**
+     * 查询有没有正在进行中的任务
+     * @param userId
+     * @param jobId
+     * @return
+     */
+    int findJob(@Param("userId") Integer userId,@Param("jobId") Integer jobId);
 
     /**
      * 查询用户信息
@@ -101,6 +117,12 @@ public interface UserInfoMapper {
     List<UserInfo> findAll(@Param("phone") String phone, @Param("status") Integer status);
 
     /**
+     * 发现客服列表
+     * @return
+     */
+    List<UserInfo> findCustomer();
+
+    /**
      * 更新用户信息
      *
      * @param userInfo 用户信息
@@ -130,10 +152,9 @@ public interface UserInfoMapper {
      * 后台让他添加账户
      * @param account
      * @param password
-     * @param userId
      * @return
      */
-    int insertInfo(@Param("account") String account, @Param("password") String password,@Param("userId") Integer userId);
+    int insertInfo(@Param("account") String account, @Param("password") String password);
 
     /**
      * 后台账户是否存在

@@ -10,6 +10,7 @@ import com.github.qcloudsms.SmsSingleSenderResult;
 import com.job.common.page.PageVO;
 import com.job.common.statuscode.ServerResponse;
 import com.job.common.utils.AlipayUtils;
+import com.job.common.utils.MD5Util;
 import com.job.common.utils.RandomUtil;
 import com.job.common.utils.WxUtils;
 import com.job.entity.*;
@@ -80,49 +81,151 @@ public class UserInfoService {
     }
 
     /**
-     * 登录
+     * 手机号登录
      *
      * @param phone 账号密码
      * @return 0存在，1不存在
      */
-    public ServerResponse signIn(String phone, String uid) {
+    public ServerResponse signIn(String phone, String password) {
         //查询用户信息
-        UserInfo result = userInfoMapper.findByPhone(phone);
+        UserInfo result = userInfoMapper.findPassword(phone, password);
         if (result != null) {
             if (result.getStatus() == 1) {
                 return ServerResponse.createByErrorCodeMessage(2, "用户为黑名单，不可登录");
             } else {
-                result.setIsFirst(2);
                 return ServerResponse.createBySuccess(result);
             }
         } else {
-            UserInfo userInfo = new UserInfo();
-            userInfo.setPhone(phone);
-            userInfo.setUID(getUid());
-            if (uid != null && !"".equals(uid)) {
-                userInfo.setUpUID(uid);
-            }
-            userInfoMapper.insertPhone(userInfo);
+            return ServerResponse.createByErrorMessage("账户或者密码失败");
+        }
+    }
+
+    /**
+     * 注册
+     *
+     * @param userInfo
+     * @return
+     */
+    public ServerResponse register(UserInfo userInfo) {
+        UserInfo user = userInfoMapper.findByPhone(userInfo.getPhone());
+        if (user != null) {
+            return ServerResponse.createByErrorCodeMessage(2, "手机号已经存在");
+        }
+        userInfo.setUID(getUid());
+        UserInfo info = userInfoMapper.findByOpenId(userInfo.getOpenid());
+        int result;
+        if (info == null) {
+            result = userInfoMapper.insertSelective(userInfo);
             //注册时插入用户账户信息
             userMoneyMapper.insertMoney(userInfo.getUserId());
-            userInfo.setIsFirst(1);
-            return ServerResponse.createBySuccess(userInfo);
+        } else {
+            info.setOpenid(userInfo.getOpenid());
+            info.setHeadimgurl(userInfo.getHeadimgurl());
+            info.setNickname(userInfo.getNickname());
+            info.setSex(userInfo.getSex());
+            info.setCountry(userInfo.getCountry());
+            info.setProvince(userInfo.getProvince());
+            info.setCity(userInfo.getCity());
+            info.setPassword(userInfo.getPassword());
+            info.setPhone(userInfo.getPhone());
+            result = userInfoMapper.updateByPrimaryKeySelective(info);
+        }
+        if (result > 0) {
+            return ServerResponse.createBySuccess();
+        } else {
+            return ServerResponse.createByError();
+        }
+    }
+
+    /**
+     * 网页注册
+     *
+     * @param userInfo
+     * @return
+     */
+    public ServerResponse webRegister(UserInfo userInfo) {
+        UserInfo user = userInfoMapper.findByPhone(userInfo.getPhone());
+        if (user != null) {
+            return ServerResponse.createByErrorCodeMessage(2, "手机号已经存在");
+        }
+        userInfo.setUID(getUid());
+        int result = userInfoMapper.insertSelective(userInfo);
+        //注册时插入用户账户信息
+        userMoneyMapper.insertMoney(userInfo.getUserId());
+        if (result > 0) {
+            return ServerResponse.createBySuccess();
+        } else {
+            return ServerResponse.createByError();
+        }
+    }
+
+    /**
+     * 绑定微信
+     * @param userInfo
+     * @return
+     */
+    public ServerResponse bindWx(UserInfo userInfo){
+        //查询用户信息
+        UserInfo result = userInfoMapper.findPassword(userInfo.getPhone(), userInfo.getPassword());
+        if(result!=null){
+            result.setOpenid(userInfo.getOpenid());
+            result.setHeadimgurl(userInfo.getHeadimgurl());
+            result.setNickname(userInfo.getNickname());
+            result.setSex(userInfo.getSex());
+            result.setProvince(userInfo.getProvince());
+            result.setCountry(userInfo.getCountry());
+            result.setCity(userInfo.getCity());
+            userInfoMapper.updateByPrimaryKeySelective(result);
+            return ServerResponse.createBySuccess(result);
+        }else{
+            return ServerResponse.createByErrorMessage("账户或者密码不对");
+        }
+    }
+
+    /**
+     * 手机号是否存在
+     *
+     * @param phone
+     * @return
+     */
+    public ServerResponse isExistPhone(String phone) {
+        UserInfo userInfo = userInfoMapper.findByPhone(phone);
+        if (userInfo == null) {
+            return ServerResponse.createBySuccessMessage("手机号不存在");
+        } else {
+            return ServerResponse.createByErrorMessage("手机号已存在");
+        }
+    }
+
+    /**
+     * 获取微信信息
+     *
+     * @param code
+     * @return
+     */
+    public ServerResponse wxInfo(String code) {
+        try {
+            return ServerResponse.createBySuccess(wxUtils.authorization(code));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("获取信息失败");
         }
     }
 
     /**
      * 插入邀请码
+     *
      * @param uid
      * @param userId
      * @return
      */
-    public ServerResponse insertUid(String uid,Integer userId){
-        UserInfo userInfo=userInfoMapper.findByUserId(userId);
+    public ServerResponse insertUid(String uid, Integer userId) {
+        UserInfo userInfo = userInfoMapper.findByUserId(userId);
         userInfo.setUpUID(uid);
-        int result=userInfoMapper.updateByPrimaryKeySelective(userInfo);
-        if(result>0){
+        int result = userInfoMapper.updateByPrimaryKeySelective(userInfo);
+        if (result > 0) {
             return ServerResponse.createBySuccess();
-        }else{
+        } else {
             return ServerResponse.createByError();
         }
 
@@ -135,8 +238,30 @@ public class UserInfoService {
      * @author Kuangzc
      * @updateTime 2019-9-12 16:00:51
      */
-    public ServerResponse weChatLogin(String code, Integer userId) throws IOException {
-        return wxUtils.authorization(code, userId);
+    public ServerResponse weChatLogin(String code) throws IOException {
+        Map<?, ?> infoMap = wxUtils.authorization(code);
+        if (infoMap == null) {
+            return ServerResponse.createByErrorMessage("微信授权失败");
+        }
+        UserInfo userInfo = userInfoMapper.findByOpenId(infoMap.get("openid").toString());
+        if (userInfo != null) {
+            userInfoMapper.updateByPrimaryKeySelective(userInfo);
+            return ServerResponse.createBySuccess(userInfo);
+        } else {
+            UserInfo info = new UserInfo();
+            info.setOpenid(infoMap.get("openid").toString());
+            info.setNickname(infoMap.get("nickname").toString());
+            info.setHeadimgurl(infoMap.get("headimgurl").toString());
+            info.setSex(Integer.valueOf(infoMap.get("sex").toString()));
+            info.setProvince(infoMap.get("province").toString());
+            info.setCity(infoMap.get("city").toString());
+            info.setCountry(infoMap.get("country").toString());
+            info.setUID(getUid());
+            userInfoMapper.insertSelective(info);
+            //注册时插入用户账户信息
+            userMoneyMapper.insertMoney(info.getUserId());
+            return ServerResponse.createBySuccess(info);
+        }
     }
 
 
@@ -372,6 +497,14 @@ public class UserInfoService {
         }
     }
 
+    /**
+     * 查询客服列表
+     * @return
+     */
+    public ServerResponse findCustomer(){
+        return ServerResponse.createBySuccess(userInfoMapper.findCustomer());
+    }
+
     public ServerResponse updateMoney(UserMoney userMoney) {
         int result = userMoneyMapper.updateMoney(userMoney);
         if (result > 0) {
@@ -423,21 +556,23 @@ public class UserInfoService {
      */
     public ServerResponse insertInfo(String account, String password, String phone) {
         int res = userInfoMapper.selectInfo(account, -1);
+        UserInfo userInfo = userInfoMapper.findByPhone(phone);
         if (res > 0) {
             return ServerResponse.createByErrorCodeMessage(2, "账户已存在");
         }
-        int result;
-        UserInfo userInfo = userInfoMapper.findByPhone(phone);
-        if (userInfo == null) {
-            UserInfo user = new UserInfo();
-            user.setPhone(phone);
-            user.setUID(getUid());
-            userInfoMapper.insertPhone(user);
-            //注册时插入用户账户信息
-            userMoneyMapper.insertMoney(user.getUserId());
-            result=userInfoMapper.insertInfo(account, password,user.getUserId());
-        }else{
-            result=userInfoMapper.insertInfo(account, password,userInfo.getUserId());
+        int result = 0;
+        if (userInfo != null) {
+            return ServerResponse.createByErrorCodeMessage(2, "账户已存在");
+        } else {
+//            UserInfo user = new UserInfo();
+//            user.setPhone(phone);
+//            user.setUID(getUid());
+//            user.setPassword(MD5Util.md5EncodeUtf8(password));
+//            user.setIsAdmin(1);
+//            userInfoMapper.insertSelective(user);
+//            //注册时插入用户账户信息
+//            userMoneyMapper.insertMoney(user.getUserId());
+            result = userInfoMapper.insertInfo(account, password);
         }
         if (result > 0) {
             return ServerResponse.createBySuccess();

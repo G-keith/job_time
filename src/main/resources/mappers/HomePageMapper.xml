@@ -7,7 +7,7 @@
   </select>
 
     <select id="findRecommend" resultType="com.job.entity.vo.JobListVo">
-        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,(j.jobNum-j.signUpNum-j.commitNum-j.finishNum) as surplusNum,t.typeName,j.jobSource,i.headimgurl
+        select j.jobId,i.userId,j.jobTitle,j.releasePrice,j.jobNum,j.jobNum as surplusNum,t.typeName,j.jobSource,i.headimgurl,i.isMember,j.isRecommend
         from job j
         inner join job_type t on j.typeId=t.typeId
         inner join user_info i on j.userId=i.userId

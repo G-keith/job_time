@@ -6,6 +6,11 @@
     where phone=#{phone}
   </select>
 
+    <select id="findPassword" resultType="com.job.entity.UserInfo">
+        select * from user_info
+        where phone=#{phone} and password=#{password}
+    </select>
+
     <select id="findByOpenId" resultType="com.job.entity.UserInfo">
     select * from user_info
     where openId=#{openId}
@@ -15,6 +20,10 @@
     select * from user_info
     where userId=#{userId}
   </select>
+
+    <select id="findJob" resultType="java.lang.Integer">
+        select count(1) from user_job where status in (1,3) and userId=#{userId} and jobId=#{jobId}
+    </select>
 
     <select id="findByUId" resultType="com.job.entity.UserInfo">
     select * from user_info
@@ -80,6 +89,10 @@
         order by status asc
     </select>
 
+    <select id="findCustomer" resultType="com.job.entity.UserInfo">
+        select userId,headimgurl,nickname from user_info where isAdmin=1
+    </select>
+
     <update id="updateByPrimaryKeySelective" parameterType="com.job.entity.UserInfo">
         update user_info
         <set>
@@ -88,6 +101,9 @@
             </if>
             <if test="openid != null">
                 openid = #{openid,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
             </if>
             <if test="nickname != null">
                 nickname = #{nickname,jdbcType=VARCHAR},
@@ -154,8 +170,8 @@
     </select>
 
     <insert id="insertInfo">
-        insert into user_admin (account,password,userId)
-        values (#{account},#{password},#{userId})
+        insert into user_admin (account,password)
+        values (#{account},#{password})
     </insert>
 
     <select id="selectInfo" resultType="java.lang.Integer">
@@ -197,6 +213,9 @@
             </if>
             <if test="phone != null">
                 phone,
+            </if>
+            <if test="password != null">
+                password,
             </if>
             <if test="openid != null">
                 openid,
@@ -257,6 +276,9 @@
             <if test="phone != null">
                 #{phone,jdbcType=VARCHAR},
             </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
             <if test="openid != null">
                 #{openid,jdbcType=VARCHAR},
             </if>
@@ -288,7 +310,7 @@
                 #{status,jdbcType=INTEGER},
             </if>
             <if test="upUID != null">
-                #{upUID,jdbcType=INTEGER},
+                #{upUID,jdbcType=VARCHAR},
             </if>
             <if test="weekMemberTime != null">
                 #{weekMemberTime,jdbcType=TIMESTAMP},

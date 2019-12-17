@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.job.mapper.UserJobMapper">
     <select id="findByUserId" resultType="com.job.entity.vo.JobListVo">
-        select j.jobId,j.jobTitle,j.releasePrice,t.typeName,j.jobSource,i.headimgurl,
-        uj.enrollTime,uj.commitTime,uj.auditTime,uj.status
+        select uj.taskId,j.jobId,j.jobTitle,j.releasePrice,t.typeName,j.jobSource,i.headimgurl,
+        uj.enrollTime,uj.commitTime,uj.auditTime,uj.status,uj.refuseReason,uj.commitInfo
         from user_job uj
         inner join job j on uj.jobId=j.jobId
         inner join user_info i on j.userId=i.userId
