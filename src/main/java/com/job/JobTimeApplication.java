@@ -62,6 +62,7 @@ public class JobTimeApplication {
     }
 
     public static void main(String[] args) {
+        System.out.println("-----");
         SpringApplication.run(JobTimeApplication.class, args);
     }
 
